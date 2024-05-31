@@ -1,0 +1,33 @@
+﻿<Window x:Class="TrafficSimulation.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TrafficSimulation"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="600" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Controls for traffic light timings -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
+            <TextBlock Text="Traffic Light Time (seconds):" VerticalAlignment="Center"/>
+            <Slider x:Name="TrafficLightSlider" Minimum="5" Maximum="60" Value="30" Margin="5" Width="145"/>
+            <TextBlock x:Name="TrafficLightValue" VerticalAlignment="Center" Margin="10,0,0,0" Text="{Binding ElementName=TrafficLightSlider, Path=Value, StringFormat=F0}"/>
+        </StackPanel>
+
+        <!-- Controls for maximum vehicle speed -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal">
+            <TextBlock Text="Max Vehicle Speed (m/s):" VerticalAlignment="Center"/>
+            <Slider x:Name="MaxSpeedSlider" Minimum="5" Maximum="20" Value="10" Margin="5" Width="150"/>
+            <TextBlock x:Name="MaxSpeedValue" VerticalAlignment="Center" Margin="10,0,0,0" Text="{Binding ElementName=MaxSpeedSlider, Path=Value, StringFormat=F0}"/>
+        </StackPanel>
+
+        <!-- Canvas for drawing the city -->
+        <Canvas Name="CityCanvas" Grid.Row="2" Background="LightGray"/>
+    </Grid>
+</Window>
