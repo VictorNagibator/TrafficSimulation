@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TrafficSimulation.Models
 {
@@ -13,25 +10,31 @@ namespace TrafficSimulation.Models
         public double MaxSpeed { get; set; }
         public Road CurrentRoad { get; set; }
         public double Position { get; set; }
-        public Intersection Destination { get; set; }
+        public Intersection NextIntersection { get; set; }
+        public bool IsMovingForward { get; set; } = true;
 
         private const double SafetyDistance = 40; // Расстояние до следующего автомобиля для остановки
-        private const double StopDistance = 30.0;
 
         public void Update(City city)
         {
+            var stopDistance = CurrentRoad.Width / 1.4;
             // Проверка светофора на текущей дороге
-            var trafficLight = city.TrafficLights.FirstOrDefault(light => light.ControlledRoad == CurrentRoad);
+            var trafficLight = city.TrafficLights.FirstOrDefault(light => light.ControlledIntersection == NextIntersection && light.ControlledRoad == CurrentRoad);
             if (trafficLight != null)
             {
-                if (trafficLight.State == TrafficLightState.Red && Position + Speed >= CurrentRoad.Length - StopDistance)
+                if (trafficLight.State == TrafficLightState.Red && ((IsMovingForward && Position + Speed >= CurrentRoad.Length - stopDistance) || (!IsMovingForward && Position - Speed <= stopDistance)))
                 {
+                    Position = IsMovingForward ? CurrentRoad.Length - stopDistance : stopDistance;
                     Speed = 0;
                 }
                 else
                 {
                     Speed = MaxSpeed;
                 }
+            }
+            else
+            {
+                Speed = MaxSpeed;
             }
 
             // Проверка расстояния до следующего автомобиля
@@ -41,59 +44,46 @@ namespace TrafficSimulation.Models
                 Speed = 0;
             }
 
-            Position += Speed;
+            // Обновляем позицию автомобиля в зависимости от направления движения
+            Position += IsMovingForward ? Speed : -Speed;
 
-            if (Position >= CurrentRoad.Length)
+            // Если автомобиль достиг конца или начала дороги
+            if (Speed != 0 && (Position >= CurrentRoad.Length || Position <= 0))
             {
-                // Если достигнут конец дороги без перекрестка, развернуться и двигаться обратно
-                if (CurrentRoad.EndIntersection.GetAllRoads().Count == 0)
+                // Получаем следующую дорогу на маршруте
+                Road nextRoad = GetNextRoad(city);
+
+                if (nextRoad != null)
                 {
-                    Position = CurrentRoad.Length;
-                    Speed = -Speed; // Разворачиваемся, меняя знак скорости
+                    // Перемещаем автомобиль на следующую дорогу
+                    CurrentRoad.RemoveVehicle(this);
+                    nextRoad.AddVehicle(this);
+                    CurrentRoad = nextRoad;
+                    IsMovingForward = nextRoad.StartIntersection == NextIntersection;
+                    Position = IsMovingForward ? 0 : nextRoad.Length;
+                    NextIntersection = IsMovingForward ? nextRoad.EndIntersection : nextRoad.StartIntersection;
                 }
                 else
                 {
-                    Position = 0;
-                    CurrentRoad = GetNextRoad(city);
+                    Speed = 0; // Останавливаем машину, если нет доступной следующей дороги
                 }
-            }
-            else if (Position <= 0)
-            {
-                // Достигнут начало дороги без перекрестка, развернуться и двигаться обратно
-                Speed = -Speed; // Разворачиваемся, меняя знак скорости
             }
         }
 
         public Road GetNextRoad(City city)
         {
-            var currentIntersection = CurrentRoad.EndIntersection;
+            var currentIntersection = IsMovingForward ? CurrentRoad.EndIntersection : CurrentRoad.StartIntersection;
             var outgoingRoads = currentIntersection.OutgoingRoads;
 
-            // Если на перекрестке нет исходящих дорог, возвращаем текущую дорогу
+            // Выбираем случайное направление из доступных на перекрестке
             if (outgoingRoads.Count == 0)
             {
-                return CurrentRoad;
+                return null; // Если нет доступных дорог, возвращаем null
             }
 
-            // Выбираем случайное направление из доступных на перекрестке
             Random random = new Random();
             var randomIndex = random.Next(outgoingRoads.Count);
             return outgoingRoads[randomIndex];
         }
-    }
-
-    internal class Bus : Vehicle
-    {
-        public int PassengerCapacity { get; set; }
-    }
-
-    internal class Car : Vehicle
-    {
-        public int PassengerCapacity { get; set; }
-    }
-
-    internal class Bicycle : Vehicle
-    {
-        public bool IsElectric { get; set; }
     }
 }

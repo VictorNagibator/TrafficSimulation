@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualBasic;
+﻿
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +13,7 @@ namespace TrafficSimulation.Models
         public double Length { get; set; }
         public double Width { get; set; }
         public RoadType Type { get; set; }
+        public int NumOfLanes { get; set; }
         public Intersection StartIntersection { get; set; }
         public Intersection EndIntersection { get; set; }
         public List<Vehicle> Vehicles { get; set; } = new List<Vehicle>();

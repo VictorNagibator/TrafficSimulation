@@ -10,6 +10,7 @@ namespace TrafficSimulation.Models
     {
         public string ID { get; set; }
         public Road ControlledRoad { get; set; }
+        public Intersection ControlledIntersection { get; set; }
         public TrafficLightState State { get; set; }
         public int Timer { get; set; }
         private int currentTime;

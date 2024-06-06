@@ -11,27 +11,33 @@ namespace TrafficSimulation.Models
         public string Name { get; set; }
         public double X { get; set; }
         public double Y { get; set; }
-        public List<Road> IncomingRoads { get; set; } = new List<Road>();
-        public List<Road> OutgoingRoads { get; set; } = new List<Road>();
-        public List<TrafficLight> TrafficLights { get; set; } = new List<TrafficLight>();
+        public List<Road> IncomingRoads { get; set; } = [];
+        public List<Road> OutgoingRoads { get; set; } = [];
 
-        public void AddIncomingRoad(Road road) => IncomingRoads.Add(road);
-        public void AddOutgoingRoad(Road road) => OutgoingRoads.Add(road);
-        public void AddTrafficLight(TrafficLight trafficLight) => TrafficLights.Add(trafficLight);
-
-        public bool IsGreenLight(Road road)
+        public void AddRoad(Road road)
         {
-            var light = TrafficLights.FirstOrDefault(t => t.ControlledRoad == road);
-            return light != null && light.State == TrafficLightState.Green;
+            if (road.Type == RoadType.TwoWay)
+            {
+                IncomingRoads.Add(road);
+                OutgoingRoads.Add(road);
+            }
+            else
+            {
+                if (road.StartIntersection == this)
+                {
+                    OutgoingRoads.Add(road);
+                }
+                else
+                {
+                    IncomingRoads.Add(road);
+                }
+            }
         }
 
-        public List<Road> GetAllRoads()
+        public void RemoveRoad(Road road) 
         {
-            var roads = new List<Road>();
-            roads.AddRange(IncomingRoads);
-            roads.AddRange(OutgoingRoads);
-
-            return roads;
+            IncomingRoads.Remove(road);
+            OutgoingRoads.Remove(road);
         }
     }
 }
