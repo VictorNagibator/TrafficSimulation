@@ -14,20 +14,21 @@
         </Grid.RowDefinitions>
 
         <!-- Controls for traffic light timings -->
-        <StackPanel Grid.Row="0" Orientation="Horizontal">
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10">
             <TextBlock Text="Traffic Light Time (seconds):" VerticalAlignment="Center"/>
-            <Slider x:Name="TrafficLightSlider" Minimum="5" Maximum="60" Value="30" Margin="5" Width="145"/>
+            <Slider x:Name="TrafficLightSlider" Minimum="5" Maximum="60" Value="30" Margin="5" Width="225"/>
             <TextBlock x:Name="TrafficLightValue" VerticalAlignment="Center" Margin="10,0,0,0" Text="{Binding ElementName=TrafficLightSlider, Path=Value, StringFormat=F0}"/>
         </StackPanel>
 
         <!-- Controls for maximum vehicle speed -->
-        <StackPanel Grid.Row="1" Orientation="Horizontal">
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="10">
             <TextBlock Text="Max Vehicle Speed (m/s):" VerticalAlignment="Center"/>
-            <Slider x:Name="MaxSpeedSlider" Minimum="5" Maximum="20" Value="10" Margin="5" Width="150"/>
+            <Slider x:Name="MaxSpeedSlider" Minimum="5" Maximum="20" Value="10" Margin="5" Width="198"/>
             <TextBlock x:Name="MaxSpeedValue" VerticalAlignment="Center" Margin="10,0,0,0" Text="{Binding ElementName=MaxSpeedSlider, Path=Value, StringFormat=F0}"/>
+            <Button Content="Add Vehicle" Click="AddVehicleButton_Click" Margin="10,0,0,0"/>
         </StackPanel>
 
         <!-- Canvas for drawing the city -->
-        <Canvas Name="CityCanvas" Grid.Row="2" Background="LightGray"/>
+        <Canvas Name="CityCanvas" Grid.Row="2" Background="LightGray" Margin="10"/>
     </Grid>
 </Window>

@@ -12,6 +12,10 @@ namespace TrafficSimulation.Models
         public void AddRoad(Road road)
         {
             Roads.Add(road);
+
+            // Добавляем дорогу в список дорог каждого перекрестка
+            road.StartIntersection.AddRoad(road);
+            road.EndIntersection.AddRoad(road);
         }
 
         public void AddVehicle(Vehicle vehicle)

@@ -41,7 +41,7 @@ namespace TrafficSimulation.Models
             // Проверка расстояния до следующего автомобиля
             var nextVehicle = city.Vehicles
                 .Where(v => v.CurrentRoad == CurrentRoad && v.IsMovingForward == IsMovingForward)
-                .OrderBy(v => v.Position)
+                .OrderBy(v => Math.Abs(v.Position - Position))
                 .FirstOrDefault(v => IsMovingForward ? v.Position > Position : v.Position < Position);
 
             if (nextVehicle != null)

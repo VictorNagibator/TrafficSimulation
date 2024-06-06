@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -12,6 +13,7 @@ namespace TrafficSimulation
     {
         private City city;
         private DispatcherTimer timer;
+        private Random random = new Random();
 
         public MainWindow()
         {
@@ -29,27 +31,16 @@ namespace TrafficSimulation
             Intersection intersection2 = new Intersection { Name = "Intersection2", X = 300, Y = 100 };
             Intersection intersection3 = new Intersection { Name = "Intersection3", X = 300, Y = 300 };
 
-            Road road1 = new Road { Name = "Road1", Length = 200, Width = 40, Type = RoadType. TwoWay, NumOfLanes = 1, StartIntersection = intersection1, EndIntersection = intersection2 };
+            Road road1 = new Road { Name = "Road1", Length = 200, Width = 40, Type = RoadType.TwoWay, NumOfLanes = 1, StartIntersection = intersection1, EndIntersection = intersection2 };
             Road road2 = new Road { Name = "Road2", Length = 200, Width = 40, Type = RoadType.TwoWay, NumOfLanes = 1, StartIntersection = intersection2, EndIntersection = intersection3 };
 
             city.AddRoad(road1);
             city.AddRoad(road2);
 
-            intersection1.AddRoad(road1);
-            intersection2.AddRoad(road1);
-            intersection2.AddRoad(road2);
-            intersection3.AddRoad(road2);
-
-            Vehicle car1 = new Vehicle { ID = "Car1", Speed = 10, MaxSpeed = (int)MaxSpeedSlider.Value, CurrentRoad = road1, Position = 0, NextIntersection = intersection2 };
-            Vehicle car2 = new Vehicle { ID = "Car2", Speed = 10, MaxSpeed = (int)MaxSpeedSlider.Value, CurrentRoad = road2, Position = 0, NextIntersection = intersection3 };
-
-            city.AddVehicle(car1);
-            city.AddVehicle(car2);
-
             TrafficLight light1 = new TrafficLight { ID = "Light1", ControlledRoad = road1, ControlledIntersection = intersection1, State = TrafficLightState.Green, Timer = (int)TrafficLightSlider.Value };
             TrafficLight light2 = new TrafficLight { ID = "Light2", ControlledRoad = road1, ControlledIntersection = intersection2, State = TrafficLightState.Red, Timer = (int)TrafficLightSlider.Value };
             TrafficLight light3 = new TrafficLight { ID = "Light3", ControlledRoad = road2, ControlledIntersection = intersection2, State = TrafficLightState.Red, Timer = (int)TrafficLightSlider.Value };
-            
+
             city.AddTrafficLight(light1);
             city.AddTrafficLight(light2);
             city.AddTrafficLight(light3);
@@ -218,6 +209,30 @@ namespace TrafficSimulation
             Canvas.SetLeft(ellipse, offsetX - ellipse.Width / 2);
             Canvas.SetTop(ellipse, offsetY - ellipse.Height / 2);
             CityCanvas.Children.Add(ellipse);
+        }
+
+        private void AddVehicleButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (city.Roads.Count == 0) return;
+
+            // Выбираем случайную дорогу
+            var road = city.Roads[random.Next(city.Roads.Count)];
+
+            // Определяем направление движения (0 - вперед, 1 - назад)
+            bool isMovingForward = random.Next(2) == 0;
+
+            var vehicle = new Vehicle
+            {
+                ID = "Car" + (city.Vehicles.Count + 1),
+                Speed = 10,
+                MaxSpeed = (int)MaxSpeedSlider.Value,
+                CurrentRoad = road,
+                Position = isMovingForward ? 0 : road.Length,
+                NextIntersection = isMovingForward ? road.EndIntersection : road.StartIntersection,
+                IsMovingForward = isMovingForward
+            };
+
+            city.AddVehicle(vehicle);
         }
     }
 }
