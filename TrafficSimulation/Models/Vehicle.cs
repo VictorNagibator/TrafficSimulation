@@ -17,7 +17,8 @@ namespace TrafficSimulation.Models
 
         public void Update(City city)
         {
-            var stopDistance = CurrentRoad.Width / 1.4;
+            var stopDistance = CurrentRoad.Width / 1.35;
+
             // Проверка светофора на текущей дороге
             var trafficLight = city.TrafficLights.FirstOrDefault(light => light.ControlledIntersection == NextIntersection && light.ControlledRoad == CurrentRoad);
             if (trafficLight != null)
@@ -38,10 +39,18 @@ namespace TrafficSimulation.Models
             }
 
             // Проверка расстояния до следующего автомобиля
-            var nextVehicle = city.Vehicles.FirstOrDefault(v => v.CurrentRoad == CurrentRoad && v.Position > Position);
-            if (nextVehicle != null && nextVehicle.Position - Position < SafetyDistance)
+            var nextVehicle = city.Vehicles
+                .Where(v => v.CurrentRoad == CurrentRoad && v.IsMovingForward == IsMovingForward)
+                .OrderBy(v => v.Position)
+                .FirstOrDefault(v => IsMovingForward ? v.Position > Position : v.Position < Position);
+
+            if (nextVehicle != null)
             {
-                Speed = 0;
+                double distanceToNextVehicle = Math.Abs(nextVehicle.Position - Position);
+                if (distanceToNextVehicle < SafetyDistance)
+                {
+                    Speed = 0;
+                }
             }
 
             // Обновляем позицию автомобиля в зависимости от направления движения

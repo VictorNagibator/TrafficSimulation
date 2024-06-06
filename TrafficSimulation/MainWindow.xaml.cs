@@ -41,14 +41,18 @@ namespace TrafficSimulation
             intersection3.AddRoad(road2);
 
             Vehicle car1 = new Vehicle { ID = "Car1", Speed = 10, MaxSpeed = (int)MaxSpeedSlider.Value, CurrentRoad = road1, Position = 0, NextIntersection = intersection2 };
+            Vehicle car2 = new Vehicle { ID = "Car2", Speed = 10, MaxSpeed = (int)MaxSpeedSlider.Value, CurrentRoad = road2, Position = 0, NextIntersection = intersection3 };
 
             city.AddVehicle(car1);
+            city.AddVehicle(car2);
 
             TrafficLight light1 = new TrafficLight { ID = "Light1", ControlledRoad = road1, ControlledIntersection = intersection1, State = TrafficLightState.Green, Timer = (int)TrafficLightSlider.Value };
             TrafficLight light2 = new TrafficLight { ID = "Light2", ControlledRoad = road1, ControlledIntersection = intersection2, State = TrafficLightState.Red, Timer = (int)TrafficLightSlider.Value };
+            TrafficLight light3 = new TrafficLight { ID = "Light3", ControlledRoad = road2, ControlledIntersection = intersection2, State = TrafficLightState.Red, Timer = (int)TrafficLightSlider.Value };
             
             city.AddTrafficLight(light1);
             city.AddTrafficLight(light2);
+            city.AddTrafficLight(light3);
         }
 
         private void InitializeTimer()
