@@ -21,6 +21,8 @@ namespace TrafficSimulation
             InitializeCity();
             InitializeTimer();
             InitializeSliders();
+
+            DrawCity();
         }
 
         private void InitializeCity()
@@ -51,7 +53,6 @@ namespace TrafficSimulation
             timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromMilliseconds(100);
             timer.Tick += Timer_Tick;
-            timer.Start();
         }
 
         private void InitializeSliders()
@@ -77,7 +78,8 @@ namespace TrafficSimulation
             {
                 foreach (var vehicle in city.Vehicles)
                 {
-                    vehicle.MaxSpeed = (int)MaxSpeedSlider.Value;
+                    double maxSpeedInMps = MaxSpeedSlider.Value * 1000 / 3600; // переводим км/ч в м/с
+                    vehicle.MaxSpeed = maxSpeedInMps;
                 }
             }
         }
@@ -86,6 +88,7 @@ namespace TrafficSimulation
         {
             city.Update();
             DrawCity();
+            DrawMetresLine();
         }
 
         private void DrawCity()
@@ -211,6 +214,33 @@ namespace TrafficSimulation
             CityCanvas.Children.Add(ellipse);
         }
 
+        private void DrawMetresLine()
+        {
+            Line line = new Line
+            {
+                X1 = CityCanvas.ActualWidth - 10,
+                Y1 = CityCanvas.ActualHeight - 10,
+                X2 = CityCanvas.ActualWidth - 100,
+                Y2 = CityCanvas.ActualHeight - 10,
+                Stroke = Brushes.Black,
+                StrokeThickness = 1
+            };
+
+            CityCanvas.Children.Add(line);
+
+            // Добавление текста "100 метров"
+            TextBlock textBlock = new TextBlock
+            {
+                Text = "100 метров",
+                Foreground = Brushes.Black,
+                FontSize = 10,
+                Margin = new Thickness(CityCanvas.ActualWidth - 80, CityCanvas.ActualHeight - 25, 0, 0)
+            };
+
+            CityCanvas.Children.Add(textBlock);
+        }
+
+
         private void AddVehicleButton_Click(object sender, RoutedEventArgs e)
         {
             if (city.Roads.Count == 0) return;
@@ -224,8 +254,8 @@ namespace TrafficSimulation
             var vehicle = new Vehicle
             {
                 ID = "Car" + (city.Vehicles.Count + 1),
-                Speed = 10,
-                MaxSpeed = (int)MaxSpeedSlider.Value,
+                Speed = 30, // Начальная скорость автомобиля (может быть изменена позже)
+                MaxSpeed = MaxSpeedSlider.Value * 1000 / 3600, // Переводим км/ч в м/с
                 CurrentRoad = road,
                 Position = isMovingForward ? 0 : road.Length,
                 NextIntersection = isMovingForward ? road.EndIntersection : road.StartIntersection,
@@ -233,6 +263,42 @@ namespace TrafficSimulation
             };
 
             city.AddVehicle(vehicle);
+        }
+
+        private void StartSimulationButton_Click(object sender, RoutedEventArgs e)
+        {
+            StartSimulation();
+        }
+
+        private void StopSimulationButton_Click(object sender, RoutedEventArgs e)
+        {
+            StopSimulation();
+        }
+
+        private void StartSimulation()
+        {
+            // Запустить таймер
+            timer.Start();
+
+            // Изменить видимость кнопок
+            StartSimulationButton.Visibility = Visibility.Collapsed;
+            StopSimulationButton.Visibility = Visibility.Visible;
+        }
+
+        private void StopSimulation()
+        {
+            // Остановить таймер
+            timer.Stop();
+
+            // Изменить видимость кнопок
+            StartSimulationButton.Visibility = Visibility.Visible;
+            StopSimulationButton.Visibility = Visibility.Collapsed;
+        }
+
+        private void CityCanvas_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            DrawCity();
+            DrawMetresLine();
         }
     }
 }

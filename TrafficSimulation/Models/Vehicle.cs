@@ -13,7 +13,7 @@ namespace TrafficSimulation.Models
         public Intersection NextIntersection { get; set; }
         public bool IsMovingForward { get; set; } = true;
 
-        private const double SafetyDistance = 40; // Расстояние до следующего автомобиля для остановки
+        private const double safetyDistance = 40; //Расстояние до следующего автомобиля для остановки
 
         public void Update(City city)
         {
@@ -47,7 +47,7 @@ namespace TrafficSimulation.Models
             if (nextVehicle != null)
             {
                 double distanceToNextVehicle = Math.Abs(nextVehicle.Position - Position);
-                if (distanceToNextVehicle < SafetyDistance)
+                if (distanceToNextVehicle < safetyDistance)
                 {
                     Speed = 0;
                 }
