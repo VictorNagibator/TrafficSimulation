@@ -32,12 +32,15 @@ namespace TrafficSimulation
             Intersection intersection1 = new Intersection { Name = "Intersection1", X = 100, Y = 100 };
             Intersection intersection2 = new Intersection { Name = "Intersection2", X = 300, Y = 100 };
             Intersection intersection3 = new Intersection { Name = "Intersection3", X = 300, Y = 300 };
+            Intersection intersection4 = new Intersection { Name = "Intersection4", X = 600, Y = 100 };
 
-            Road road1 = new Road { Name = "Road1", Length = 200, Width = 40, Type = RoadType.TwoWay, NumOfLanes = 1, StartIntersection = intersection1, EndIntersection = intersection2 };
-            Road road2 = new Road { Name = "Road2", Length = 200, Width = 40, Type = RoadType.TwoWay, NumOfLanes = 1, StartIntersection = intersection2, EndIntersection = intersection3 };
+            Road road1 = new Road { Name = "Road1", Type = RoadType.TwoWay, NumOfLanesPerDirection = 1, StartIntersection = intersection1, EndIntersection = intersection2 };
+            Road road2 = new Road { Name = "Road2", Type = RoadType.TwoWay, NumOfLanesPerDirection = 1, StartIntersection = intersection2, EndIntersection = intersection3 };
+            Road road3 = new Road { Name = "Road3", Type = RoadType.TwoWay, NumOfLanesPerDirection = 2, StartIntersection = intersection2, EndIntersection = intersection4 };
 
             city.AddRoad(road1);
             city.AddRoad(road2);
+            city.AddRoad(road3);
 
             TrafficLight light1 = new TrafficLight { ID = "Light1", ControlledRoad = road1, ControlledIntersection = intersection1, State = TrafficLightState.Green, Timer = (int)TrafficLightSlider.Value };
             TrafficLight light2 = new TrafficLight { ID = "Light2", ControlledRoad = road1, ControlledIntersection = intersection2, State = TrafficLightState.Red, Timer = (int)TrafficLightSlider.Value };
@@ -113,7 +116,7 @@ namespace TrafficSimulation
 
         private void DrawRoad(Road road)
         {
-            double extension = road.Width / 2;
+            double extension = Road.Width / 2;
 
             double startX = road.StartIntersection.X;
             double startY = road.StartIntersection.Y;
@@ -134,7 +137,7 @@ namespace TrafficSimulation
                 X2 = endX,
                 Y2 = endY,
                 Stroke = Brushes.Black,
-                StrokeThickness = road.Width
+                StrokeThickness = Road.Width * road.NumOfLanesPerDirection
             };
 
             CityCanvas.Children.Add(line);
@@ -165,13 +168,13 @@ namespace TrafficSimulation
             double offsetY = position[1];
             if (vehicle.IsMovingForward)
             {
-                offsetX -= Math.Sin(roadAngle) * vehicle.CurrentRoad.Width / 4;
-                offsetY += Math.Cos(roadAngle) * vehicle.CurrentRoad.Width / 4;
+                offsetX -= Math.Sin(roadAngle) * Road.Width / 4;
+                offsetY += Math.Cos(roadAngle) * Road.Width / 4;
             }
             else
             {
-                offsetX += Math.Sin(roadAngle) * vehicle.CurrentRoad.Width / 4;
-                offsetY -= Math.Cos(roadAngle) * vehicle.CurrentRoad.Width / 4;
+                offsetX += Math.Sin(roadAngle) * Road.Width / 4;
+                offsetY -= Math.Cos(roadAngle) * Road.Width / 4;
             }
 
             Canvas.SetLeft(rect, offsetX - rect.Width / 2);
@@ -192,14 +195,14 @@ namespace TrafficSimulation
             }
             else
             {
-                position = light.ControlledRoad.GetPositionOnRoad(new Vehicle { Position = light.ControlledRoad.Length });
+                position = light.ControlledRoad.GetPositionOnRoad(new Vehicle { Position = light.ControlledRoad.GetLength() });
                 roadAngle = Math.Atan2(light.ControlledRoad.StartIntersection.Y - light.ControlledRoad.EndIntersection.Y,
                                        light.ControlledRoad.StartIntersection.X - light.ControlledRoad.EndIntersection.X);
             }
 
             // Смещение светофора вдоль дороги
-            double offsetX = position[0] + Math.Cos(roadAngle) * light.ControlledRoad.Width / 4;
-            double offsetY = position[1] + Math.Sin(roadAngle) * light.ControlledRoad.Width / 4;
+            double offsetX = position[0] + Math.Cos(roadAngle) * Road.Width / 4;
+            double offsetY = position[1] + Math.Sin(roadAngle) * Road.Width / 4;
 
             Ellipse ellipse = new Ellipse
             {
@@ -257,7 +260,7 @@ namespace TrafficSimulation
                 Speed = 30, // Начальная скорость автомобиля (может быть изменена позже)
                 MaxSpeed = MaxSpeedSlider.Value * 1000 / 3600, // Переводим км/ч в м/с
                 CurrentRoad = road,
-                Position = isMovingForward ? 0 : road.Length,
+                Position = isMovingForward ? 0 : road.GetLength(),
                 NextIntersection = isMovingForward ? road.EndIntersection : road.StartIntersection,
                 IsMovingForward = isMovingForward
             };

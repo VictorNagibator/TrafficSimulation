@@ -10,10 +10,10 @@ namespace TrafficSimulation.Models
     internal class Road
     {
         public string Name { get; set; }
-        public double Length { get; set; }
-        public double Width { get; set; }
+
+        public const double Width = 40;
         public RoadType Type { get; set; }
-        public int NumOfLanes { get; set; }
+        public int NumOfLanesPerDirection { get; set; }
         public Intersection StartIntersection { get; set; }
         public Intersection EndIntersection { get; set; }
         public List<Vehicle> Vehicles { get; set; } = new List<Vehicle>();
@@ -35,6 +35,13 @@ namespace TrafficSimulation.Models
             double offsetY = Math.Sin(angle) * vehicle.Position;
 
             return [startX + offsetX, startY + offsetY];
+        }
+
+        public double GetLength()
+        {
+            double start = StartIntersection.X;
+            double end = EndIntersection.X;
+            return end - start;
         }
     }
 

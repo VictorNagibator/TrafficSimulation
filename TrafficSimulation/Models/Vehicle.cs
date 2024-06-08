@@ -17,15 +17,15 @@ namespace TrafficSimulation.Models
 
         public void Update(City city)
         {
-            var stopDistance = CurrentRoad.Width / 1.35;
+            var stopDistance = Road.Width / 1.35;
 
             // Проверка светофора на текущей дороге
             var trafficLight = city.TrafficLights.FirstOrDefault(light => light.ControlledIntersection == NextIntersection && light.ControlledRoad == CurrentRoad);
             if (trafficLight != null)
             {
-                if (trafficLight.State == TrafficLightState.Red && ((IsMovingForward && Position + Speed >= CurrentRoad.Length - stopDistance) || (!IsMovingForward && Position - Speed <= stopDistance)))
+                if (trafficLight.State == TrafficLightState.Red && ((IsMovingForward && Position + Speed >= CurrentRoad.GetLength() - stopDistance) || (!IsMovingForward && Position - Speed <= stopDistance)))
                 {
-                    Position = IsMovingForward ? CurrentRoad.Length - stopDistance : stopDistance;
+                    Position = IsMovingForward ? CurrentRoad.GetLength() - stopDistance : stopDistance;
                     Speed = 0;
                 }
                 else
@@ -57,7 +57,7 @@ namespace TrafficSimulation.Models
             Position += IsMovingForward ? Speed : -Speed;
 
             // Если автомобиль достиг конца или начала дороги
-            if (Speed != 0 && (Position >= CurrentRoad.Length || Position <= 0))
+            if (Speed != 0 && (Position >= CurrentRoad.GetLength() || Position <= 0))
             {
                 // Получаем следующую дорогу на маршруте
                 Road nextRoad = GetNextRoad(city);
@@ -69,7 +69,7 @@ namespace TrafficSimulation.Models
                     nextRoad.AddVehicle(this);
                     CurrentRoad = nextRoad;
                     IsMovingForward = nextRoad.StartIntersection == NextIntersection;
-                    Position = IsMovingForward ? 0 : nextRoad.Length;
+                    Position = IsMovingForward ? 0 : nextRoad.GetLength();
                     NextIntersection = IsMovingForward ? nextRoad.EndIntersection : nextRoad.StartIntersection;
                 }
                 else
