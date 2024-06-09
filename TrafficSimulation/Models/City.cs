@@ -32,12 +32,12 @@ namespace TrafficSimulation.Models
         {
             foreach (var vehicle in Vehicles)
             {
-                vehicle.Update(this); // Обновляем положение каждой машины
+                vehicle.Update(this); //Обновляем положение каждой машины
             }
 
             foreach (var light in TrafficLights)
             {
-                light.Tick(); // Уменьшаем таймер для каждого светофора
+                light.Tick(); //Уменьшаем таймер для каждого светофора
             }
         }
     }

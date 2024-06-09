@@ -9,6 +9,8 @@ namespace TrafficSimulation.Models
         public double Speed { get; set; }
         public double MaxSpeed { get; set; }
         public Road CurrentRoad { get; set; }
+
+        public int LineNumber { get; set; }
         public double Position { get; set; }
         public Intersection NextIntersection { get; set; }
         public bool IsMovingForward { get; set; } = true;
@@ -17,7 +19,7 @@ namespace TrafficSimulation.Models
 
         public void Update(City city)
         {
-            var stopDistance = Road.Width / 1.35;
+            double stopDistance = Road.Width / 1.35;
 
             // Проверка светофора на текущей дороге
             var trafficLight = city.TrafficLights.FirstOrDefault(light => light.ControlledIntersection == NextIntersection && light.ControlledRoad == CurrentRoad);
@@ -40,7 +42,7 @@ namespace TrafficSimulation.Models
 
             // Проверка расстояния до следующего автомобиля
             var nextVehicle = city.Vehicles
-                .Where(v => v.CurrentRoad == CurrentRoad && v.IsMovingForward == IsMovingForward)
+                .Where(v => v.CurrentRoad == CurrentRoad && v.IsMovingForward == IsMovingForward && v.LineNumber == LineNumber)
                 .OrderBy(v => Math.Abs(v.Position - Position))
                 .FirstOrDefault(v => IsMovingForward ? v.Position > Position : v.Position < Position);
 
@@ -65,29 +67,72 @@ namespace TrafficSimulation.Models
                 if (nextRoad != null)
                 {
                     // Перемещаем автомобиль на следующую дорогу
-                    CurrentRoad.RemoveVehicle(this);
-                    nextRoad.AddVehicle(this);
-                    CurrentRoad = nextRoad;
-                    IsMovingForward = nextRoad.StartIntersection == NextIntersection;
-                    Position = IsMovingForward ? 0 : nextRoad.GetLength();
-                    NextIntersection = IsMovingForward ? nextRoad.EndIntersection : nextRoad.StartIntersection;
+                    if (CurrentRoad == nextRoad)
+                    {
+                        Random random = new();
+                        LineNumber = random.Next(1, CurrentRoad.NumOfLanesPerDirection + 1);
+                        IsMovingForward = !IsMovingForward;
+                        Position = IsMovingForward ? 0 : nextRoad.GetLength();
+                        NextIntersection = IsMovingForward ? nextRoad.EndIntersection : nextRoad.StartIntersection;
+                    }
+                    else
+                    {
+                        CurrentRoad.RemoveVehicle(this);
+                        nextRoad.AddVehicle(this);
+                        CurrentRoad = nextRoad;
+                        Random random = new();
+                        LineNumber = random.Next(1, CurrentRoad.NumOfLanesPerDirection + 1);
+                        IsMovingForward = nextRoad.StartIntersection == NextIntersection;
+                        Position = IsMovingForward ? 0 : nextRoad.GetLength();
+                        NextIntersection = IsMovingForward ? nextRoad.EndIntersection : nextRoad.StartIntersection;
+                    }
                 }
                 else
                 {
-                    Speed = 0; // Останавливаем машину, если нет доступной следующей дороги
+                    LineNumber = 1;
                 }
             }
         }
 
         public Road GetNextRoad(City city)
         {
-            var currentIntersection = IsMovingForward ? CurrentRoad.EndIntersection : CurrentRoad.StartIntersection;
-            var outgoingRoads = currentIntersection.OutgoingRoads;
+            int numOfLanes = CurrentRoad.NumOfLanesPerDirection;
+            List<Road> outgoingRoads;
+            switch (numOfLanes)
+            {
+                case 1:
+                    outgoingRoads = NextIntersection.OutgoingRoads;
+                    break;
+                case 2:
+                    outgoingRoads = CurrentRoad.GetRoads(this, RoadDirection.Forward);
+                    if (LineNumber == 1)
+                    {
+                        outgoingRoads.AddRange(CurrentRoad.GetRoads(this, RoadDirection.Left));
+                        outgoingRoads.Add(CurrentRoad);
+                    }
+                    else
+                    {
+                        outgoingRoads.AddRange(CurrentRoad.GetRoads(this, RoadDirection.Right));
+                    }
+                    break;
+                default:
+                    outgoingRoads = CurrentRoad.GetRoads(this, RoadDirection.Forward);
+                    if (LineNumber == 1)
+                    {
+                        outgoingRoads.AddRange(CurrentRoad.GetRoads(this, RoadDirection.Left));
+                        outgoingRoads.Add(CurrentRoad);
+                    }
+                    else if (LineNumber == CurrentRoad.NumOfLanesPerDirection)
+                    {
+                        outgoingRoads.AddRange(CurrentRoad.GetRoads(this, RoadDirection.Right));
+                    }
+                    break;
+            }
 
-            // Выбираем случайное направление из доступных на перекрестке
+            //Выбираем случайное направление из доступных на перекрестке
             if (outgoingRoads.Count == 0)
             {
-                return null; // Если нет доступных дорог, возвращаем null
+                return null; //Если нет доступных дорог, возвращаем null
             }
 
             Random random = new Random();

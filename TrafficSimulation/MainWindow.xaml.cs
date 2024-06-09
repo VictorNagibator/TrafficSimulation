@@ -45,10 +45,12 @@ namespace TrafficSimulation
             TrafficLight light1 = new TrafficLight { ID = "Light1", ControlledRoad = road1, ControlledIntersection = intersection1, State = TrafficLightState.Green, Timer = (int)TrafficLightSlider.Value };
             TrafficLight light2 = new TrafficLight { ID = "Light2", ControlledRoad = road1, ControlledIntersection = intersection2, State = TrafficLightState.Red, Timer = (int)TrafficLightSlider.Value };
             TrafficLight light3 = new TrafficLight { ID = "Light3", ControlledRoad = road2, ControlledIntersection = intersection2, State = TrafficLightState.Red, Timer = (int)TrafficLightSlider.Value };
+            TrafficLight light4 = new TrafficLight { ID = "Light4", ControlledRoad = road3, ControlledIntersection = intersection2, State = TrafficLightState.Red, Timer = (int)TrafficLightSlider.Value };
 
             city.AddTrafficLight(light1);
             city.AddTrafficLight(light2);
             city.AddTrafficLight(light3);
+            city.AddTrafficLight(light4);
         }
 
         private void InitializeTimer()
@@ -156,25 +158,32 @@ namespace TrafficSimulation
                 Fill = Brushes.Blue
             };
 
-            // Поворачиваем машину в зависимости от направления движения
+            // Calculate the angle for vehicle direction
             double angle = (vehicle.IsMovingForward ? roadAngle : roadAngle + Math.PI) * 180 / Math.PI;
-            if (!vehicle.IsMovingForward)
-            {
-                angle += 180; // Инвертируем угол для машин, движущихся в обратную сторону
-            }
             rect.RenderTransform = new RotateTransform(angle, rect.Width / 2, rect.Height / 2);
 
-            double offsetX = position[0];
-            double offsetY = position[1];
+            // Calculate lane offset
+            double laneWidth = Road.Width / vehicle.CurrentRoad.NumOfLanesPerDirection;
+            double laneOffset = laneWidth * (vehicle.LineNumber - 1);
             if (vehicle.IsMovingForward)
             {
-                offsetX -= Math.Sin(roadAngle) * Road.Width / 4;
-                offsetY += Math.Cos(roadAngle) * Road.Width / 4;
+                laneOffset *= -1;
+            }
+
+            // Adjust the offset for the direction of movement and lane position (right-hand traffic)
+            double offsetX = position[0] + Math.Sin(roadAngle) * laneOffset;
+            double offsetY = position[1] - Math.Cos(roadAngle) * laneOffset;
+
+            // Adjust position for forward or backward movement
+            if (vehicle.IsMovingForward)
+            {
+                offsetX -= Math.Sin(roadAngle) * rect.Width / 2;
+                offsetY += Math.Cos(roadAngle) * rect.Width / 2;
             }
             else
             {
-                offsetX += Math.Sin(roadAngle) * Road.Width / 4;
-                offsetY -= Math.Cos(roadAngle) * Road.Width / 4;
+                offsetX += Math.Sin(roadAngle) * rect.Width / 2;
+                offsetY -= Math.Cos(roadAngle) * rect.Width / 2;
             }
 
             Canvas.SetLeft(rect, offsetX - rect.Width / 2);
@@ -182,6 +191,8 @@ namespace TrafficSimulation
 
             CityCanvas.Children.Add(rect);
         }
+
+
 
         private void DrawTrafficLight(TrafficLight light)
         {
@@ -254,12 +265,15 @@ namespace TrafficSimulation
             // Определяем направление движения (0 - вперед, 1 - назад)
             bool isMovingForward = random.Next(2) == 0;
 
+            int lineNumber = random.Next(1, road.NumOfLanesPerDirection + 1);
+
             var vehicle = new Vehicle
             {
                 ID = "Car" + (city.Vehicles.Count + 1),
                 Speed = 30, // Начальная скорость автомобиля (может быть изменена позже)
                 MaxSpeed = MaxSpeedSlider.Value * 1000 / 3600, // Переводим км/ч в м/с
                 CurrentRoad = road,
+                LineNumber = lineNumber,
                 Position = isMovingForward ? 0 : road.GetLength(),
                 NextIntersection = isMovingForward ? road.EndIntersection : road.StartIntersection,
                 IsMovingForward = isMovingForward
