@@ -105,7 +105,7 @@
                     if (LineNumber == 1)
                     {
                         outgoingRoads.AddRange(CurrentRoad.GetRoads(this, RoadDirection.Left));
-                        outgoingRoads.Add(CurrentRoad);
+                        if (CurrentRoad.Type != RoadType.OneWay) outgoingRoads.Add(CurrentRoad);
                     }
                     else
                     {
@@ -117,7 +117,7 @@
                     if (LineNumber == 1)
                     {
                         outgoingRoads.AddRange(CurrentRoad.GetRoads(this, RoadDirection.Left));
-                        outgoingRoads.Add(CurrentRoad);
+                        if (CurrentRoad.Type != RoadType.OneWay) outgoingRoads.Add(CurrentRoad);
                     }
                     else if (LineNumber == CurrentRoad.NumOfLanesPerDirection)
                     {

@@ -32,9 +32,7 @@
 
         public double GetLength()
         {
-            double start = StartIntersection.X;
-            double end = EndIntersection.X;
-            return end - start;
+            return Math.Sqrt((EndIntersection.X - StartIntersection.X)* (EndIntersection.X - StartIntersection.X) + (EndIntersection.Y - StartIntersection.Y) * (EndIntersection.Y - StartIntersection.Y));
         }
 
         public List<Road> GetRoads(Vehicle vehicle, RoadDirection direction)
