@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace TrafficSimulation.Models
+﻿namespace TrafficSimulation.Models
 {
     internal class City
     {

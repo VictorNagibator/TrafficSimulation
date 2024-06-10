@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-
-namespace TrafficSimulation.Models
+﻿namespace TrafficSimulation.Models
 {
     internal class Vehicle
     {
@@ -62,7 +59,7 @@ namespace TrafficSimulation.Models
             if (Speed != 0 && (Position >= CurrentRoad.GetLength() || Position <= 0))
             {
                 // Получаем следующую дорогу на маршруте
-                Road nextRoad = GetNextRoad(city);
+                Road nextRoad = GetNextRoad();
 
                 if (nextRoad != null)
                 {
@@ -94,7 +91,7 @@ namespace TrafficSimulation.Models
             }
         }
 
-        public Road GetNextRoad(City city)
+        public Road GetNextRoad()
         {
             int numOfLanes = CurrentRoad.NumOfLanesPerDirection;
             List<Road> outgoingRoads;
