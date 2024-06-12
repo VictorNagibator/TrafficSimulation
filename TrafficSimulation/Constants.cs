@@ -8,8 +8,8 @@ namespace TrafficSimulation
 {
     internal static class Constants
     {
-        public const double MetresPerPixel = 0.1;
-        public const double RoadWidthMetres = 3.75;
+        public const double MetresPerPixel = 0.2;
+        public const double RoadWidthMetres = 4;
         public const double VehicleLengthMetres = 4.5;
         public const double VehicleWidthMetres = 1.8;
         public const double TrafficLightMetres = 1;

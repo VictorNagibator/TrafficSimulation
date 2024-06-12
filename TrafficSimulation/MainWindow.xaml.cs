@@ -213,19 +213,15 @@ namespace TrafficSimulation
                 Fill = Brushes.Blue
             };
 
-            // Calculate the angle for vehicle direction
             double angle = (vehicle.IsMovingForward ? roadAngle : roadAngle + Math.PI) * 180 / Math.PI;
             rect.RenderTransform = new RotateTransform(angle, rect.Width / 2, rect.Height / 2);
 
-            // Check if the road has one lane
             if (vehicle.CurrentRoad.NumOfLanesPerDirection == 1 && vehicle.CurrentRoad.Type == RoadType.OneWay)
             {
-                // Calculate the offset from the center
-                double offset = Constants.RoadWidthPixels / 4; // Ширина дороги разделена на 4 для центрирования
+                double offset = Constants.RoadWidthPixels / 4;
                 double offsetX = position[0] - offset * Math.Cos(roadAngle);
                 double offsetY = position[1] - offset * Math.Sin(roadAngle);
 
-                // Adjust position for forward or backward movement
                 if (!vehicle.IsMovingForward)
                 {
                     offsetX += offset * Math.Cos(roadAngle);
@@ -237,13 +233,12 @@ namespace TrafficSimulation
             }
             else if (vehicle.CurrentRoad.Type == RoadType.OneWay)
             {
-                //Adjust the offset for the direction of movement and lane position (right-hand traffic)
-                double laneOffset = Constants.RoadWidthPixels * (vehicle.LineNumber - 1);
+                //вот здесь нет, думай над четным и нечетным количеством полос
+                double laneOffset = rect.Width / 2;
 
                 double offsetX = position[0] + Math.Sin(roadAngle) * laneOffset;
                 double offsetY = position[1] - Math.Cos(roadAngle) * laneOffset;
 
-                // Adjust position for forward or backward movement
                 if (vehicle.IsMovingForward)
                 {
                     offsetX -= Math.Sin(roadAngle) * rect.Width;
@@ -255,36 +250,24 @@ namespace TrafficSimulation
                     offsetY -= Math.Cos(roadAngle) * rect.Width;
                 }
 
-                Canvas.SetLeft(rect, offsetX - rect.Width);
+                Canvas.SetLeft(rect, offsetX - rect.Width / 2);
                 Canvas.SetTop(rect, offsetY - rect.Height / 2); 
             }
             else
             {
-                //Adjust the offset for the direction of movement and lane position (right-hand traffic)
-                double laneWidth = Constants.RoadWidthPixels * vehicle.CurrentRoad.NumOfLanesPerDirection;
-                double laneOffset = laneWidth * (vehicle.LineNumber - 1);
+                //здесь все работает
+                double laneOffset = rect.Height / 2 + Constants.VehicleWidthPixels * (vehicle.LineNumber - 1);
+
                 if (vehicle.IsMovingForward)
                 {
-                    laneOffset *= -1;
+                    laneOffset = -laneOffset;
                 }
 
                 double offsetX = position[0] + Math.Sin(roadAngle) * laneOffset;
                 double offsetY = position[1] - Math.Cos(roadAngle) * laneOffset;
 
-                // Adjust position for forward or backward movement
-                if (vehicle.IsMovingForward)
-                {
-                    offsetX -= Math.Sin(roadAngle) * rect.Width;
-                    offsetY += Math.Cos(roadAngle) * rect.Width / 2;
-                }
-                else
-                {
-                    offsetX += Math.Sin(roadAngle) * rect.Width;
-                    offsetY -= Math.Cos(roadAngle) * rect.Width;
-                }
-
-                Canvas.SetLeft(rect, offsetX - rect.Width);
-                Canvas.SetTop(rect, offsetY - rect.Height);
+                Canvas.SetLeft(rect, offsetX - rect.Width / 2);
+                Canvas.SetTop(rect, offsetY - rect.Height / 2);
             }
 
             CityCanvas.Children.Add(rect);
