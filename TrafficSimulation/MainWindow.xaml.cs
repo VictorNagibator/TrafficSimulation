@@ -101,10 +101,13 @@ namespace TrafficSimulation
         {
             CityCanvas.Children.Clear();
 
+            foreach (var intersection in city.Intersections)
+            {
+                DrawIntersection(intersection);
+            }
+
             foreach (var road in city.Roads)
             {
-                DrawIntersection(road.StartIntersection);
-                DrawIntersection(road.EndIntersection);
                 DrawRoad(road);
             }
 
@@ -123,51 +126,16 @@ namespace TrafficSimulation
         {
             double maxRoadWidth = intersection.GetWidth();
 
-            foreach (var road in intersection.IncomingRoads)
-            {
-                if (road.EndIntersection.GetWidth() == maxRoadWidth)
+            Rectangle rect = new()
                 {
-                    double roadAngle = Math.Atan2(road.EndIntersection.Y - road.StartIntersection.Y,
-                                          road.EndIntersection.X - road.StartIntersection.X);
+                    Width = maxRoadWidth / Constants.MetresPerPixel,
+                    Height = maxRoadWidth / Constants.MetresPerPixel,
+                    Fill = Brushes.Gray
+                };
 
-                    Rectangle rect = new()
-                    {
-                        Width = maxRoadWidth / Constants.MetresPerPixel,
-                        Height = maxRoadWidth / Constants.MetresPerPixel,
-                        Fill = Brushes.Gray
-                    };
-
-                    double angle = roadAngle * 180 / Math.PI;
-                    rect.RenderTransform = new RotateTransform(angle, rect.Width / 2, rect.Height / 2);
-
-                    Canvas.SetLeft(rect, intersection.X - maxRoadWidth / (2 * Constants.MetresPerPixel));
-                    Canvas.SetTop(rect, intersection.Y - maxRoadWidth / (2 * Constants.MetresPerPixel));
-                    CityCanvas.Children.Add(rect);
-                }
-            }
-
-            foreach (var road in intersection.OutgoingRoads)
-            {
-                if (road.StartIntersection.GetWidth() == maxRoadWidth)
-                {
-                    double roadAngle = Math.Atan2(road.EndIntersection.Y - road.StartIntersection.Y,
-                                          road.EndIntersection.X - road.StartIntersection.X);
-
-                    Rectangle rect = new()
-                    {
-                        Width = maxRoadWidth / Constants.MetresPerPixel,
-                        Height = maxRoadWidth / Constants.MetresPerPixel,
-                        Fill = Brushes.Gray
-                    };
-
-                    double angle = roadAngle * 180 / Math.PI;
-                    rect.RenderTransform = new RotateTransform(angle, rect.Width / 2, rect.Height / 2);
-
-                    Canvas.SetLeft(rect, intersection.X - maxRoadWidth / (2 * Constants.MetresPerPixel));
-                    Canvas.SetTop(rect, intersection.Y - maxRoadWidth / (2 * Constants.MetresPerPixel));
-                    CityCanvas.Children.Add(rect);
-                }
-            }
+            Canvas.SetLeft(rect, intersection.X - maxRoadWidth / (2 * Constants.MetresPerPixel));
+            Canvas.SetTop(rect, intersection.Y - maxRoadWidth / (2 * Constants.MetresPerPixel));
+            CityCanvas.Children.Add(rect);
         }
 
         private void DrawRoad(Road road)
@@ -194,20 +162,20 @@ namespace TrafficSimulation
                 X2 = endX,
                 Y2 = endY,
                 Stroke = Brushes.Black,
-                StrokeThickness = road.Type != RoadType.OneWay ? Constants.RoadWidthPixels * road.NumOfLanesPerDirection : Constants.RoadWidthPixels / 2 * road.NumOfLanesPerDirection,
+                StrokeThickness = road.GetWidth() / Constants.MetresPerPixel,
             };
 
             CityCanvas.Children.Add(line);
 
             if (road.Type == RoadType.OneWay)
             {
-                //DrawOneWayArrow(road);
+                DrawOneWayArrow(road);
             }
         }
 
         private void DrawOneWayArrow(Road road)
         {
-            double arrowLength = 20 / Constants.MetresPerPixel;
+            double arrowLength = (road.GetWidth() - 0.5) / Constants.MetresPerPixel;
 
             double startX = road.StartIntersection.X;
             double startY = road.StartIntersection.Y;
@@ -216,11 +184,9 @@ namespace TrafficSimulation
 
             double roadAngle = Math.Atan2(endY - startY, endX - startX);
 
-            // Determine the center of the road for the arrow
             double midX = (startX + endX) / 2;
             double midY = (startY + endY) / 2;
 
-            // Calculate arrow points
             Point p1 = new(midX, midY);
             Point p2 = new(midX - arrowLength * Math.Cos(roadAngle - Math.PI / 6), midY - arrowLength * Math.Sin(roadAngle - Math.PI / 6));
             Point p3 = new(midX - arrowLength * Math.Cos(roadAngle + Math.PI / 6), midY - arrowLength * Math.Sin(roadAngle + Math.PI / 6));

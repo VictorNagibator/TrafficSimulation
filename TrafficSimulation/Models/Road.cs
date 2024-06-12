@@ -34,6 +34,11 @@
             return Math.Sqrt((EndIntersection.X - StartIntersection.X)* (EndIntersection.X - StartIntersection.X) + (EndIntersection.Y - StartIntersection.Y) * (EndIntersection.Y - StartIntersection.Y));
         }
 
+        public double GetWidth()
+        {
+            return Type != RoadType.OneWay ? NumOfLanesPerDirection * Constants.RoadWidthMetres : NumOfLanesPerDirection * Constants.RoadWidthMetres / 2;
+        }
+
         public List<Road> GetRoads(Vehicle vehicle, RoadDirection direction)
         {
             var neededRoads = new List<Road>();

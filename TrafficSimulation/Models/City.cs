@@ -2,6 +2,7 @@
 {
     internal class City
     {
+        public List<Intersection> Intersections { get; set; } = [];
         public List<Road> Roads { get; private set; } = [];
         public List<Vehicle> Vehicles { get; private set; } = [];
         public List<TrafficLight> TrafficLights { get; private set; } = [];
@@ -13,6 +14,9 @@
             // Добавляем дорогу в список дорог каждого перекрестка
             road.StartIntersection.AddRoad(road);
             road.EndIntersection.AddRoad(road);
+
+            if (!Intersections.Contains(road.StartIntersection)) Intersections.Add(road.StartIntersection);
+            if (!Intersections.Contains(road.EndIntersection)) Intersections.Add(road.EndIntersection);
         }
 
         public void AddVehicle(Vehicle vehicle)
