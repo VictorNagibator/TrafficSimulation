@@ -12,11 +12,9 @@
         public Intersection NextIntersection { get; set; }
         public bool IsMovingForward { get; set; } = true;
 
-        private const double safetyDistance = 40; //Расстояние до следующего автомобиля для остановки
-
         public void Update(City city)
         {
-            double stopDistance = Road.Width / 1.35;
+            double stopDistance = Constants.RoadWidthMetres;
 
             // Проверка светофора на текущей дороге
             var trafficLight = city.TrafficLights.FirstOrDefault(light => light.ControlledIntersection == NextIntersection && light.ControlledRoad == CurrentRoad);
@@ -46,7 +44,7 @@
             if (nextVehicle != null)
             {
                 double distanceToNextVehicle = Math.Abs(nextVehicle.Position - Position);
-                if (distanceToNextVehicle < safetyDistance)
+                if (distanceToNextVehicle < Constants.SafetyDistanceToStop)
                 {
                     Speed = 0;
                 }

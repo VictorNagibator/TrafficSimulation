@@ -1,4 +1,6 @@
-﻿namespace TrafficSimulation.Models
+﻿using Microsoft.VisualBasic;
+
+namespace TrafficSimulation.Models
 {
     internal class Intersection
     {
@@ -32,6 +34,22 @@
         {
             IncomingRoads.Remove(road);
             OutgoingRoads.Remove(road);
+        }
+
+        public double GetWidth()
+        {
+            double maxRoadWidth = 0;
+
+            foreach (var road in IncomingRoads)
+            {
+                maxRoadWidth = Math.Max(maxRoadWidth, road.Type == RoadType.OneWay ? Constants.RoadWidthMetres * road.NumOfLanesPerDirection / 2 : Constants.RoadWidthMetres * road.NumOfLanesPerDirection);
+            }
+            foreach (var road in OutgoingRoads)
+            {
+                maxRoadWidth = Math.Max(maxRoadWidth, road.Type == RoadType.OneWay ? Constants.RoadWidthMetres * road.NumOfLanesPerDirection / 2 : Constants.RoadWidthMetres * road.NumOfLanesPerDirection);
+            }
+
+            return maxRoadWidth;
         }
     }
 }

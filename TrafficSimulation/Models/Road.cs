@@ -3,8 +3,6 @@
     internal class Road
     {
         public string Name { get; set; }
-
-        public const double Width = 40;
         public RoadType Type { get; set; }
         public int NumOfLanesPerDirection { get; set; }
         public Intersection StartIntersection { get; set; }
@@ -21,6 +19,7 @@
             double startY = StartIntersection.Y;
             double endX = EndIntersection.X;
             double endY = EndIntersection.Y;
+
             
             double angle = Math.Atan2(endY - startY, endX - startX);
 

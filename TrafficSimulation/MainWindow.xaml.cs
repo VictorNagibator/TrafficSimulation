@@ -30,7 +30,7 @@ namespace TrafficSimulation
             Intersection intersection3 = new() { Name = "Intersection3", X = 300, Y = 300 };
             Intersection intersection4 = new() { Name = "Intersection4", X = 600, Y = 100 };
 
-            Road road1 = new () { Name = "Road1", Type = RoadType.TwoWay, NumOfLanesPerDirection = 1, StartIntersection = intersection1, EndIntersection = intersection2 };
+            Road road1 = new() { Name = "Road1", Type = RoadType.TwoWay, NumOfLanesPerDirection = 1, StartIntersection = intersection1, EndIntersection = intersection2 };
             Road road2 = new() { Name = "Road2", Type = RoadType.TwoWay, NumOfLanesPerDirection = 1, StartIntersection = intersection2, EndIntersection = intersection3 };
             Road road3 = new() { Name = "Road3", Type = RoadType.TwoWay, NumOfLanesPerDirection = 2, StartIntersection = intersection2, EndIntersection = intersection4 };
             Road road4 = new() { Name = "Road4", Type = RoadType.OneWay, NumOfLanesPerDirection = 1, StartIntersection = intersection3, EndIntersection = intersection4 };
@@ -103,6 +103,8 @@ namespace TrafficSimulation
 
             foreach (var road in city.Roads)
             {
+                DrawIntersection(road.StartIntersection);
+                DrawIntersection(road.EndIntersection);
                 DrawRoad(road);
             }
 
@@ -117,9 +119,61 @@ namespace TrafficSimulation
             }
         }
 
+        private void DrawIntersection(Intersection intersection)
+        {
+            double maxRoadWidth = intersection.GetWidth();
+
+            foreach (var road in intersection.IncomingRoads)
+            {
+                if (road.EndIntersection.GetWidth() == maxRoadWidth)
+                {
+                    double roadAngle = Math.Atan2(road.EndIntersection.Y - road.StartIntersection.Y,
+                                          road.EndIntersection.X - road.StartIntersection.X);
+
+                    Rectangle rect = new()
+                    {
+                        Width = maxRoadWidth / Constants.MetresPerPixel,
+                        Height = maxRoadWidth / Constants.MetresPerPixel,
+                        Fill = Brushes.Gray
+                    };
+
+                    double angle = roadAngle * 180 / Math.PI;
+                    rect.RenderTransform = new RotateTransform(angle, rect.Width / 2, rect.Height / 2);
+
+                    Canvas.SetLeft(rect, intersection.X - maxRoadWidth / (2 * Constants.MetresPerPixel));
+                    Canvas.SetTop(rect, intersection.Y - maxRoadWidth / (2 * Constants.MetresPerPixel));
+                    CityCanvas.Children.Add(rect);
+                }
+            }
+
+            foreach (var road in intersection.OutgoingRoads)
+            {
+                if (road.StartIntersection.GetWidth() == maxRoadWidth)
+                {
+                    double roadAngle = Math.Atan2(road.EndIntersection.Y - road.StartIntersection.Y,
+                                          road.EndIntersection.X - road.StartIntersection.X);
+
+                    Rectangle rect = new()
+                    {
+                        Width = maxRoadWidth / Constants.MetresPerPixel,
+                        Height = maxRoadWidth / Constants.MetresPerPixel,
+                        Fill = Brushes.Gray
+                    };
+
+                    double angle = roadAngle * 180 / Math.PI;
+                    rect.RenderTransform = new RotateTransform(angle, rect.Width / 2, rect.Height / 2);
+
+                    Canvas.SetLeft(rect, intersection.X - maxRoadWidth / (2 * Constants.MetresPerPixel));
+                    Canvas.SetTop(rect, intersection.Y - maxRoadWidth / (2 * Constants.MetresPerPixel));
+                    CityCanvas.Children.Add(rect);
+                }
+            }
+        }
+
         private void DrawRoad(Road road)
         {
-            double extension = Road.Width / 2;
+            double startIntersectionWidth = road.StartIntersection.GetWidth();
+            double endIntersectionWidth = road.EndIntersection.GetWidth();
 
             double startX = road.StartIntersection.X;
             double startY = road.StartIntersection.Y;
@@ -128,10 +182,10 @@ namespace TrafficSimulation
 
             double roadAngle = Math.Atan2(endY - startY, endX - startX);
 
-            startX -= extension * Math.Cos(roadAngle);
-            startY -= extension * Math.Sin(roadAngle);
-            endX += extension * Math.Cos(roadAngle);
-            endY += extension * Math.Sin(roadAngle);
+            startX = road.StartIntersection.X + startIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Cos(roadAngle);
+            startY = road.StartIntersection.Y + startIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Sin(roadAngle);
+            endX = road.EndIntersection.X - endIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Cos(roadAngle);
+            endY = road.EndIntersection.Y - endIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Sin(roadAngle);
 
             Line line = new()
             {
@@ -140,20 +194,20 @@ namespace TrafficSimulation
                 X2 = endX,
                 Y2 = endY,
                 Stroke = Brushes.Black,
-                StrokeThickness = road.Type != RoadType.OneWay ? Road.Width * road.NumOfLanesPerDirection : Road.Width / 2 * road.NumOfLanesPerDirection,
+                StrokeThickness = road.Type != RoadType.OneWay ? Constants.RoadWidthPixels * road.NumOfLanesPerDirection : Constants.RoadWidthPixels / 2 * road.NumOfLanesPerDirection,
             };
 
             CityCanvas.Children.Add(line);
 
             if (road.Type == RoadType.OneWay)
             {
-                DrawOneWayArrow(road);
+                //DrawOneWayArrow(road);
             }
         }
 
         private void DrawOneWayArrow(Road road)
         {
-            double arrowLength = 20;
+            double arrowLength = 20 / Constants.MetresPerPixel;
 
             double startX = road.StartIntersection.X;
             double startY = road.StartIntersection.Y;
@@ -188,8 +242,8 @@ namespace TrafficSimulation
 
             Rectangle rect = new()
             {
-                Width = 20,
-                Height = 10,
+                Width = Constants.VehicleLengthPixels,
+                Height = Constants.VehicleWidthPixels,
                 Fill = Brushes.Blue
             };
 
@@ -201,7 +255,7 @@ namespace TrafficSimulation
             if (vehicle.CurrentRoad.NumOfLanesPerDirection == 1 && vehicle.CurrentRoad.Type == RoadType.OneWay)
             {
                 // Calculate the offset from the center
-                double offset = Road.Width / 4; // Ширина дороги разделена на 4 для центрирования
+                double offset = Constants.RoadWidthPixels / 4; // Ширина дороги разделена на 4 для центрирования
                 double offsetX = position[0] - offset * Math.Cos(roadAngle);
                 double offsetY = position[1] - offset * Math.Sin(roadAngle);
 
@@ -218,8 +272,7 @@ namespace TrafficSimulation
             else if (vehicle.CurrentRoad.Type == RoadType.OneWay)
             {
                 //Adjust the offset for the direction of movement and lane position (right-hand traffic)
-                double laneWidth = Road.Width / vehicle.CurrentRoad.NumOfLanesPerDirection;
-                double laneOffset = laneWidth * (vehicle.LineNumber - 1);
+                double laneOffset = Constants.RoadWidthPixels * (vehicle.LineNumber - 1);
 
                 double offsetX = position[0] + Math.Sin(roadAngle) * laneOffset;
                 double offsetY = position[1] - Math.Cos(roadAngle) * laneOffset;
@@ -227,22 +280,22 @@ namespace TrafficSimulation
                 // Adjust position for forward or backward movement
                 if (vehicle.IsMovingForward)
                 {
-                    offsetX -= Math.Sin(roadAngle) * rect.Width / 2;
-                    offsetY += Math.Cos(roadAngle) * rect.Width / 2;
+                    offsetX -= Math.Sin(roadAngle) * rect.Width;
+                    offsetY += Math.Cos(roadAngle) * rect.Width;
                 }
                 else
                 {
-                    offsetX += Math.Sin(roadAngle) * rect.Width / 2;
-                    offsetY -= Math.Cos(roadAngle) * rect.Width / 2;
+                    offsetX += Math.Sin(roadAngle) * rect.Width;
+                    offsetY -= Math.Cos(roadAngle) * rect.Width;
                 }
 
-                Canvas.SetLeft(rect, offsetX - rect.Width / 2);
+                Canvas.SetLeft(rect, offsetX - rect.Width);
                 Canvas.SetTop(rect, offsetY - rect.Height / 2); 
             }
             else
             {
                 //Adjust the offset for the direction of movement and lane position (right-hand traffic)
-                double laneWidth = Road.Width / vehicle.CurrentRoad.NumOfLanesPerDirection;
+                double laneWidth = Constants.RoadWidthPixels * vehicle.CurrentRoad.NumOfLanesPerDirection;
                 double laneOffset = laneWidth * (vehicle.LineNumber - 1);
                 if (vehicle.IsMovingForward)
                 {
@@ -255,17 +308,17 @@ namespace TrafficSimulation
                 // Adjust position for forward or backward movement
                 if (vehicle.IsMovingForward)
                 {
-                    offsetX -= Math.Sin(roadAngle) * rect.Width / 2;
+                    offsetX -= Math.Sin(roadAngle) * rect.Width;
                     offsetY += Math.Cos(roadAngle) * rect.Width / 2;
                 }
                 else
                 {
-                    offsetX += Math.Sin(roadAngle) * rect.Width / 2;
-                    offsetY -= Math.Cos(roadAngle) * rect.Width / 2;
+                    offsetX += Math.Sin(roadAngle) * rect.Width;
+                    offsetY -= Math.Cos(roadAngle) * rect.Width;
                 }
 
-                Canvas.SetLeft(rect, offsetX - rect.Width / 2);
-                Canvas.SetTop(rect, offsetY - rect.Height / 2);
+                Canvas.SetLeft(rect, offsetX - rect.Width);
+                Canvas.SetTop(rect, offsetY - rect.Height);
             }
 
             CityCanvas.Children.Add(rect);
@@ -291,13 +344,13 @@ namespace TrafficSimulation
             }
 
             // Смещение светофора вдоль дороги
-            double offsetX = position[0] + Math.Cos(roadAngle) * Road.Width / 4;
-            double offsetY = position[1] + Math.Sin(roadAngle) * Road.Width / 4;
+            double offsetX = position[0] + Math.Cos(roadAngle) * Constants.RoadWidthPixels / 4;
+            double offsetY = position[1] + Math.Sin(roadAngle) * Constants.RoadWidthPixels / 4;
 
             Ellipse ellipse = new Ellipse
             {
-                Width = 10,
-                Height = 10,
+                Width = Constants.TrafficLightPixels,
+                Height = Constants.TrafficLightPixels,
                 Fill = light.State == TrafficLightState.Red ? Brushes.Red :
                        light.State == TrafficLightState.Yellow ? Brushes.Yellow : Brushes.Green
             };
@@ -321,10 +374,10 @@ namespace TrafficSimulation
 
             CityCanvas.Children.Add(line);
 
-            // Добавление текста "100 метров"
-            TextBlock textBlock = new TextBlock
+            var text = 100 * Constants.MetresPerPixel + " метров";
+            TextBlock textBlock = new()
             {
-                Text = "100 метров",
+                Text = text,
                 Foreground = Brushes.Black,
                 FontSize = 10,
                 Margin = new Thickness(CityCanvas.ActualWidth - 80, CityCanvas.ActualHeight - 25, 0, 0)
