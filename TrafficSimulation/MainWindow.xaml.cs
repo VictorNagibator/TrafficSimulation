@@ -25,16 +25,16 @@ namespace TrafficSimulation
 
         private void InitializeCity()
         {
-            Intersection intersection1 = new Intersection { Name = "Intersection1", X = 100, Y = 100 };
-            Intersection intersection2 = new Intersection { Name = "Intersection2", X = 300, Y = 100 };
-            Intersection intersection3 = new Intersection { Name = "Intersection3", X = 300, Y = 300 };
-            Intersection intersection4 = new Intersection { Name = "Intersection4", X = 600, Y = 100 };
+            Intersection intersection1 = new() { Name = "Intersection1", X = 100, Y = 100 };
+            Intersection intersection2 = new() { Name = "Intersection2", X = 300, Y = 100 };
+            Intersection intersection3 = new() { Name = "Intersection3", X = 300, Y = 300 };
+            Intersection intersection4 = new() { Name = "Intersection4", X = 600, Y = 100 };
 
-            Road road1 = new Road { Name = "Road1", Type = RoadType.TwoWay, NumOfLanesPerDirection = 1, StartIntersection = intersection1, EndIntersection = intersection2 };
-            Road road2 = new Road { Name = "Road2", Type = RoadType.TwoWay, NumOfLanesPerDirection = 1, StartIntersection = intersection2, EndIntersection = intersection3 };
-            Road road3 = new Road { Name = "Road3", Type = RoadType.TwoWay, NumOfLanesPerDirection = 2, StartIntersection = intersection2, EndIntersection = intersection4 };
-            Road road4 = new Road { Name = "Road4", Type = RoadType.OneWay, NumOfLanesPerDirection = 1, StartIntersection = intersection3, EndIntersection = intersection4 };
-            Road road5 = new Road { Name = "Road5", Type = RoadType.OneWay, NumOfLanesPerDirection = 2, StartIntersection = intersection1, EndIntersection = intersection3 };
+            Road road1 = new () { Name = "Road1", Type = RoadType.TwoWay, NumOfLanesPerDirection = 1, StartIntersection = intersection1, EndIntersection = intersection2 };
+            Road road2 = new() { Name = "Road2", Type = RoadType.TwoWay, NumOfLanesPerDirection = 1, StartIntersection = intersection2, EndIntersection = intersection3 };
+            Road road3 = new() { Name = "Road3", Type = RoadType.TwoWay, NumOfLanesPerDirection = 2, StartIntersection = intersection2, EndIntersection = intersection4 };
+            Road road4 = new() { Name = "Road4", Type = RoadType.OneWay, NumOfLanesPerDirection = 1, StartIntersection = intersection3, EndIntersection = intersection4 };
+            Road road5 = new() { Name = "Road5", Type = RoadType.OneWay, NumOfLanesPerDirection = 2, StartIntersection = intersection1, EndIntersection = intersection3 };
 
             city.AddRoad(road1);
             city.AddRoad(road2);
@@ -42,11 +42,11 @@ namespace TrafficSimulation
             city.AddRoad(road4);
             city.AddRoad(road5);
 
-            TrafficLight light1 = new TrafficLight { ID = "Light1", ControlledRoad = road1, ControlledIntersection = intersection1, State = TrafficLightState.Green, Timer = (int)TrafficLightSlider.Value };
-            TrafficLight light2 = new TrafficLight { ID = "Light2", ControlledRoad = road1, ControlledIntersection = intersection2, State = TrafficLightState.Red, Timer = (int)TrafficLightSlider.Value };
-            TrafficLight light3 = new TrafficLight { ID = "Light3", ControlledRoad = road2, ControlledIntersection = intersection2, State = TrafficLightState.Red, Timer = (int)TrafficLightSlider.Value };
-            TrafficLight light4 = new TrafficLight { ID = "Light4", ControlledRoad = road3, ControlledIntersection = intersection2, State = TrafficLightState.Red, Timer = (int)TrafficLightSlider.Value };
-            TrafficLight light5 = new TrafficLight { ID = "Light5", ControlledRoad = road5, ControlledIntersection = intersection3, State = TrafficLightState.Red, Timer = (int)TrafficLightSlider.Value };
+            TrafficLight light1 = new() { ID = "Light1", ControlledRoad = road1, ControlledIntersection = intersection1, State = TrafficLightState.Green, Timer = (int)TrafficLightSlider.Value };
+            TrafficLight light2 = new() { ID = "Light2", ControlledRoad = road1, ControlledIntersection = intersection2, State = TrafficLightState.Red, Timer = (int)TrafficLightSlider.Value };
+            TrafficLight light3 = new() { ID = "Light3", ControlledRoad = road2, ControlledIntersection = intersection2, State = TrafficLightState.Red, Timer = (int)TrafficLightSlider.Value };
+            TrafficLight light4 = new() { ID = "Light4", ControlledRoad = road3, ControlledIntersection = intersection2, State = TrafficLightState.Red, Timer = (int)TrafficLightSlider.Value };
+            TrafficLight light5 = new() { ID = "Light5", ControlledRoad = road5, ControlledIntersection = intersection3, State = TrafficLightState.Red, Timer = (int)TrafficLightSlider.Value };
 
             city.AddTrafficLight(light1);
             city.AddTrafficLight(light2);
@@ -133,7 +133,7 @@ namespace TrafficSimulation
             endX += extension * Math.Cos(roadAngle);
             endY += extension * Math.Sin(roadAngle);
 
-            Line line = new Line
+            Line line = new()
             {
                 X1 = startX,
                 Y1 = startY,
@@ -147,27 +147,33 @@ namespace TrafficSimulation
 
             if (road.Type == RoadType.OneWay)
             {
-                DrawOneWayArrow(road, roadAngle, startX, startY, endX, endY);
+                DrawOneWayArrow(road);
             }
         }
 
-        private void DrawOneWayArrow(Road road, double roadAngle, double startX, double startY, double endX, double endY)
+        private void DrawOneWayArrow(Road road)
         {
             double arrowLength = 20;
-            double arrowWidth = 10;
+
+            double startX = road.StartIntersection.X;
+            double startY = road.StartIntersection.Y;
+            double endX = road.EndIntersection.X;
+            double endY = road.EndIntersection.Y;
+
+            double roadAngle = Math.Atan2(endY - startY, endX - startX);
 
             // Determine the center of the road for the arrow
             double midX = (startX + endX) / 2;
             double midY = (startY + endY) / 2;
 
             // Calculate arrow points
-            Point p1 = new Point(midX, midY);
-            Point p2 = new Point(midX - arrowLength * Math.Cos(roadAngle - Math.PI / 6), midY - arrowLength * Math.Sin(roadAngle - Math.PI / 6));
-            Point p3 = new Point(midX - arrowLength * Math.Cos(roadAngle + Math.PI / 6), midY - arrowLength * Math.Sin(roadAngle + Math.PI / 6));
+            Point p1 = new(midX, midY);
+            Point p2 = new(midX - arrowLength * Math.Cos(roadAngle - Math.PI / 6), midY - arrowLength * Math.Sin(roadAngle - Math.PI / 6));
+            Point p3 = new(midX - arrowLength * Math.Cos(roadAngle + Math.PI / 6), midY - arrowLength * Math.Sin(roadAngle + Math.PI / 6));
 
-            Polygon arrow = new Polygon
+            Polygon arrow = new()
             {
-                Points = new PointCollection { p1, p2, p3 },
+                Points = { p1, p2, p3 },
                 Fill = Brushes.White
             };
 
@@ -180,7 +186,7 @@ namespace TrafficSimulation
             double roadAngle = Math.Atan2(vehicle.CurrentRoad.EndIntersection.Y - vehicle.CurrentRoad.StartIntersection.Y,
                                           vehicle.CurrentRoad.EndIntersection.X - vehicle.CurrentRoad.StartIntersection.X);
 
-            Rectangle rect = new Rectangle
+            Rectangle rect = new()
             {
                 Width = 20,
                 Height = 10,
@@ -303,7 +309,7 @@ namespace TrafficSimulation
 
         private void DrawMetresLine()
         {
-            Line line = new Line
+            Line line = new()
             {
                 X1 = CityCanvas.ActualWidth - 10,
                 Y1 = CityCanvas.ActualHeight - 10,
