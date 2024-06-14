@@ -1,4 +1,6 @@
-﻿namespace TrafficSimulation.Models
+﻿using TrafficSimulation;
+
+namespace TrafficSimulation.Models
 {
     internal class Vehicle
     {
@@ -14,9 +16,10 @@
 
         public void Update(City city)
         {
-            double stopDistance = Constants.RoadWidthMetres;
+            double stopDistance = NextIntersection.GetWidth() / 2 + Constants.VehicleLengthMetres / 2;
+            double length = CurrentRoad.GetLength();
 
-            // Проверка светофора на текущей дороге
+            //Проверка светофора на текущей дороге
             var trafficLight = city.TrafficLights.FirstOrDefault(light => light.ControlledIntersection == NextIntersection && light.ControlledRoad == CurrentRoad);
             if (trafficLight != null)
             {

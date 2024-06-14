@@ -31,7 +31,7 @@
 
         public double GetLength()
         {
-            return Math.Sqrt((EndIntersection.X - StartIntersection.X)* (EndIntersection.X - StartIntersection.X) + (EndIntersection.Y - StartIntersection.Y) * (EndIntersection.Y - StartIntersection.Y));
+            return Math.Sqrt((EndIntersection.X - StartIntersection.X) * (EndIntersection.X - StartIntersection.X) + (EndIntersection.Y - StartIntersection.Y) * (EndIntersection.Y - StartIntersection.Y));
         }
 
         public double GetWidth()
