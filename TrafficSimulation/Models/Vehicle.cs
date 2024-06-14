@@ -17,54 +17,60 @@ namespace TrafficSimulation.Models
         public void Update(City city)
         {
             double stopDistance = NextIntersection.GetWidth() / 2 + Constants.VehicleLengthMetres / 2;
-            double length = CurrentRoad.GetLength();
 
-            //Проверка светофора на текущей дороге
+            // Проверка светофора на текущей дороге
             var trafficLight = city.TrafficLights.FirstOrDefault(light => light.ControlledIntersection == NextIntersection && light.ControlledRoad == CurrentRoad);
-            if (trafficLight != null)
+            bool shouldStopForTrafficLight = false;
+            if (trafficLight != null && trafficLight.State == TrafficLightState.Red)
             {
-                if (trafficLight.State == TrafficLightState.Red && ((IsMovingForward && Position + Speed >= CurrentRoad.GetLength() - stopDistance) || (!IsMovingForward && Position - Speed <= stopDistance)))
+                if ((IsMovingForward && Position + Speed >= CurrentRoad.GetLength() - stopDistance) || (!IsMovingForward && Position - Speed <= stopDistance))
                 {
-                    Position = IsMovingForward ? CurrentRoad.GetLength() - stopDistance : stopDistance;
-                    Speed = 0;
+                    shouldStopForTrafficLight = true;
                 }
-                else
+            }
+
+            // Проверка расстояния до следующего автомобиля
+            var nextVehicle = city.Vehicles
+                .Where(v => v.CurrentRoad == CurrentRoad && v.IsMovingForward == IsMovingForward && v.LineNumber == LineNumber)
+                .OrderBy(v => IsMovingForward ? v.Position : -v.Position)
+                .FirstOrDefault(v => IsMovingForward ? v.Position > Position : v.Position < Position);
+
+            bool shouldStopForNextVehicle = false;
+            if (nextVehicle != null)
+            {
+                double distanceToNextVehicle = Math.Abs(nextVehicle.Position - Position);
+                if (distanceToNextVehicle < Constants.SafetyDistanceToStop)
                 {
-                    Speed = MaxSpeed;
+                    shouldStopForNextVehicle = true;
                 }
+            }
+
+            if (shouldStopForTrafficLight || shouldStopForNextVehicle)
+            {
+                Speed = 0;
             }
             else
             {
                 Speed = MaxSpeed;
             }
 
-            // Проверка расстояния до следующего автомобиля
-            var nextVehicle = city.Vehicles
-                .Where(v => v.CurrentRoad == CurrentRoad && v.IsMovingForward == IsMovingForward && v.LineNumber == LineNumber)
-                .OrderBy(v => Math.Abs(v.Position - Position))
-                .FirstOrDefault(v => IsMovingForward ? v.Position > Position : v.Position < Position);
-
-            if (nextVehicle != null)
+            // Обновление позиции автомобиля
+            if (!shouldStopForTrafficLight && !shouldStopForNextVehicle)
             {
-                double distanceToNextVehicle = Math.Abs(nextVehicle.Position - Position);
-                if (distanceToNextVehicle < Constants.SafetyDistanceToStop)
-                {
-                    Speed = 0;
-                }
+                Position += IsMovingForward ? Speed : -Speed;
             }
-
-            // Обновляем позицию автомобиля в зависимости от направления движения
-            Position += IsMovingForward ? Speed : -Speed;
+            else if (shouldStopForTrafficLight && !shouldStopForNextVehicle)
+            {
+                Position = IsMovingForward ? CurrentRoad.GetLength() - stopDistance : stopDistance;
+            }
 
             // Если автомобиль достиг конца или начала дороги
             if (Speed != 0 && (Position >= CurrentRoad.GetLength() || Position <= 0))
             {
-                // Получаем следующую дорогу на маршруте
                 Road nextRoad = GetNextRoad();
 
                 if (nextRoad != null)
                 {
-                    // Перемещаем автомобиль на следующую дорогу
                     if (CurrentRoad == nextRoad)
                     {
                         Random random = new();

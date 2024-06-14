@@ -26,10 +26,10 @@ namespace TrafficSimulation
         private void InitializeCity()
         {
             Intersection intersection1 = new() { Name = "Intersection1", X = 10, Y = 10 };
-            Intersection intersection2 = new() { Name = "Intersection2", X = 60, Y = 10 };
-            Intersection intersection3 = new() { Name = "Intersection3", X = 60, Y = 50 };
-            Intersection intersection4 = new() { Name = "Intersection4", X = 110, Y = 10 };
-            Intersection intersection5 = new() { Name = "Intersection5", X = 10, Y = 40 };
+            Intersection intersection2 = new() { Name = "Intersection2", X = 110, Y = 10 };
+            Intersection intersection3 = new() { Name = "Intersection3", X = 110, Y = 110 };
+            Intersection intersection4 = new() { Name = "Intersection4", X = 210, Y = 10 };
+            Intersection intersection5 = new() { Name = "Intersection5", X = 10, Y = 110 };
 
             Road road1 = new() { Name = "Road1", Type = RoadType.TwoWay, NumOfLanesPerDirection = 1, StartIntersection = intersection1, EndIntersection = intersection2 };
             Road road2 = new() { Name = "Road2", Type = RoadType.TwoWay, NumOfLanesPerDirection = 1, StartIntersection = intersection2, EndIntersection = intersection3 };
@@ -326,7 +326,7 @@ namespace TrafficSimulation
 
             CityCanvas.Children.Add(line);
 
-            var text = 100 * Constants.MetresPerPixel + " метров";
+            var text = Math.Round(100 * Constants.MetresPerPixel, 2) + " метров";
             TextBlock textBlock = new()
             {
                 Text = text,
@@ -408,6 +408,38 @@ namespace TrafficSimulation
         {
             DrawCity();
             DrawMetresLine();
+        }
+
+        private void ZoomInButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (Constants.MetresPerPixel <= 0.1) return;
+
+            Constants.MetresPerPixel -= 0.05;
+            Math.Round(Constants.MetresPerPixel, 2);
+
+            DrawCity();
+            DrawMetresLine();
+        }
+
+        private void ZoomOutButton_Click(object sender, RoutedEventArgs e)
+        {
+            Constants.MetresPerPixel += 0.05;
+            Math.Round(Constants.MetresPerPixel, 2);
+
+            DrawCity();
+            DrawMetresLine();
+        }
+
+        private void CityCanvas_MouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
+        {
+            if (e.Delta > 0)
+            {
+                ZoomInButton_Click(sender, e);
+            }
+            else
+            {
+                ZoomOutButton_Click(sender, e);
+            }
         }
     }
 }
