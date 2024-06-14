@@ -3,8 +3,6 @@
     internal class Road
     {
         public string Name { get; set; }
-
-        public const double Width = 40;
         public RoadType Type { get; set; }
         public int NumOfLanesPerDirection { get; set; }
         public Intersection StartIntersection { get; set; }
@@ -21,6 +19,7 @@
             double startY = StartIntersection.Y;
             double endX = EndIntersection.X;
             double endY = EndIntersection.Y;
+
             
             double angle = Math.Atan2(endY - startY, endX - startX);
 
@@ -32,7 +31,12 @@
 
         public double GetLength()
         {
-            return Math.Sqrt((EndIntersection.X - StartIntersection.X)* (EndIntersection.X - StartIntersection.X) + (EndIntersection.Y - StartIntersection.Y) * (EndIntersection.Y - StartIntersection.Y));
+            return Math.Sqrt((EndIntersection.X - StartIntersection.X) * (EndIntersection.X - StartIntersection.X) + (EndIntersection.Y - StartIntersection.Y) * (EndIntersection.Y - StartIntersection.Y));
+        }
+
+        public double GetWidth()
+        {
+            return Type != RoadType.OneWay ? NumOfLanesPerDirection * Constants.RoadWidthMetres : NumOfLanesPerDirection * Constants.RoadWidthMetres / 2;
         }
 
         public List<Road> GetRoads(Vehicle vehicle, RoadDirection direction)
