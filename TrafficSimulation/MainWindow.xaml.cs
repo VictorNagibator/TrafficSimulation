@@ -29,18 +29,23 @@ namespace TrafficSimulation
             Intersection intersection2 = new() { Name = "Intersection2", X = 300, Y = 100 };
             Intersection intersection3 = new() { Name = "Intersection3", X = 300, Y = 300 };
             Intersection intersection4 = new() { Name = "Intersection4", X = 600, Y = 100 };
+            Intersection intersection5 = new() { Name = "Intersection5", X = 100, Y = 300 };
 
             Road road1 = new() { Name = "Road1", Type = RoadType.TwoWay, NumOfLanesPerDirection = 1, StartIntersection = intersection1, EndIntersection = intersection2 };
             Road road2 = new() { Name = "Road2", Type = RoadType.TwoWay, NumOfLanesPerDirection = 1, StartIntersection = intersection2, EndIntersection = intersection3 };
             Road road3 = new() { Name = "Road3", Type = RoadType.TwoWay, NumOfLanesPerDirection = 2, StartIntersection = intersection2, EndIntersection = intersection4 };
             Road road4 = new() { Name = "Road4", Type = RoadType.OneWay, NumOfLanesPerDirection = 1, StartIntersection = intersection3, EndIntersection = intersection4 };
             Road road5 = new() { Name = "Road5", Type = RoadType.OneWay, NumOfLanesPerDirection = 2, StartIntersection = intersection1, EndIntersection = intersection3 };
+            Road road6 = new() { Name = "Road6", Type = RoadType.OneWay, NumOfLanesPerDirection = 3, StartIntersection = intersection1, EndIntersection = intersection5 };
+            Road road7 = new() { Name = "Road7", Type = RoadType.OneWay, NumOfLanesPerDirection = 2, StartIntersection = intersection5, EndIntersection = intersection3 };
 
             city.AddRoad(road1);
             city.AddRoad(road2);
             city.AddRoad(road3);
             city.AddRoad(road4);
             city.AddRoad(road5);
+            city.AddRoad(road6);
+            city.AddRoad(road7);
 
             TrafficLight light1 = new() { ID = "Light1", ControlledRoad = road1, ControlledIntersection = intersection1, State = TrafficLightState.Green, Timer = (int)TrafficLightSlider.Value };
             TrafficLight light2 = new() { ID = "Light2", ControlledRoad = road1, ControlledIntersection = intersection2, State = TrafficLightState.Red, Timer = (int)TrafficLightSlider.Value };
@@ -216,46 +221,44 @@ namespace TrafficSimulation
             double angle = (vehicle.IsMovingForward ? roadAngle : roadAngle + Math.PI) * 180 / Math.PI;
             rect.RenderTransform = new RotateTransform(angle, rect.Width / 2, rect.Height / 2);
 
-            if (vehicle.CurrentRoad.NumOfLanesPerDirection == 1 && vehicle.CurrentRoad.Type == RoadType.OneWay)
+            if (vehicle.CurrentRoad.Type == RoadType.OneWay)
             {
-                double offset = Constants.RoadWidthPixels / 4;
-                double offsetX = position[0] - offset * Math.Cos(roadAngle);
-                double offsetY = position[1] - offset * Math.Sin(roadAngle);
-
-                if (!vehicle.IsMovingForward)
+                if (vehicle.CurrentRoad.NumOfLanesPerDirection % 2 == 0)
                 {
-                    offsetX += offset * Math.Cos(roadAngle);
-                    offsetY += offset * Math.Sin(roadAngle);
-                }
+                    double offset; 
+                    if (vehicle.LineNumber <= vehicle.CurrentRoad.NumOfLanesPerDirection / 2)
+                    {
+                        offset = rect.Height / 2 + Constants.VehicleWidthPixels * Math.Abs(vehicle.CurrentRoad.NumOfLanesPerDirection / 2 - vehicle.LineNumber);
+                    }
+                    else
+                    {
+                        offset = rect.Height / 2 + Constants.VehicleWidthPixels * Math.Abs(vehicle.CurrentRoad.NumOfLanesPerDirection / 2 - vehicle.LineNumber + 1);
+                        offset = -offset;
+                    }
 
-                Canvas.SetLeft(rect, offsetX - rect.Width / 2);
-                Canvas.SetTop(rect, offsetY - rect.Height / 2);
-            }
-            else if (vehicle.CurrentRoad.Type == RoadType.OneWay)
-            {
-                //вот здесь нет, думай над четным и нечетным количеством полос
-                double laneOffset = rect.Width / 2;
+                    double offsetX = position[0] + Math.Sin(roadAngle) * offset;
+                    double offsetY = position[1] - Math.Cos(roadAngle) * offset;
 
-                double offsetX = position[0] + Math.Sin(roadAngle) * laneOffset;
-                double offsetY = position[1] - Math.Cos(roadAngle) * laneOffset;
-
-                if (vehicle.IsMovingForward)
-                {
-                    offsetX -= Math.Sin(roadAngle) * rect.Width;
-                    offsetY += Math.Cos(roadAngle) * rect.Width;
+                    Canvas.SetLeft(rect, offsetX - rect.Width / 2);
+                    Canvas.SetTop(rect, offsetY - rect.Height / 2);
                 }
                 else
                 {
-                    offsetX += Math.Sin(roadAngle) * rect.Width;
-                    offsetY -= Math.Cos(roadAngle) * rect.Width;
-                }
+                    double offset = Constants.VehicleWidthPixels * Math.Abs(vehicle.CurrentRoad.NumOfLanesPerDirection / 2 - vehicle.LineNumber + 1);
+                    if (vehicle.LineNumber > vehicle.CurrentRoad.NumOfLanesPerDirection / 2)
+                    {
+                        offset = -offset;
+                    }
 
-                Canvas.SetLeft(rect, offsetX - rect.Width / 2);
-                Canvas.SetTop(rect, offsetY - rect.Height / 2); 
+                    double offsetX = position[0] + Math.Sin(roadAngle) * offset;
+                    double offsetY = position[1] - Math.Cos(roadAngle) * offset;
+
+                    Canvas.SetLeft(rect, offsetX - rect.Width / 2);
+                    Canvas.SetTop(rect, offsetY - rect.Height / 2);
+                }
             }
             else
             {
-                //здесь все работает
                 double laneOffset = rect.Height / 2 + Constants.VehicleWidthPixels * (vehicle.LineNumber - 1);
 
                 if (vehicle.IsMovingForward)
