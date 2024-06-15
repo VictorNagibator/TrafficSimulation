@@ -26,6 +26,10 @@ namespace TrafficSimulation
 
             DrawCity();
 
+            // Clip the canvas to its boundaries
+            RectangleGeometry clipRect = new(new Rect(0, 0, CityCanvas.ActualWidth, CityCanvas.ActualHeight));
+            CityCanvas.Clip = clipRect;
+
             CityCanvas.MouseDown += CityCanvas_MouseDown;
             CityCanvas.MouseMove += CityCanvas_MouseMove;
             CityCanvas.MouseUp += CityCanvas_MouseUp;
@@ -415,6 +419,9 @@ namespace TrafficSimulation
 
         private void CityCanvas_SizeChanged(object sender, SizeChangedEventArgs e)
         {
+            RectangleGeometry clipRect = new(new Rect(0, 0, CityCanvas.ActualWidth, CityCanvas.ActualHeight));
+            CityCanvas.Clip = clipRect;
+
             DrawCity();
             DrawMetresLine();
         }
@@ -423,23 +430,19 @@ namespace TrafficSimulation
         {
             if (Constants.MetresPerPixel <= 0.1) return;
 
-            Constants.MetresPerPixel -= 0.05;
-            Math.Round(Constants.MetresPerPixel, 2);
-
+            Constants.MetresPerPixel = Math.Max(Constants.MetresPerPixel - 0.05, 0.1);
             DrawCity();
             DrawMetresLine();
         }
 
         private void ZoomOutButton_Click(object sender, RoutedEventArgs e)
         {
-            Constants.MetresPerPixel += 0.05;
-            Math.Round(Constants.MetresPerPixel, 2);
-
+            Constants.MetresPerPixel = Math.Min(Constants.MetresPerPixel + 0.05, 1);
             DrawCity();
             DrawMetresLine();
         }
 
-        private void CityCanvas_MouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
+        private void CityCanvas_MouseWheel(object sender, MouseWheelEventArgs e)
         {
             if (e.Delta > 0)
             {
@@ -476,25 +479,6 @@ namespace TrafficSimulation
 
                     if (!double.IsNaN(newLeft) && !double.IsNaN(newTop))
                     {
-                        // Проверка на границы канваса
-                        if (newLeft < 0)
-                        {
-                            newLeft = 0;
-                        }
-                        else if (newLeft + element.RenderSize.Width > CityCanvas.ActualWidth)
-                        {
-                            newLeft = CityCanvas.ActualWidth - element.RenderSize.Width;
-                        }
-
-                        if (newTop < 0)
-                        {
-                            newTop = 0;
-                        }
-                        else if (newTop + element.RenderSize.Height > CityCanvas.ActualHeight)
-                        {
-                            newTop = CityCanvas.ActualHeight - element.RenderSize.Height;
-                        }
-
                         Canvas.SetLeft(element, newLeft);
                         Canvas.SetTop(element, newTop);
                     }
