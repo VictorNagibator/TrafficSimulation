@@ -36,10 +36,9 @@
         </StackPanel>
 
         <!-- Canvas for drawing the city -->
-        <Canvas Name="CityCanvas" Grid.Row="2" Grid.Column="0" Background="LightGray" Margin="10" SizeChanged="CityCanvas_SizeChanged" MouseWheel="CityCanvas_MouseWheel">
-            <Canvas.LayoutTransform>
-                <ScaleTransform x:Name="CanvasScaleTransform" ScaleX="1" ScaleY="1"/>
-            </Canvas.LayoutTransform>
+        <Canvas Name="CityCanvas" Grid.Row="2" Grid.Column="0" Background="LightGray" Margin="10" 
+        SizeChanged="CityCanvas_SizeChanged" MouseWheel="CityCanvas_MouseWheel"
+        MouseDown="CityCanvas_MouseDown" MouseMove="CityCanvas_MouseMove" MouseUp="CityCanvas_MouseUp">
         </Canvas>
 
         <!-- Zoom controls -->

@@ -4,6 +4,7 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using TrafficSimulation.Models;
 using System.Windows.Threading;
+using System.Windows.Input;
 
 namespace TrafficSimulation
 {
@@ -13,6 +14,11 @@ namespace TrafficSimulation
         private DispatcherTimer timer = new();
         private Random random = new();
 
+        private bool isDragging = false;
+        private Point clickPosition;
+
+        private double[] globalOffset = [0, 0];
+
         public MainWindow()
         {
             InitializeComponent();
@@ -21,6 +27,13 @@ namespace TrafficSimulation
             InitializeSliders();
 
             DrawCity();
+
+            RectangleGeometry clipRect = new(new Rect(0, 0, CityCanvas.ActualWidth, CityCanvas.ActualHeight));
+            CityCanvas.Clip = clipRect;
+
+            CityCanvas.MouseDown += CityCanvas_MouseDown;
+            CityCanvas.MouseMove += CityCanvas_MouseMove;
+            CityCanvas.MouseUp += CityCanvas_MouseUp;
         }
 
         private void InitializeCity()
@@ -135,11 +148,11 @@ namespace TrafficSimulation
             {
                 Width = maxRoadWidth / Constants.MetresPerPixel,
                 Height = maxRoadWidth / Constants.MetresPerPixel,
-                Fill = Brushes.Gray
+                Fill = Brushes.Black
             };
 
-            Canvas.SetLeft(rect, intersection.ActualX - maxRoadWidth / (2 * Constants.MetresPerPixel));
-            Canvas.SetTop(rect, intersection.ActualY - maxRoadWidth / (2 * Constants.MetresPerPixel));
+            Canvas.SetLeft(rect, intersection.ActualX - maxRoadWidth / (2 * Constants.MetresPerPixel) + globalOffset[0]);
+            Canvas.SetTop(rect, intersection.ActualY - maxRoadWidth / (2 * Constants.MetresPerPixel) + globalOffset[1]);
             CityCanvas.Children.Add(rect);
         }
 
@@ -162,10 +175,10 @@ namespace TrafficSimulation
 
             Line line = new()
             {
-                X1 = startX,
-                Y1 = startY,
-                X2 = endX,
-                Y2 = endY,
+                X1 = startX + globalOffset[0],
+                Y1 = startY + globalOffset[1],
+                X2 = endX + globalOffset[0],
+                Y2 = endY + globalOffset[1],
                 Stroke = Brushes.Black,
                 StrokeThickness = road.GetWidth() / Constants.MetresPerPixel,
             };
@@ -189,8 +202,8 @@ namespace TrafficSimulation
 
             double roadAngle = Math.Atan2(endY - startY, endX - startX);
 
-            double midX = (startX + endX) / 2;
-            double midY = (startY + endY) / 2;
+            double midX = (startX + endX) / 2 + globalOffset[0];
+            double midY = (startY + endY) / 2 + globalOffset[1];
 
             Point p1 = new(midX, midY);
             Point p2 = new(midX - arrowLength * Math.Cos(roadAngle - Math.PI / 6), midY - arrowLength * Math.Sin(roadAngle - Math.PI / 6));
@@ -223,11 +236,12 @@ namespace TrafficSimulation
             double angle = (vehicle.IsMovingForward ? roadAngle : roadAngle + Math.PI) * 180 / Math.PI;
             rect.RenderTransform = new RotateTransform(angle, rect.Width / 2, rect.Height / 2);
 
+            double offset, offsetX, offsetY;
+
             if (vehicle.CurrentRoad.Type == RoadType.OneWay)
             {
                 if (vehicle.CurrentRoad.NumOfLanesPerDirection % 2 == 0)
                 {
-                    double offset; 
                     if (vehicle.LineNumber <= vehicle.CurrentRoad.NumOfLanesPerDirection / 2)
                     {
                         offset = rect.Height / 2 + Constants.VehicleWidthPixels * Math.Abs(vehicle.CurrentRoad.NumOfLanesPerDirection / 2 - vehicle.LineNumber);
@@ -238,47 +252,41 @@ namespace TrafficSimulation
                         offset = -offset;
                     }
 
-                    double offsetX = position[0] + Math.Sin(roadAngle) * offset;
-                    double offsetY = position[1] - Math.Cos(roadAngle) * offset;
+                    offsetX = position[0] + Math.Sin(roadAngle) * offset;
+                    offsetY = position[1] - Math.Cos(roadAngle) * offset;
 
                     Canvas.SetLeft(rect, offsetX - rect.Width / 2);
                     Canvas.SetTop(rect, offsetY - rect.Height / 2);
                 }
                 else
                 {
-                    double offset = Constants.VehicleWidthPixels * Math.Abs(vehicle.CurrentRoad.NumOfLanesPerDirection / 2 - vehicle.LineNumber + 1);
+                    offset = Constants.VehicleWidthPixels * Math.Abs(vehicle.CurrentRoad.NumOfLanesPerDirection / 2 - vehicle.LineNumber + 1);
                     if (vehicle.LineNumber > vehicle.CurrentRoad.NumOfLanesPerDirection / 2)
                     {
                         offset = -offset;
                     }
 
-                    double offsetX = position[0] + Math.Sin(roadAngle) * offset;
-                    double offsetY = position[1] - Math.Cos(roadAngle) * offset;
-
-                    Canvas.SetLeft(rect, offsetX - rect.Width / 2);
-                    Canvas.SetTop(rect, offsetY - rect.Height / 2);
+                    offsetX = position[0] + Math.Sin(roadAngle) * offset;
+                    offsetY = position[1] - Math.Cos(roadAngle) * offset;
                 }
             }
             else
             {
-                double laneOffset = rect.Height / 2 + Constants.VehicleWidthPixels * (vehicle.LineNumber - 1);
+                offset = rect.Height / 2 + Constants.VehicleWidthPixels * (vehicle.LineNumber - 1);
 
                 if (vehicle.IsMovingForward)
                 {
-                    laneOffset = -laneOffset;
+                    offset = -offset;
                 }
 
-                double offsetX = position[0] + Math.Sin(roadAngle) * laneOffset;
-                double offsetY = position[1] - Math.Cos(roadAngle) * laneOffset;
-
-                Canvas.SetLeft(rect, offsetX - rect.Width / 2);
-                Canvas.SetTop(rect, offsetY - rect.Height / 2);
+                offsetX = position[0] + Math.Sin(roadAngle) * offset;
+                offsetY = position[1] - Math.Cos(roadAngle) * offset;
             }
 
+            Canvas.SetLeft(rect, offsetX - rect.Width / 2 + globalOffset[0]);
+            Canvas.SetTop(rect, offsetY - rect.Height / 2 + globalOffset[1]);
             CityCanvas.Children.Add(rect);
         }
-
-
 
         private void DrawTrafficLight(TrafficLight light)
         {
@@ -307,8 +315,8 @@ namespace TrafficSimulation
                        light.State == TrafficLightState.Yellow ? Brushes.Yellow : Brushes.Green
             };
 
-            Canvas.SetLeft(ellipse, offsetX - ellipse.Width / 2);
-            Canvas.SetTop(ellipse, offsetY - ellipse.Height / 2);
+            Canvas.SetLeft(ellipse, offsetX - ellipse.Width / 2 + globalOffset[0]);
+            Canvas.SetTop(ellipse, offsetY - ellipse.Height / 2 + globalOffset[1]);
             CityCanvas.Children.Add(ellipse);
         }
 
@@ -316,12 +324,13 @@ namespace TrafficSimulation
         {
             Line line = new()
             {
+                Name = "MetresLine",
                 X1 = CityCanvas.ActualWidth - 10,
                 Y1 = CityCanvas.ActualHeight - 10,
                 X2 = CityCanvas.ActualWidth - 100,
                 Y2 = CityCanvas.ActualHeight - 10,
                 Stroke = Brushes.Black,
-                StrokeThickness = 1
+                StrokeThickness = 1,
             };
 
             CityCanvas.Children.Add(line);
@@ -406,6 +415,9 @@ namespace TrafficSimulation
 
         private void CityCanvas_SizeChanged(object sender, SizeChangedEventArgs e)
         {
+            RectangleGeometry clipRect = new(new Rect(0, 0, CityCanvas.ActualWidth, CityCanvas.ActualHeight));
+            CityCanvas.Clip = clipRect;
+
             DrawCity();
             DrawMetresLine();
         }
@@ -414,23 +426,19 @@ namespace TrafficSimulation
         {
             if (Constants.MetresPerPixel <= 0.1) return;
 
-            Constants.MetresPerPixel -= 0.05;
-            Math.Round(Constants.MetresPerPixel, 2);
-
+            Constants.MetresPerPixel = Math.Max(Constants.MetresPerPixel - 0.05, 0.1);
             DrawCity();
             DrawMetresLine();
         }
 
         private void ZoomOutButton_Click(object sender, RoutedEventArgs e)
         {
-            Constants.MetresPerPixel += 0.05;
-            Math.Round(Constants.MetresPerPixel, 2);
-
+            Constants.MetresPerPixel = Math.Min(Constants.MetresPerPixel + 0.05, 1);
             DrawCity();
             DrawMetresLine();
         }
 
-        private void CityCanvas_MouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
+        private void CityCanvas_MouseWheel(object sender, MouseWheelEventArgs e)
         {
             if (e.Delta > 0)
             {
@@ -439,6 +447,72 @@ namespace TrafficSimulation
             else
             {
                 ZoomOutButton_Click(sender, e);
+            }
+        }
+
+        private void CityCanvas_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                isDragging = true;
+                clickPosition = e.GetPosition(CityCanvas);
+                CityCanvas.CaptureMouse();
+            }
+        }
+
+        private void CityCanvas_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (isDragging && e.LeftButton == MouseButtonState.Pressed)
+            {
+                Point currentPosition = e.GetPosition(CityCanvas);
+                double offsetX = currentPosition.X - clickPosition.X;
+                double offsetY = currentPosition.Y - clickPosition.Y;
+
+                globalOffset[0] += offsetX;
+                globalOffset[1] += offsetY;
+
+                foreach (UIElement element in CityCanvas.Children)
+                {
+                    double newLeft = Canvas.GetLeft(element) + offsetX;
+                    double newTop = Canvas.GetTop(element) + offsetY;
+
+                    if (!double.IsNaN(newLeft) && !double.IsNaN(newTop))
+                    {
+                        Canvas.SetLeft(element, newLeft);
+                        Canvas.SetTop(element, newTop);
+                    }
+                    else
+                    {
+                        if (element is Line line)
+                        {
+                            if (line.Name != "MetresLine")
+                            {
+                                line.X1 += offsetX;
+                                line.Y1 += offsetY;
+                                line.X2 += offsetX;
+                                line.Y2 += offsetY;
+                            }
+                        }
+                        else if (element is Polygon polygon)
+                        {
+                            for (int i = 0; i < polygon.Points.Count; i++)
+                            {
+                                polygon.Points[i] = new Point(polygon.Points[i].X + offsetX, polygon.Points[i].Y + offsetY);
+                            }
+                        }
+                    }
+                }
+
+                clickPosition = currentPosition;
+            }
+        }
+
+        private void CityCanvas_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Released)
+            {
+                isDragging = false;
+                CityCanvas.ReleaseMouseCapture();
             }
         }
     }
