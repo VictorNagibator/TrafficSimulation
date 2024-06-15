@@ -4,6 +4,7 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using TrafficSimulation.Models;
 using System.Windows.Threading;
+using System.Windows.Input;
 
 namespace TrafficSimulation
 {
@@ -13,6 +14,9 @@ namespace TrafficSimulation
         private DispatcherTimer timer = new();
         private Random random = new();
 
+        private bool isDragging = false;
+        private Point clickPosition;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -21,6 +25,10 @@ namespace TrafficSimulation
             InitializeSliders();
 
             DrawCity();
+
+            CityCanvas.MouseDown += CityCanvas_MouseDown;
+            CityCanvas.MouseMove += CityCanvas_MouseMove;
+            CityCanvas.MouseUp += CityCanvas_MouseUp;
         }
 
         private void InitializeCity()
@@ -316,12 +324,13 @@ namespace TrafficSimulation
         {
             Line line = new()
             {
+                Name = "MetresLine",
                 X1 = CityCanvas.ActualWidth - 10,
                 Y1 = CityCanvas.ActualHeight - 10,
                 X2 = CityCanvas.ActualWidth - 100,
                 Y2 = CityCanvas.ActualHeight - 10,
                 Stroke = Brushes.Black,
-                StrokeThickness = 1
+                StrokeThickness = 1,
             };
 
             CityCanvas.Children.Add(line);
@@ -439,6 +448,88 @@ namespace TrafficSimulation
             else
             {
                 ZoomOutButton_Click(sender, e);
+            }
+        }
+
+        private void CityCanvas_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                isDragging = true;
+                clickPosition = e.GetPosition(CityCanvas);
+                CityCanvas.CaptureMouse();
+            }
+        }
+
+        private void CityCanvas_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (isDragging && e.LeftButton == MouseButtonState.Pressed)
+            {
+                Point currentPosition = e.GetPosition(CityCanvas);
+                double offsetX = currentPosition.X - clickPosition.X;
+                double offsetY = currentPosition.Y - clickPosition.Y;
+
+                foreach (UIElement element in CityCanvas.Children)
+                {
+                    double newLeft = Canvas.GetLeft(element) + offsetX;
+                    double newTop = Canvas.GetTop(element) + offsetY;
+
+                    if (!double.IsNaN(newLeft) && !double.IsNaN(newTop))
+                    {
+                        // Проверка на границы канваса
+                        if (newLeft < 0)
+                        {
+                            newLeft = 0;
+                        }
+                        else if (newLeft + element.RenderSize.Width > CityCanvas.ActualWidth)
+                        {
+                            newLeft = CityCanvas.ActualWidth - element.RenderSize.Width;
+                        }
+
+                        if (newTop < 0)
+                        {
+                            newTop = 0;
+                        }
+                        else if (newTop + element.RenderSize.Height > CityCanvas.ActualHeight)
+                        {
+                            newTop = CityCanvas.ActualHeight - element.RenderSize.Height;
+                        }
+
+                        Canvas.SetLeft(element, newLeft);
+                        Canvas.SetTop(element, newTop);
+                    }
+                    else
+                    {
+                        if (element is Line line)
+                        {
+                            if (line.Name != "MetresLine")
+                            {
+                                line.X1 += offsetX;
+                                line.Y1 += offsetY;
+                                line.X2 += offsetX;
+                                line.Y2 += offsetY;
+                            }
+                        }
+                        else if (element is Polygon polygon)
+                        {
+                            for (int i = 0; i < polygon.Points.Count; i++)
+                            {
+                                polygon.Points[i] = new Point(polygon.Points[i].X + offsetX, polygon.Points[i].Y + offsetY);
+                            }
+                        }
+                    }
+                }
+
+                clickPosition = currentPosition;
+            }
+        }
+
+        private void CityCanvas_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Released)
+            {
+                isDragging = false;
+                CityCanvas.ReleaseMouseCapture();
             }
         }
     }
