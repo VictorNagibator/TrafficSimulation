@@ -17,6 +17,8 @@ namespace TrafficSimulation
         private bool isDragging = false;
         private Point clickPosition;
 
+        private double[] globalOffset = [0, 0];
+
         public MainWindow()
         {
             InitializeComponent();
@@ -26,7 +28,6 @@ namespace TrafficSimulation
 
             DrawCity();
 
-            // Clip the canvas to its boundaries
             RectangleGeometry clipRect = new(new Rect(0, 0, CityCanvas.ActualWidth, CityCanvas.ActualHeight));
             CityCanvas.Clip = clipRect;
 
@@ -147,11 +148,11 @@ namespace TrafficSimulation
             {
                 Width = maxRoadWidth / Constants.MetresPerPixel,
                 Height = maxRoadWidth / Constants.MetresPerPixel,
-                Fill = Brushes.Gray
+                Fill = Brushes.Black
             };
 
-            Canvas.SetLeft(rect, intersection.ActualX - maxRoadWidth / (2 * Constants.MetresPerPixel));
-            Canvas.SetTop(rect, intersection.ActualY - maxRoadWidth / (2 * Constants.MetresPerPixel));
+            Canvas.SetLeft(rect, intersection.ActualX - maxRoadWidth / (2 * Constants.MetresPerPixel) + globalOffset[0]);
+            Canvas.SetTop(rect, intersection.ActualY - maxRoadWidth / (2 * Constants.MetresPerPixel) + globalOffset[1]);
             CityCanvas.Children.Add(rect);
         }
 
@@ -174,10 +175,10 @@ namespace TrafficSimulation
 
             Line line = new()
             {
-                X1 = startX,
-                Y1 = startY,
-                X2 = endX,
-                Y2 = endY,
+                X1 = startX + globalOffset[0],
+                Y1 = startY + globalOffset[1],
+                X2 = endX + globalOffset[0],
+                Y2 = endY + globalOffset[1],
                 Stroke = Brushes.Black,
                 StrokeThickness = road.GetWidth() / Constants.MetresPerPixel,
             };
@@ -201,8 +202,8 @@ namespace TrafficSimulation
 
             double roadAngle = Math.Atan2(endY - startY, endX - startX);
 
-            double midX = (startX + endX) / 2;
-            double midY = (startY + endY) / 2;
+            double midX = (startX + endX) / 2 + globalOffset[0];
+            double midY = (startY + endY) / 2 + globalOffset[1];
 
             Point p1 = new(midX, midY);
             Point p2 = new(midX - arrowLength * Math.Cos(roadAngle - Math.PI / 6), midY - arrowLength * Math.Sin(roadAngle - Math.PI / 6));
@@ -235,11 +236,12 @@ namespace TrafficSimulation
             double angle = (vehicle.IsMovingForward ? roadAngle : roadAngle + Math.PI) * 180 / Math.PI;
             rect.RenderTransform = new RotateTransform(angle, rect.Width / 2, rect.Height / 2);
 
+            double offset, offsetX, offsetY;
+
             if (vehicle.CurrentRoad.Type == RoadType.OneWay)
             {
                 if (vehicle.CurrentRoad.NumOfLanesPerDirection % 2 == 0)
                 {
-                    double offset; 
                     if (vehicle.LineNumber <= vehicle.CurrentRoad.NumOfLanesPerDirection / 2)
                     {
                         offset = rect.Height / 2 + Constants.VehicleWidthPixels * Math.Abs(vehicle.CurrentRoad.NumOfLanesPerDirection / 2 - vehicle.LineNumber);
@@ -250,47 +252,41 @@ namespace TrafficSimulation
                         offset = -offset;
                     }
 
-                    double offsetX = position[0] + Math.Sin(roadAngle) * offset;
-                    double offsetY = position[1] - Math.Cos(roadAngle) * offset;
+                    offsetX = position[0] + Math.Sin(roadAngle) * offset;
+                    offsetY = position[1] - Math.Cos(roadAngle) * offset;
 
                     Canvas.SetLeft(rect, offsetX - rect.Width / 2);
                     Canvas.SetTop(rect, offsetY - rect.Height / 2);
                 }
                 else
                 {
-                    double offset = Constants.VehicleWidthPixels * Math.Abs(vehicle.CurrentRoad.NumOfLanesPerDirection / 2 - vehicle.LineNumber + 1);
+                    offset = Constants.VehicleWidthPixels * Math.Abs(vehicle.CurrentRoad.NumOfLanesPerDirection / 2 - vehicle.LineNumber + 1);
                     if (vehicle.LineNumber > vehicle.CurrentRoad.NumOfLanesPerDirection / 2)
                     {
                         offset = -offset;
                     }
 
-                    double offsetX = position[0] + Math.Sin(roadAngle) * offset;
-                    double offsetY = position[1] - Math.Cos(roadAngle) * offset;
-
-                    Canvas.SetLeft(rect, offsetX - rect.Width / 2);
-                    Canvas.SetTop(rect, offsetY - rect.Height / 2);
+                    offsetX = position[0] + Math.Sin(roadAngle) * offset;
+                    offsetY = position[1] - Math.Cos(roadAngle) * offset;
                 }
             }
             else
             {
-                double laneOffset = rect.Height / 2 + Constants.VehicleWidthPixels * (vehicle.LineNumber - 1);
+                offset = rect.Height / 2 + Constants.VehicleWidthPixels * (vehicle.LineNumber - 1);
 
                 if (vehicle.IsMovingForward)
                 {
-                    laneOffset = -laneOffset;
+                    offset = -offset;
                 }
 
-                double offsetX = position[0] + Math.Sin(roadAngle) * laneOffset;
-                double offsetY = position[1] - Math.Cos(roadAngle) * laneOffset;
-
-                Canvas.SetLeft(rect, offsetX - rect.Width / 2);
-                Canvas.SetTop(rect, offsetY - rect.Height / 2);
+                offsetX = position[0] + Math.Sin(roadAngle) * offset;
+                offsetY = position[1] - Math.Cos(roadAngle) * offset;
             }
 
+            Canvas.SetLeft(rect, offsetX - rect.Width / 2 + globalOffset[0]);
+            Canvas.SetTop(rect, offsetY - rect.Height / 2 + globalOffset[1]);
             CityCanvas.Children.Add(rect);
         }
-
-
 
         private void DrawTrafficLight(TrafficLight light)
         {
@@ -319,8 +315,8 @@ namespace TrafficSimulation
                        light.State == TrafficLightState.Yellow ? Brushes.Yellow : Brushes.Green
             };
 
-            Canvas.SetLeft(ellipse, offsetX - ellipse.Width / 2);
-            Canvas.SetTop(ellipse, offsetY - ellipse.Height / 2);
+            Canvas.SetLeft(ellipse, offsetX - ellipse.Width / 2 + globalOffset[0]);
+            Canvas.SetTop(ellipse, offsetY - ellipse.Height / 2 + globalOffset[1]);
             CityCanvas.Children.Add(ellipse);
         }
 
@@ -471,6 +467,9 @@ namespace TrafficSimulation
                 Point currentPosition = e.GetPosition(CityCanvas);
                 double offsetX = currentPosition.X - clickPosition.X;
                 double offsetY = currentPosition.Y - clickPosition.Y;
+
+                globalOffset[0] += offsetX;
+                globalOffset[1] += offsetY;
 
                 foreach (UIElement element in CityCanvas.Children)
                 {
