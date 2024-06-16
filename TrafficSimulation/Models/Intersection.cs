@@ -1,6 +1,4 @@
-﻿using Microsoft.VisualBasic;
-
-namespace TrafficSimulation.Models
+﻿namespace TrafficSimulation.Models
 {
     internal class Intersection
     {

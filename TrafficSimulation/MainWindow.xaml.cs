@@ -66,11 +66,11 @@ namespace TrafficSimulation
             TrafficLight light4 = new() { ID = "Light4", ControlledRoad = road3, ControlledIntersection = intersection2, State = TrafficLightState.Red, Timer = (int)TrafficLightSlider.Value };
             TrafficLight light5 = new() { ID = "Light5", ControlledRoad = road5, ControlledIntersection = intersection3, State = TrafficLightState.Red, Timer = (int)TrafficLightSlider.Value };
 
-            city.AddTrafficLight(light1);
-            city.AddTrafficLight(light2);
-            city.AddTrafficLight(light3);
-            city.AddTrafficLight(light4);
-            city.AddTrafficLight(light5);
+            //city.AddTrafficLight(light1);
+            //city.AddTrafficLight(light2);
+            //city.AddTrafficLight(light3);
+            //city.AddTrafficLight(light4);
+            //city.AddTrafficLight(light5);
         }
 
         private void InitializeTimer()
@@ -180,7 +180,7 @@ namespace TrafficSimulation
                 X2 = endX + globalOffset[0],
                 Y2 = endY + globalOffset[1],
                 Stroke = Brushes.Black,
-                StrokeThickness = road.GetWidth() / Constants.MetresPerPixel,
+                StrokeThickness = road.Width / Constants.MetresPerPixel,
             };
 
             CityCanvas.Children.Add(line);
@@ -193,7 +193,7 @@ namespace TrafficSimulation
 
         private void DrawOneWayArrow(Road road)
         {
-            double arrowLength = (road.GetWidth() - 0.5) / Constants.MetresPerPixel;
+            double arrowLength = (road.Width - 0.5) / Constants.MetresPerPixel;
 
             double startX = road.StartIntersection.ActualX;
             double startY = road.StartIntersection.ActualY;
@@ -375,7 +375,7 @@ namespace TrafficSimulation
                 MaxSpeed = MaxSpeedSlider.Value * 1000 / 3600, // Переводим км/ч в м/с
                 CurrentRoad = road,
                 LineNumber = lineNumber,
-                Position = isMovingForward ? 0 : road.GetLength(),
+                Position = isMovingForward ? 0 : road.Length,
                 NextIntersection = isMovingForward ? road.EndIntersection : road.StartIntersection,
                 IsMovingForward = isMovingForward
             };
