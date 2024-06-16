@@ -97,6 +97,18 @@
             while (angle <= -Math.PI) angle += 2 * Math.PI;
             return angle;
         }
+
+        public bool IsClear(Vehicle passingVehicle)
+        {
+            if (passingVehicle.NextIntersection == StartIntersection)
+            {
+                return !Vehicles.Any(v => v.Position < passingVehicle.StopDistance && passingVehicle.IsMovingForward == v.IsMovingForward);
+            }
+            else
+            {
+                return !Vehicles.Any(v => v.Position > Length - passingVehicle.StopDistance && !passingVehicle.IsMovingForward == v.IsMovingForward);
+            }
+        }
     }
 
     internal enum RoadType

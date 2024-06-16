@@ -62,15 +62,15 @@ namespace TrafficSimulation
 
             TrafficLight light1 = new() { ID = "Light1", ControlledRoad = road1, ControlledIntersection = intersection1, State = TrafficLightState.Green, Timer = (int)TrafficLightSlider.Value };
             TrafficLight light2 = new() { ID = "Light2", ControlledRoad = road1, ControlledIntersection = intersection2, State = TrafficLightState.Red, Timer = (int)TrafficLightSlider.Value };
-            TrafficLight light3 = new() { ID = "Light3", ControlledRoad = road2, ControlledIntersection = intersection2, State = TrafficLightState.Red, Timer = (int)TrafficLightSlider.Value };
+            TrafficLight light3 = new() { ID = "Light3", ControlledRoad = road2, ControlledIntersection = intersection2, State = TrafficLightState.Green, Timer = (int)TrafficLightSlider.Value };
             TrafficLight light4 = new() { ID = "Light4", ControlledRoad = road3, ControlledIntersection = intersection2, State = TrafficLightState.Red, Timer = (int)TrafficLightSlider.Value };
             TrafficLight light5 = new() { ID = "Light5", ControlledRoad = road5, ControlledIntersection = intersection3, State = TrafficLightState.Red, Timer = (int)TrafficLightSlider.Value };
 
-            //city.AddTrafficLight(light1);
-            //city.AddTrafficLight(light2);
-            //city.AddTrafficLight(light3);
-            //city.AddTrafficLight(light4);
-            //city.AddTrafficLight(light5);
+            city.AddTrafficLight(light1);
+            city.AddTrafficLight(light2);
+            city.AddTrafficLight(light3);
+            city.AddTrafficLight(light4);
+            city.AddTrafficLight(light5);
         }
 
         private void InitializeTimer()
@@ -377,8 +377,10 @@ namespace TrafficSimulation
                 LineNumber = lineNumber,
                 Position = isMovingForward ? 0 : road.Length,
                 NextIntersection = isMovingForward ? road.EndIntersection : road.StartIntersection,
-                IsMovingForward = isMovingForward
+                IsMovingForward = isMovingForward,
             };
+
+            vehicle.NextRoad = vehicle.GetNextRoad();
 
             city.AddVehicle(vehicle);
         }

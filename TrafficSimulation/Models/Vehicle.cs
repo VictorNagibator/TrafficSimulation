@@ -1,7 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using TrafficSimulation;
-
-namespace TrafficSimulation.Models
+﻿namespace TrafficSimulation.Models
 {
     internal class Vehicle
     {
@@ -13,9 +10,10 @@ namespace TrafficSimulation.Models
         public int LineNumber { get; set; }
         public double Position { get; set; }
         public Intersection NextIntersection { get; set; }
+        public Road NextRoad { get; set; }
         public bool IsMovingForward { get; set; } = true;
 
-        private double StopDistance => NextIntersection.GetWidth() / 2 + Constants.VehicleLengthMetres / 2;
+        public double StopDistance => NextIntersection.GetWidth() / 2 + Constants.VehicleLengthMetres / 2;
 
         public void Update(City city)
         {
@@ -48,7 +46,7 @@ namespace TrafficSimulation.Models
 
             //Проверка наличия автомобиля справа и расстояния до перекрестка
             bool shouldStopBecauseOfVehicleOnRight = false;
-            if ((IsMovingForward && Position + Speed >= CurrentRoad.Length - StopDistance) || (!IsMovingForward && Position - Speed <= StopDistance) && city.TrafficLights.Where(v => v.ControlledIntersection == NextIntersection).FirstOrDefault() == null)
+            if ((IsMovingForward && Position + Speed >= CurrentRoad.Length - StopDistance) || (!IsMovingForward && Position - Speed <= StopDistance) && city.TrafficLights.Where(v => v.ControlledIntersection == NextIntersection && v.ControlledRoad == CurrentRoad).FirstOrDefault() == null)
             {
                 var roadsOnRight = CurrentRoad.GetRoads(NextIntersection, RoadDirection.Right);
                 var vehicleOnRight = city.Vehicles
@@ -61,7 +59,19 @@ namespace TrafficSimulation.Models
                 }
             }
 
-            if (shouldStopForTrafficLight || shouldStopForNextVehicle || shouldStopBecauseOfVehicleOnRight)
+            //Проверка затора на следующей дороге
+            bool shouldStopForTrafficJam = false;
+            if (NextRoad != null && ((IsMovingForward && Position + Speed >= CurrentRoad.Length - StopDistance) || (!IsMovingForward && Position - Speed <= StopDistance)))
+            {
+                bool isNextRoadClear = NextRoad.IsClear(this);
+ 
+                if (!isNextRoadClear)
+                {
+                    shouldStopForTrafficJam = true;
+                }
+            }
+
+            if (shouldStopForTrafficLight || shouldStopForNextVehicle || shouldStopBecauseOfVehicleOnRight || shouldStopForTrafficJam)
             {
                 Speed = 0;
             }
@@ -71,11 +81,11 @@ namespace TrafficSimulation.Models
             }
 
             //Обновление позиции автомобиля
-            if (!shouldStopForTrafficLight && !shouldStopForNextVehicle && !shouldStopBecauseOfVehicleOnRight)
+            if (!shouldStopForTrafficLight && !shouldStopForNextVehicle && !shouldStopBecauseOfVehicleOnRight && !shouldStopForTrafficJam)
             {
                 Position += IsMovingForward ? Speed : -Speed;
             }
-            else if ((shouldStopForTrafficLight || shouldStopBecauseOfVehicleOnRight) && !shouldStopForNextVehicle)
+            else if ((shouldStopForTrafficLight || shouldStopBecauseOfVehicleOnRight || shouldStopForTrafficJam) && !shouldStopForNextVehicle)
             {
                 Position = IsMovingForward ? CurrentRoad.Length - StopDistance : StopDistance;
             }
@@ -83,34 +93,35 @@ namespace TrafficSimulation.Models
             //Если автомобиль достиг конца или начала дороги
             if (Speed != 0 && (Position >= CurrentRoad.Length || Position <= 0))
             {
-                Road nextRoad = GetNextRoad();
-
-                if (nextRoad != null)
+                if (NextRoad != null)
                 {
-                    if (CurrentRoad == nextRoad)
+                    if (CurrentRoad == NextRoad)
                     {
                         Random random = new();
                         LineNumber = random.Next(1, CurrentRoad.NumOfLanesPerDirection + 1);
                         IsMovingForward = !IsMovingForward;
-                        Position = IsMovingForward ? 0 : nextRoad.Length;
-                        NextIntersection = IsMovingForward ? nextRoad.EndIntersection : nextRoad.StartIntersection;
+                        Position = IsMovingForward ? 0 : NextRoad.Length;
+                        NextIntersection = IsMovingForward ? NextRoad.EndIntersection : NextRoad.StartIntersection;
+                        NextRoad = GetNextRoad();
                     }
                     else
                     {
                         CurrentRoad.RemoveVehicle(this);
-                        nextRoad.AddVehicle(this);
-                        CurrentRoad = nextRoad;
+                        NextRoad.AddVehicle(this);
+                        CurrentRoad = NextRoad;
                         Random random = new();
                         LineNumber = random.Next(1, CurrentRoad.NumOfLanesPerDirection + 1);
-                        IsMovingForward = nextRoad.StartIntersection == NextIntersection;
-                        Position = IsMovingForward ? 0 : nextRoad.Length;
-                        NextIntersection = IsMovingForward ? nextRoad.EndIntersection : nextRoad.StartIntersection;
+                        IsMovingForward = NextRoad.StartIntersection == NextIntersection;
+                        Position = IsMovingForward ? 0 : NextRoad.Length;
+                        NextIntersection = IsMovingForward ? NextRoad.EndIntersection : NextRoad.StartIntersection;
+                        NextRoad = GetNextRoad();
                     }
                 }
-                else
-                {
-                    LineNumber = 1;
-                }
+            }
+            else
+            {
+                LineNumber = 1;
+                NextRoad = GetNextRoad();
             }
         }
 
