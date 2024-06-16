@@ -11,7 +11,7 @@
         {
             Roads.Add(road);
 
-            // Добавляем дорогу в список дорог каждого перекрестка
+            //Добавляем дорогу в список дорог каждого перекрестка
             road.StartIntersection.AddRoad(road);
             road.EndIntersection.AddRoad(road);
 
@@ -33,12 +33,12 @@
         {
             foreach (var vehicle in Vehicles)
             {
-                vehicle.Update(this); //Обновляем положение каждой машины
+                vehicle.Update(this);
             }
 
             foreach (var light in TrafficLights)
             {
-                light.Tick(); //Уменьшаем таймер для каждого светофора
+                light.Tick();
             }
         }
     }

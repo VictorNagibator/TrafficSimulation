@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TrafficSimulation.Models
+﻿namespace TrafficSimulation.Models
 {
     internal class TrafficLight
     {
@@ -47,6 +41,6 @@ namespace TrafficSimulation.Models
         Red,
         Yellow,
         Green,
-        Transition // новое состояние для переходного момента
+        Transition //новое состояние для переходного момента
     }
 }

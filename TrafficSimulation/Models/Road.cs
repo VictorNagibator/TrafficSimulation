@@ -29,55 +29,73 @@
             return [startX + offsetX, startY + offsetY];
         }
 
-        public double GetLength()
-        {
-            return Math.Sqrt((EndIntersection.X - StartIntersection.X) * (EndIntersection.X - StartIntersection.X) + (EndIntersection.Y - StartIntersection.Y) * (EndIntersection.Y - StartIntersection.Y));
-        }
+        public double Length => Math.Sqrt((EndIntersection.X - StartIntersection.X) * (EndIntersection.X - StartIntersection.X) + (EndIntersection.Y - StartIntersection.Y) * (EndIntersection.Y - StartIntersection.Y));
 
-        public double GetWidth()
-        {
-            return Type != RoadType.OneWay ? NumOfLanesPerDirection * Constants.RoadWidthMetres : NumOfLanesPerDirection * Constants.RoadWidthMetres / 2;
-        }
+        public double Width => Type != RoadType.OneWay ? NumOfLanesPerDirection * Constants.RoadWidthMetres : NumOfLanesPerDirection * Constants.RoadWidthMetres / 2;
 
-        public List<Road> GetRoads(Vehicle vehicle, RoadDirection direction)
+        public List<Road> GetRoads(Intersection intersection, RoadDirection direction)
         {
             var neededRoads = new List<Road>();
 
-            List<Road> lookingRoads;
-            if (vehicle.IsMovingForward) lookingRoads = EndIntersection.OutgoingRoads;
-            else lookingRoads = StartIntersection.OutgoingRoads;
+            List<Road> roads = [];
+            roads.AddRange(intersection.OutgoingRoads);
+            roads.AddRange(intersection.IncomingRoads);
+            HashSet<Road> lookingRoads = roads.ToHashSet();
 
-                foreach (var road in lookingRoads)
+            // Угол текущей дороги относительно перекрестка
+            double currentRoadAngle = intersection == StartIntersection
+                ? Math.Atan2(EndIntersection.Y - StartIntersection.Y, EndIntersection.X - StartIntersection.X)
+                : Math.Atan2(StartIntersection.Y - EndIntersection.Y, StartIntersection.X - EndIntersection.X);
+
+            foreach (var road in lookingRoads)
+            {
+                // Угол других дорог относительно перекрестка
+                double roadAngle = intersection == road.StartIntersection
+                    ? Math.Atan2(road.EndIntersection.Y - road.StartIntersection.Y, road.EndIntersection.X - road.StartIntersection.X)
+                    : Math.Atan2(road.StartIntersection.Y - road.EndIntersection.Y, road.StartIntersection.X - road.EndIntersection.X);
+
+                // Разница углов относительно текущей дороги
+                double angleDifference = NormalizeAngle(roadAngle - currentRoadAngle);
+
+                switch (direction)
                 {
-                    double angle = Math.Atan2(EndIntersection.Y - StartIntersection.Y, EndIntersection.X - StartIntersection.X);
-                    double angleToRoad = Math.Atan2(road.EndIntersection.Y - road.StartIntersection.Y, road.EndIntersection.X - road.StartIntersection.X);
-
-                    switch (direction)
-                    {
-                        case RoadDirection.Left:
-                            if (angleToRoad < angle)
-                            {
-                                neededRoads.Add(road);
-                            }
-                            break;
-                        case RoadDirection.Forward:
-                            if (angleToRoad == angle && road != this)
-                            {
-                                neededRoads.Add(road);
-                            }
-                            break;
-                        case RoadDirection.Right:
-                            if (angleToRoad > angle)
-                            {
-                                neededRoads.Add(road);
-                            }
-                            break;
-                        default:
-                            break;
-                    }
+                    case RoadDirection.Left:
+                        if (angleDifference > 0)
+                        {
+                            neededRoads.Add(road);
+                        }
+                        break;
+                    case RoadDirection.Forward:
+                        if (angleDifference == 0 && road != this)
+                        {
+                            neededRoads.Add(road);
+                        }
+                        break;
+                    case RoadDirection.Right:
+                        if (angleDifference < 0)
+                        {
+                            neededRoads.Add(road);
+                        }
+                        break;
+                    default:
+                        break;
                 }
+            }
 
             return neededRoads;
+        }
+
+        public List<Road> GetRoadsToGo(Intersection intersection, RoadDirection direction)
+        {
+            var list = GetRoads(intersection, direction).Where(v => intersection.OutgoingRoads.Contains(v)).ToList();
+            return list;
+        }
+
+        private double NormalizeAngle(double angle)
+        {
+            while (angle > Math.PI) angle -= 2 * Math.PI;
+            while (angle <= -Math.PI) angle += 2 * Math.PI;
+            return angle;
         }
     }
 
