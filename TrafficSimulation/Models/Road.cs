@@ -9,6 +9,7 @@
         public Intersection EndIntersection { get; set; }
         public List<Vehicle> Vehicles { get; set; } = [];
         public double MaxAllowedSpeed { get; set; }
+        public double MaxAllowedSpeedInMetresPerSecond => MaxAllowedSpeed / 3600 * 1000;
 
         public void AddVehicle(Vehicle vehicle) => Vehicles.Add(vehicle);
 

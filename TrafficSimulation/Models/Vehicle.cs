@@ -3,8 +3,8 @@
     internal class Vehicle
     {
         public string ID { get; set; }
-        public double Speed { get; set; } //м/c
-        public double Acceleration { get; set; } = 2; //м/с^2
+        public double Speed { get; set; } //км/ч
+        public double Acceleration { get; set; } = 2; //в м/с^2
         public Road CurrentRoad { get; set; }
 
         public int LineNumber { get; set; }
@@ -14,7 +14,8 @@
         public bool IsMovingForward { get; set; } = true;
 
         public double StopDistance => NextIntersection.GetWidth() / 2 + Constants.VehicleLengthMetres / 2;
-        private double SpeedInMetresPerHundredMilliseconds => Speed * 0.1;
+        private double SpeedInMetresPerSecond => Speed / 3600 * 1000;
+        private double SpeedInMetresPerHundredMilliseconds => SpeedInMetresPerSecond * 0.1;
         private double AccelerationInMetresPerHundredMilliseconds => Acceleration * 0.01;
 
         public void Update(City city)
@@ -22,7 +23,7 @@
             //Проверка светофора на текущей дороге
             var trafficLight = city.TrafficLights.FirstOrDefault(light => light.ControlledIntersection == NextIntersection && light.ControlledRoad == CurrentRoad);
             bool shouldStopForTrafficLight = false;
-            if (trafficLight != null && trafficLight.State == TrafficLightState.Red)
+            if (trafficLight != null && (trafficLight.State == TrafficLightState.Red || trafficLight.State == TrafficLightState.Yellow))
             {
                 if ((IsMovingForward && Position + SpeedInMetresPerHundredMilliseconds >= CurrentRoad.Length - StopDistance) || (!IsMovingForward && Position - SpeedInMetresPerHundredMilliseconds <= StopDistance))
                 {
@@ -80,7 +81,7 @@
             else
             {
                 double speedAfterHundredMilliseconds = SpeedInMetresPerHundredMilliseconds + AccelerationInMetresPerHundredMilliseconds;
-                Speed += speedAfterHundredMilliseconds * 10;
+                Speed += speedAfterHundredMilliseconds * 10 * 3600 / 1000;
                 if (Speed > CurrentRoad.MaxAllowedSpeed)
                 {
                     Speed = CurrentRoad.MaxAllowedSpeed;
@@ -90,7 +91,7 @@
             //Обновление позиции автомобиля
             if (!shouldStopForTrafficLight && !shouldStopForNextVehicle && !shouldStopBecauseOfVehicleOnRight && !shouldStopForTrafficJam)
             {
-                Position += IsMovingForward ? Speed : -Speed;
+                Position += IsMovingForward ? SpeedInMetresPerHundredMilliseconds : -SpeedInMetresPerHundredMilliseconds;
             }
             else if ((shouldStopForTrafficLight || shouldStopBecauseOfVehicleOnRight || shouldStopForTrafficJam) && !shouldStopForNextVehicle)
             {

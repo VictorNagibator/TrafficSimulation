@@ -38,7 +38,7 @@ namespace TrafficSimulation
 
         private void InitializeCity()
         {
-            city.MaxAllowedSpeed = (double)MaxSpeedSlider.Value * 1000 / 3600;
+            city.MaxAllowedSpeed = MaxSpeedSlider.Value;
 
             Intersection intersection1 = new() { Name = "Intersection1", X = 10, Y = 10 };
             Intersection intersection2 = new() { Name = "Intersection2", X = 110, Y = 10 };
@@ -105,7 +105,7 @@ namespace TrafficSimulation
             {
                 foreach (var road in city.Roads)
                 {
-                    double maxSpeedInMps = MaxSpeedSlider.Value * 1000 / 3600; //переводим км/ч в м/с
+                    double maxSpeedInMps = MaxSpeedSlider.Value; //переводим км/ч в м/с
                     road.MaxAllowedSpeed = maxSpeedInMps;
                 }
             }
@@ -374,7 +374,7 @@ namespace TrafficSimulation
             var vehicle = new Vehicle
             {
                 ID = "Car" + (city.Vehicles.Count + 1),
-                Speed = MaxSpeedSlider.Value * 1000 / 3600,
+                Speed = MaxSpeedSlider.Value,
                 CurrentRoad = road,
                 LineNumber = lineNumber,
                 Position = isMovingForward ? 0 : road.Length,
