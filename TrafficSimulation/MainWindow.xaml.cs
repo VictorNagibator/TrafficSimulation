@@ -83,20 +83,7 @@ namespace TrafficSimulation
 
         private void InitializeSliders()
         {
-            TrafficLightSlider.ValueChanged += TrafficLightSlider_ValueChanged;
             MaxSpeedSlider.ValueChanged += MaxSpeedSlider_ValueChanged;
-        }
-
-        private void TrafficLightSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            if (city != null)
-            {
-                foreach (var light in city.TrafficLights)
-                {
-                    light.GreenTimer = (int)TrafficLightSlider.Value;
-                    light.RedTimer = (int)TrafficLightSlider.Value;
-                }
-            }
         }
 
         private void MaxSpeedSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -307,8 +294,8 @@ namespace TrafficSimulation
             }
 
             // Смещение светофора вдоль дороги
-            double offsetX = position[0] + Math.Cos(roadAngle) * Constants.RoadWidthPixels / 4;
-            double offsetY = position[1] + Math.Sin(roadAngle) * Constants.RoadWidthPixels / 4;
+            double offsetX = position[0] + Math.Cos(roadAngle) * Constants.RoadWidthPixels / 2;
+            double offsetY = position[1] + Math.Sin(roadAngle) * Constants.RoadWidthPixels / 2;
 
             Ellipse ellipse = new()
             {
@@ -518,6 +505,14 @@ namespace TrafficSimulation
                 isDragging = false;
                 CityCanvas.ReleaseMouseCapture();
             }
+        }
+
+        private void ResetButton_Click(object sender, RoutedEventArgs e)
+        {
+            globalOffset = [0, 0];
+            Constants.MetresPerPixel = 0.2;
+            DrawCity();
+            DrawMetresLine();
         }
     }
 }

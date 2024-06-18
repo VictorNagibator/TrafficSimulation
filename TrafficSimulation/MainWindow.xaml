@@ -9,7 +9,6 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
@@ -18,31 +17,25 @@
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
 
-        <!-- Controls for traffic light timings -->
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10">
-            <TextBlock Text="Время работы светофора (секунды):" VerticalAlignment="Center"/>
-            <Slider x:Name="TrafficLightSlider" Minimum="5" Maximum="60" Value="30" Margin="5" Width="225"/>
-            <TextBlock x:Name="TrafficLightValue" VerticalAlignment="Center" Margin="10,0,0,0" Text="{Binding ElementName=TrafficLightSlider, Path=Value, StringFormat=F0}"/>
-            <Button x:Name="StartSimulationButton" Content="Запустить симуляцию" Click="StartSimulationButton_Click" Margin="75,0,10,0"/>
-            <Button x:Name="StopSimulationButton" Content="Остановить симуляцию" Click="StopSimulationButton_Click" Margin="75,0,0,0" Visibility="Collapsed"/>
-        </StackPanel>
-
         <!-- Controls for maximum vehicle speed -->
-        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="10">
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10">
             <TextBlock Text="Максимально разрешенная скорость (км/ч):" VerticalAlignment="Center"/>
             <Slider x:Name="MaxSpeedSlider" Minimum="20" Maximum="60" Value="40" Margin="5" Width="198"/>
             <TextBlock x:Name="MaxSpeedValue" VerticalAlignment="Center" Margin="10,0,0,0" Text="{Binding ElementName=MaxSpeedSlider, Path=Value, StringFormat=F0}" Width="18"/>
             <Button x:Name="AddVehicleButton" Content="Добавить автомобиль" Click="AddVehicleButton_Click" Margin="50,0,0,0"/>
+            <Button x:Name="StartSimulationButton" Content="Запустить симуляцию" Click="StartSimulationButton_Click" Margin="75,0,10,0"/>
+            <Button x:Name="StopSimulationButton" Content="Остановить симуляцию" Click="StopSimulationButton_Click" Margin="75,0,0,0" Visibility="Collapsed"/>
         </StackPanel>
 
         <!-- Canvas for drawing the city -->
-        <Canvas Name="CityCanvas" Grid.Row="2" Grid.Column="0" Background="LightGray" Margin="10" 
+        <Canvas Name="CityCanvas" Grid.Row="1" Grid.Column="0" Background="LightGray" Margin="10" 
         SizeChanged="CityCanvas_SizeChanged" MouseWheel="CityCanvas_MouseWheel"
         MouseDown="CityCanvas_MouseDown" MouseMove="CityCanvas_MouseMove" MouseUp="CityCanvas_MouseUp">
         </Canvas>
 
         <!-- Zoom controls -->
-        <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="10">
+        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="10">
+            <Button Content="↺" Click="ResetButton_Click" Width="30" Height="30" Margin="5"/>
             <Button Content="+" Click="ZoomInButton_Click" Width="30" Height="30" Margin="5"/>
             <Button Content="-" Click="ZoomOutButton_Click" Width="30" Height="30" Margin="5"/>
         </StackPanel>
