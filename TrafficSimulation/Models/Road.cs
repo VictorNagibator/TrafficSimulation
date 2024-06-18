@@ -8,6 +8,7 @@
         public Intersection StartIntersection { get; set; }
         public Intersection EndIntersection { get; set; }
         public List<Vehicle> Vehicles { get; set; } = [];
+        public double MaxAllowedSpeed { get; set; }
 
         public void AddVehicle(Vehicle vehicle) => Vehicles.Add(vehicle);
 
@@ -102,11 +103,11 @@
         {
             if (passingVehicle.NextIntersection == StartIntersection)
             {
-                return !Vehicles.Any(v => v.Position < passingVehicle.StopDistance && passingVehicle.IsMovingForward == v.IsMovingForward);
+                return !Vehicles.Any(v => v.Position < passingVehicle.StopDistance && passingVehicle.IsMovingForward == v.IsMovingForward && v != passingVehicle);
             }
             else
             {
-                return !Vehicles.Any(v => v.Position > Length - passingVehicle.StopDistance && !passingVehicle.IsMovingForward == v.IsMovingForward);
+                return !Vehicles.Any(v => v.Position > Length - passingVehicle.StopDistance && !passingVehicle.IsMovingForward == v.IsMovingForward && v != passingVehicle);
             }
         }
     }

@@ -6,9 +6,12 @@
         public List<Road> Roads { get; private set; } = [];
         public List<Vehicle> Vehicles { get; private set; } = [];
         public List<TrafficLight> TrafficLights { get; private set; } = [];
+        public double MaxAllowedSpeed { get; set; }
 
         public void AddRoad(Road road)
         {
+            road.MaxAllowedSpeed = MaxAllowedSpeed;
+
             Roads.Add(road);
 
             //Добавляем дорогу в список дорог каждого перекрестка

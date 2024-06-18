@@ -3,8 +3,8 @@
     internal class Vehicle
     {
         public string ID { get; set; }
-        public double Speed { get; set; }
-        public double MaxSpeed { get; set; }
+        public double Speed { get; set; } //м/c
+        public double Acceleration { get; set; } = 2; //м/с^2
         public Road CurrentRoad { get; set; }
 
         public int LineNumber { get; set; }
@@ -14,6 +14,8 @@
         public bool IsMovingForward { get; set; } = true;
 
         public double StopDistance => NextIntersection.GetWidth() / 2 + Constants.VehicleLengthMetres / 2;
+        private double SpeedInMetresPerHundredMilliseconds => Speed * 0.1;
+        private double AccelerationInMetresPerHundredMilliseconds => Acceleration * 0.01;
 
         public void Update(City city)
         {
@@ -22,7 +24,7 @@
             bool shouldStopForTrafficLight = false;
             if (trafficLight != null && trafficLight.State == TrafficLightState.Red)
             {
-                if ((IsMovingForward && Position + Speed >= CurrentRoad.Length - StopDistance) || (!IsMovingForward && Position - Speed <= StopDistance))
+                if ((IsMovingForward && Position + SpeedInMetresPerHundredMilliseconds >= CurrentRoad.Length - StopDistance) || (!IsMovingForward && Position - SpeedInMetresPerHundredMilliseconds <= StopDistance))
                 {
                     shouldStopForTrafficLight = true;
                 }
@@ -46,7 +48,7 @@
 
             //Проверка наличия автомобиля справа и расстояния до перекрестка
             bool shouldStopBecauseOfVehicleOnRight = false;
-            if ((IsMovingForward && Position + Speed >= CurrentRoad.Length - StopDistance) || (!IsMovingForward && Position - Speed <= StopDistance) && city.TrafficLights.Where(v => v.ControlledIntersection == NextIntersection && v.ControlledRoad == CurrentRoad).FirstOrDefault() == null)
+            if ((IsMovingForward && Position + SpeedInMetresPerHundredMilliseconds >= CurrentRoad.Length - StopDistance) || (!IsMovingForward && Position - SpeedInMetresPerHundredMilliseconds <= StopDistance) && city.TrafficLights.Where(v => v.ControlledIntersection == NextIntersection && v.ControlledRoad == CurrentRoad).FirstOrDefault() == null)
             {
                 var roadsOnRight = CurrentRoad.GetRoads(NextIntersection, RoadDirection.Right);
                 var vehicleOnRight = city.Vehicles
@@ -61,10 +63,10 @@
 
             //Проверка затора на следующей дороге
             bool shouldStopForTrafficJam = false;
-            if (NextRoad != null && ((IsMovingForward && Position + Speed >= CurrentRoad.Length - StopDistance) || (!IsMovingForward && Position - Speed <= StopDistance)))
+            if (NextRoad != null && ((IsMovingForward && Position + SpeedInMetresPerHundredMilliseconds >= CurrentRoad.Length - StopDistance) || (!IsMovingForward && Position - SpeedInMetresPerHundredMilliseconds <= StopDistance)))
             {
                 bool isNextRoadClear = NextRoad.IsClear(this);
- 
+
                 if (!isNextRoadClear)
                 {
                     shouldStopForTrafficJam = true;
@@ -77,7 +79,12 @@
             }
             else
             {
-                Speed = MaxSpeed;
+                double speedAfterHundredMilliseconds = SpeedInMetresPerHundredMilliseconds + AccelerationInMetresPerHundredMilliseconds;
+                Speed += speedAfterHundredMilliseconds * 10;
+                if (Speed > CurrentRoad.MaxAllowedSpeed)
+                {
+                    Speed = CurrentRoad.MaxAllowedSpeed;
+                }
             }
 
             //Обновление позиции автомобиля

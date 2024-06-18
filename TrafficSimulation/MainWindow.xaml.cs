@@ -38,6 +38,8 @@ namespace TrafficSimulation
 
         private void InitializeCity()
         {
+            city.MaxAllowedSpeed = (double)MaxSpeedSlider.Value * 1000 / 3600;
+
             Intersection intersection1 = new() { Name = "Intersection1", X = 10, Y = 10 };
             Intersection intersection2 = new() { Name = "Intersection2", X = 110, Y = 10 };
             Intersection intersection3 = new() { Name = "Intersection3", X = 110, Y = 110 };
@@ -60,11 +62,11 @@ namespace TrafficSimulation
             city.AddRoad(road6);
             city.AddRoad(road7);
 
-            TrafficLight light1 = new() { ID = "Light1", ControlledRoad = road1, ControlledIntersection = intersection1, State = TrafficLightState.Green, Timer = (int)TrafficLightSlider.Value };
-            TrafficLight light2 = new() { ID = "Light2", ControlledRoad = road1, ControlledIntersection = intersection2, State = TrafficLightState.Red, Timer = (int)TrafficLightSlider.Value };
-            TrafficLight light3 = new() { ID = "Light3", ControlledRoad = road2, ControlledIntersection = intersection2, State = TrafficLightState.Green, Timer = (int)TrafficLightSlider.Value };
-            TrafficLight light4 = new() { ID = "Light4", ControlledRoad = road3, ControlledIntersection = intersection2, State = TrafficLightState.Red, Timer = (int)TrafficLightSlider.Value };
-            TrafficLight light5 = new() { ID = "Light5", ControlledRoad = road5, ControlledIntersection = intersection3, State = TrafficLightState.Red, Timer = (int)TrafficLightSlider.Value };
+            TrafficLight light1 = new() { ID = "Light1", ControlledRoad = road1, ControlledIntersection = intersection1, State = TrafficLightState.Green, RedTimer = 10, GreenTimer = 15 };
+            TrafficLight light2 = new() { ID = "Light2", ControlledRoad = road1, ControlledIntersection = intersection2, State = TrafficLightState.Red, RedTimer = 10, GreenTimer = 15 };
+            TrafficLight light3 = new() { ID = "Light3", ControlledRoad = road2, ControlledIntersection = intersection2, State = TrafficLightState.Green, RedTimer = 10, GreenTimer = 15 };
+            TrafficLight light4 = new() { ID = "Light4", ControlledRoad = road3, ControlledIntersection = intersection2, State = TrafficLightState.Red, RedTimer = 10, GreenTimer = 15 };
+            TrafficLight light5 = new() { ID = "Light5", ControlledRoad = road5, ControlledIntersection = intersection3, State = TrafficLightState.Red, RedTimer = 10, GreenTimer = 15 };
 
             city.AddTrafficLight(light1);
             city.AddTrafficLight(light2);
@@ -91,7 +93,8 @@ namespace TrafficSimulation
             {
                 foreach (var light in city.TrafficLights)
                 {
-                    light.Timer = (int)TrafficLightSlider.Value;
+                    light.GreenTimer = (int)TrafficLightSlider.Value;
+                    light.RedTimer = (int)TrafficLightSlider.Value;
                 }
             }
         }
@@ -100,10 +103,10 @@ namespace TrafficSimulation
         {
             if (city != null)
             {
-                foreach (var vehicle in city.Vehicles)
+                foreach (var road in city.Roads)
                 {
-                    double maxSpeedInMps = MaxSpeedSlider.Value * 1000 / 3600; // переводим км/ч в м/с
-                    vehicle.MaxSpeed = maxSpeedInMps;
+                    double maxSpeedInMps = MaxSpeedSlider.Value * 1000 / 3600; //переводим км/ч в м/с
+                    road.MaxAllowedSpeed = maxSpeedInMps;
                 }
             }
         }
@@ -371,8 +374,7 @@ namespace TrafficSimulation
             var vehicle = new Vehicle
             {
                 ID = "Car" + (city.Vehicles.Count + 1),
-                Speed = 40,
-                MaxSpeed = MaxSpeedSlider.Value * 1000 / 3600, // Переводим км/ч в м/с
+                Speed = MaxSpeedSlider.Value * 1000 / 3600,
                 CurrentRoad = road,
                 LineNumber = lineNumber,
                 Position = isMovingForward ? 0 : road.Length,

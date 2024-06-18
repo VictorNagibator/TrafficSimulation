@@ -6,7 +6,8 @@
         public Road ControlledRoad { get; set; }
         public Intersection ControlledIntersection { get; set; }
         public TrafficLightState State { get; set; }
-        public int Timer { get; set; }
+        public int RedTimer { get; set; }
+        public int GreenTimer { get; set; }
         private int currentTime;
 
         public TrafficLight()
@@ -18,17 +19,17 @@
         public void Tick()
         {
             currentTime++;
-            if (State == TrafficLightState.Red && currentTime >= Timer)
-            {
-                State = TrafficLightState.Green;
-                currentTime = 0;
-            }
-            else if (State == TrafficLightState.Green && currentTime >= Timer)
+            if (State == TrafficLightState.Red && currentTime >= RedTimer * 10)
             {
                 State = TrafficLightState.Yellow;
                 currentTime = 0;
             }
-            else if (State == TrafficLightState.Yellow && currentTime >= 5) // 5 секунд на желтый свет
+            else if (State == TrafficLightState.Yellow && currentTime >= 2 * 10) //2 секунды на желтый свет
+            {
+                State = TrafficLightState.Green;
+                currentTime = 0;
+            }
+            else if (State == TrafficLightState.Green && currentTime >= GreenTimer * 10)
             {
                 State = TrafficLightState.Red;
                 currentTime = 0;
@@ -40,7 +41,6 @@
     {
         Red,
         Yellow,
-        Green,
-        Transition //новое состояние для переходного момента
+        Green
     }
 }
