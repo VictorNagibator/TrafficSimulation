@@ -1,6 +1,6 @@
 ﻿namespace TrafficSimulation.Models
 {
-    internal class Intersection
+    public class Intersection
     {
         public string Name { get; set; }
         public double X { get; set; }

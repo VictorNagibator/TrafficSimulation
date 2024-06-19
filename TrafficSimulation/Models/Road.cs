@@ -1,6 +1,6 @@
 ﻿namespace TrafficSimulation.Models
 {
-    internal class Road
+    public class Road
     {
         public string Name { get; set; }
         public RoadType Type { get; set; }
@@ -113,13 +113,13 @@
         }
     }
 
-    internal enum RoadType
+    public enum RoadType
     {
         OneWay,
         TwoWay
     }
 
-    internal enum RoadDirection
+    public enum RoadDirection
     {
         Left,
         Forward,

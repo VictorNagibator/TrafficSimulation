@@ -1,6 +1,6 @@
 ﻿namespace TrafficSimulation.Models
 {
-    internal class Vehicle
+    public class Vehicle
     {
         public string ID { get; set; }
         public double Speed { get; set; } //км/ч

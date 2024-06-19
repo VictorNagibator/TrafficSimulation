@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TrafficSimulation"
         mc:Ignorable="d"
-        Title="MainWindow" Height="800" Width="1200">
+        Title="TrafficSimulator" Height="800" Width="1200">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -20,7 +20,7 @@
         <!-- Controls for maximum vehicle speed -->
         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10">
             <TextBlock Text="Максимально разрешенная скорость (км/ч):" VerticalAlignment="Center"/>
-            <Slider x:Name="MaxSpeedSlider" Minimum="20" Maximum="60" Value="40" Margin="5" Width="198"/>
+            <Slider x:Name="MaxSpeedSlider" Minimum="20" Maximum="100" Value="60" Margin="5" Width="198"/>
             <TextBlock x:Name="MaxSpeedValue" VerticalAlignment="Center" Margin="10,0,0,0" Text="{Binding ElementName=MaxSpeedSlider, Path=Value, StringFormat=F0}" Width="18"/>
             <Button x:Name="AddVehicleButton" Content="Добавить автомобиль" Click="AddVehicleButton_Click" Margin="50,0,0,0"/>
             <Button x:Name="StartSimulationButton" Content="Запустить симуляцию" Click="StartSimulationButton_Click" Margin="75,0,10,0"/>

@@ -1,0 +1,45 @@
+﻿<Window x:Class="TrafficSimulation.IntersectionSettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Настройки перекрестка" Height="500" Width="350">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="200"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="10">
+            <TextBlock x:Name="IntersectionNameTextBlock" Grid.Row="0" Grid.Column="0" Text="Название перекрестка: " HorizontalAlignment="Left" Margin="10"/>
+            <TextBox x:Name="IntersectionNameTextBox" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" Height="20" Margin="5" VerticalAlignment="Center" Width="150" TextChanged="IntersectionNameTextBox_TextChanged"/>
+        </StackPanel>
+        <Canvas x:Name="IntersectionCanvas" Grid.Row="1" Grid.Column="0" Background="LightGray" Margin="10,10,10,0"/>
+
+        <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Vertical" Margin="10">
+            <TextBlock x:Name="RoadNameTextBlock" Text="Название дороги: " Margin="5"/>
+
+            <StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Vertical" Margin="10">
+                <TextBlock Text="Настройки светофора" HorizontalAlignment="Center" FontWeight="Bold"/>
+                <RadioButton x:Name="TrafficLightOnRadioButton" Content="Вкл" Margin="5" IsEnabled="False" Checked="TrafficLightOnRadioButton_Checked"/>
+                <RadioButton x:Name="TrafficLightOffRadioButton" Content="Выкл" Margin="5" IsEnabled="False" Checked="TrafficLightOffRadioButton_Checked"/>
+                <StackPanel x:Name="TrafficLightSettingsPanel" Orientation="Vertical" Margin="10,0,0,0" Visibility="Collapsed">
+                    <StackPanel Orientation="Horizontal" Margin="5">
+                        <TextBlock Text="Время зеленого сигнала:" VerticalAlignment="Center"/>
+                        <Slider x:Name="GreenTimeSlider" Width="100" Margin="5" Minimum="5" Maximum="100" Value="30" ValueChanged="GreenTimeSlider_ValueChanged"/>
+                        <TextBlock x:Name="GreenTimeValue" VerticalAlignment="Center" Margin="10,0,0,0" Text="{Binding ElementName=GreenTimeSlider, Path=Value, StringFormat=F0}" Width="18"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="5">
+                        <TextBlock Text="Время красного сигнала:" VerticalAlignment="Center"/>
+                        <Slider x:Name="RedTimeSlider" Width="100" Margin="5" Minimum="5" Maximum="100" Value="30" ValueChanged="RedTimeSlider_ValueChanged"/>
+                        <TextBlock x:Name="RedTimeValue" VerticalAlignment="Center" Margin="10,0,0,0" Text="{Binding ElementName=RedTimeSlider, Path=Value, StringFormat=F0}" Width="18"/>
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>

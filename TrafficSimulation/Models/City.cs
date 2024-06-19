@@ -1,8 +1,8 @@
 ﻿namespace TrafficSimulation.Models
 {
-    internal class City
+    public class City
     {
-        public List<Intersection> Intersections { get; set; } = [];
+        public List<Intersection> Intersections { get; private set; } = [];
         public List<Road> Roads { get; private set; } = [];
         public List<Vehicle> Vehicles { get; private set; } = [];
         public List<TrafficLight> TrafficLights { get; private set; } = [];
@@ -22,15 +22,11 @@
             if (!Intersections.Contains(road.EndIntersection)) Intersections.Add(road.EndIntersection);
         }
 
-        public void AddVehicle(Vehicle vehicle)
-        {
-            Vehicles.Add(vehicle);
-        }
+        public void AddVehicle(Vehicle vehicle) => Vehicles.Add(vehicle);
+        public void RemoveVehicle(Vehicle vehicle) => Vehicles.Remove(vehicle);
 
-        public void AddTrafficLight(TrafficLight light)
-        {
-            TrafficLights.Add(light);
-        }
+        public void AddTrafficLight(TrafficLight light) => TrafficLights.Add(light);
+        public void RemoveTrafficLight(TrafficLight light) => TrafficLights.Remove(light);
 
         public void Update()
         {

@@ -1,6 +1,6 @@
 ﻿namespace TrafficSimulation.Models
 {
-    internal class TrafficLight
+    public class TrafficLight
     {
         public string ID { get; set; }
         public Road ControlledRoad { get; set; }
@@ -37,7 +37,7 @@
         }
     }
 
-    internal enum TrafficLightState
+    public enum TrafficLightState
     {
         Red,
         Yellow,

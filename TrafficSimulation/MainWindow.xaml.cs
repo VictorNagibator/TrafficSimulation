@@ -138,12 +138,37 @@ namespace TrafficSimulation
             {
                 Width = maxRoadWidth / Constants.MetresPerPixel,
                 Height = maxRoadWidth / Constants.MetresPerPixel,
-                Fill = Brushes.Black
+                Fill = Brushes.Black,
+                Tag = intersection
             };
+
+            rect.MouseDown += Intersection_MouseDown;
 
             Canvas.SetLeft(rect, intersection.ActualX - maxRoadWidth / (2 * Constants.MetresPerPixel) + globalOffset[0]);
             Canvas.SetTop(rect, intersection.ActualY - maxRoadWidth / (2 * Constants.MetresPerPixel) + globalOffset[1]);
             CityCanvas.Children.Add(rect);
+        }
+
+        private void Intersection_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                if (sender is Rectangle rect && rect.Tag is Intersection intersection)
+                {
+                    bool isSimulationWorked = timer.IsEnabled; 
+
+                    IntersectionSettingsWindow settingsWindow = new(intersection, city);
+                    settingsWindow.Show();
+                    settingsWindow.Closed += (s, e) => DrawCity();
+                    settingsWindow.Closed += (s, e) => DrawMetresLine();
+
+                    if (isSimulationWorked)
+                    {
+                        StopSimulation();
+                        settingsWindow.Closed += (s, e) => StartSimulation();
+                    }
+                }
+            }
         }
 
         private void DrawRoad(Road road)
