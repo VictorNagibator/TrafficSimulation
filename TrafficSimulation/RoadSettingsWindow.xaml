@@ -17,7 +17,7 @@
             <TextBox x:Name="RoadNameTextBox" Grid.Row="0" HorizontalAlignment="Center" Height="20" Margin="5" VerticalAlignment="Center" Width="150" TextChanged="RoadNameTextBox_TextChanged"/>
         </StackPanel>
 
-        <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" Margin="10">
+        <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" Margin="10" Grid.RowSpan="2">
             <TextBlock x:Name="MaxSpeedTextBlock" Text="Максимально разрешенная скорость (км/ч): " Margin="10,0,0,0" VerticalAlignment="Center"/>
             <Slider x:Name="MaxSpeedSlider" Minimum="20" Maximum="100" Margin="10" Width="198" ValueChanged="MaxSpeedSlider_ValueChanged"/>
             <TextBlock x:Name="MaxSpeedValue" VerticalAlignment="Center" Margin="10,0,0,0" Text="{Binding ElementName=MaxSpeedSlider, Path=Value, StringFormat=F0}" Width="18"/>

@@ -28,9 +28,6 @@ namespace TrafficSimulation
 
             DrawCity();
 
-            RectangleGeometry clipRect = new(new Rect(0, 0, CityCanvas.ActualWidth, CityCanvas.ActualHeight));
-            CityCanvas.Clip = clipRect;
-
             CityCanvas.MouseDown += CityCanvas_MouseDown;
             CityCanvas.MouseMove += CityCanvas_MouseMove;
             CityCanvas.MouseUp += CityCanvas_MouseUp;
@@ -205,6 +202,13 @@ namespace TrafficSimulation
             {
                 DrawOneWayArrow(road);
             }
+
+            DrawRoadName(road);
+
+            if (road.MaxAllowedSpeed != city.MaxAllowedSpeed)
+            {
+                DrawSpeedLimitSign(road);
+            }
         }
 
         private void Line_MouseDown(object sender, MouseButtonEventArgs e)
@@ -251,6 +255,95 @@ namespace TrafficSimulation
             };
 
             CityCanvas.Children.Add(arrow);
+        }
+
+        private void DrawRoadName(Road road)
+        {
+            double startIntersectionWidth = road.StartIntersection.GetWidth();
+            double endIntersectionWidth = road.EndIntersection.GetWidth();
+
+            double startX = road.StartIntersection.ActualX;
+            double startY = road.StartIntersection.ActualY;
+            double endX = road.EndIntersection.ActualX;
+            double endY = road.EndIntersection.ActualY;
+
+            double roadAngle = Math.Atan2(endY - startY, endX - startX);
+            double roadAngleDegrees = roadAngle * 180 / Math.PI;
+
+            startX = road.StartIntersection.ActualX + startIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Cos(roadAngle);
+            startY = road.StartIntersection.ActualY + startIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Sin(roadAngle);
+            endX = road.EndIntersection.ActualX - endIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Cos(roadAngle);
+            endY = road.EndIntersection.ActualY - endIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Sin(roadAngle);
+
+            TextBlock roadNameTextBlock = new()
+            {
+                Text = road.Name,
+                FontSize = 2.5 / Constants.MetresPerPixel,
+                Foreground = Brushes.White
+            };
+
+            roadNameTextBlock.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            roadNameTextBlock.Arrange(new Rect(roadNameTextBlock.DesiredSize));
+
+            double midX = (startX + endX) / 2 + globalOffset[0];
+            double midY = (startY + endY) / 2 + globalOffset[1];
+
+            roadNameTextBlock.RenderTransform = new RotateTransform(roadAngleDegrees, roadNameTextBlock.ActualWidth / 2, roadNameTextBlock.ActualHeight / 2);
+            Canvas.SetLeft(roadNameTextBlock, midX - roadNameTextBlock.ActualWidth / 2);
+            Canvas.SetTop(roadNameTextBlock, midY - roadNameTextBlock.ActualHeight / 2);
+            CityCanvas.Children.Add(roadNameTextBlock);
+        }
+
+        private void DrawSpeedLimitSign(Road road)
+        {
+            double startIntersectionWidth = road.StartIntersection.GetWidth();
+            double endIntersectionWidth = road.EndIntersection.GetWidth();
+
+            double startX = road.StartIntersection.ActualX;
+            double startY = road.StartIntersection.ActualY;
+            double endX = road.EndIntersection.ActualX;
+            double endY = road.EndIntersection.ActualY;
+
+            double roadAngle = Math.Atan2(endY - startY, endX - startX);
+
+            startX = road.StartIntersection.ActualX + startIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Cos(roadAngle);
+            startY = road.StartIntersection.ActualY + startIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Sin(roadAngle);
+            endX = road.EndIntersection.ActualX - endIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Cos(roadAngle);
+            endY = road.EndIntersection.ActualY - endIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Sin(roadAngle);
+
+            double midX = (startX + endX) / 2 + globalOffset[0];
+            double midY = (startY + endY) / 2 + globalOffset[1];
+
+            Ellipse speedLimitEllipse = new()
+            {
+                Width = 4 / Constants.MetresPerPixel,
+                Height = 4 / Constants.MetresPerPixel,
+                Fill = Brushes.White,
+                Stroke = Brushes.Red,
+                StrokeThickness = 0.4 / Constants.MetresPerPixel
+            };
+
+            TextBlock speedLimitTextBlock = new()
+            {
+                Text = road.MaxAllowedSpeed.ToString(),
+                FontSize = 2 / Constants.MetresPerPixel,
+                Foreground = Brushes.Black
+            };
+
+            // Measure and arrange to get the actual size of the text block
+            speedLimitTextBlock.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            speedLimitTextBlock.Arrange(new Rect(speedLimitTextBlock.DesiredSize));
+
+            double offsetX = midX + 20 * Math.Cos(roadAngle + Math.PI / 2);
+            double offsetY = midY + 20 * Math.Sin(roadAngle + Math.PI / 2);
+
+            Canvas.SetLeft(speedLimitEllipse, offsetX - speedLimitEllipse.Width / 2);
+            Canvas.SetTop(speedLimitEllipse, offsetY - speedLimitEllipse.Height / 2);
+            CityCanvas.Children.Add(speedLimitEllipse);
+
+            Canvas.SetLeft(speedLimitTextBlock, offsetX - speedLimitTextBlock.ActualWidth / 2);
+            Canvas.SetTop(speedLimitTextBlock, offsetY - speedLimitTextBlock.ActualHeight / 2);
+            CityCanvas.Children.Add(speedLimitTextBlock);
         }
 
         private void DrawVehicle(Vehicle vehicle)
