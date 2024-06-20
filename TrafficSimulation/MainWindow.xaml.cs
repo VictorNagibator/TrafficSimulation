@@ -251,7 +251,7 @@ namespace TrafficSimulation
             Polygon arrow = new()
             {
                 Points = { p1, p2, p3 },
-                Fill = Brushes.White
+                Fill = Brushes.Gray
             };
 
             CityCanvas.Children.Add(arrow);
