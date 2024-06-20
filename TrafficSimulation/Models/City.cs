@@ -7,6 +7,7 @@
         public List<Vehicle> Vehicles { get; private set; } = [];
         public List<TrafficLight> TrafficLights { get; private set; } = [];
         public double MaxAllowedSpeed { get; set; }
+        public double ChanceToGetInCarAccident { get; set; }
 
         public void AddRoad(Road road)
         {

@@ -5,6 +5,7 @@ using System.Windows.Shapes;
 using TrafficSimulation.Models;
 using System.Windows.Threading;
 using System.Windows.Input;
+using Microsoft.VisualBasic;
 
 namespace TrafficSimulation
 {
@@ -140,8 +141,8 @@ namespace TrafficSimulation
 
             rect.MouseDown += Intersection_MouseDown;
 
-            Canvas.SetLeft(rect, intersection.ActualX - maxRoadWidth / (2 * Constants.MetresPerPixel) + globalOffset[0]);
-            Canvas.SetTop(rect, intersection.ActualY - maxRoadWidth / (2 * Constants.MetresPerPixel) + globalOffset[1]);
+            Canvas.SetLeft(rect, intersection.X / Constants.MetresPerPixel - maxRoadWidth / (2 * Constants.MetresPerPixel) + globalOffset[0]);
+            Canvas.SetTop(rect, intersection.Y / Constants.MetresPerPixel - maxRoadWidth / (2 * Constants.MetresPerPixel) + globalOffset[1]);
             CityCanvas.Children.Add(rect);
         }
 
@@ -172,17 +173,17 @@ namespace TrafficSimulation
             double startIntersectionWidth = road.StartIntersection.GetWidth();
             double endIntersectionWidth = road.EndIntersection.GetWidth();
 
-            double startX = road.StartIntersection.ActualX;
-            double startY = road.StartIntersection.ActualY;
-            double endX = road.EndIntersection.ActualX;
-            double endY = road.EndIntersection.ActualY;
+            double startX = road.StartIntersection.X / Constants.MetresPerPixel;
+            double startY = road.StartIntersection.Y / Constants.MetresPerPixel;
+            double endX = road.EndIntersection.X / Constants.MetresPerPixel;
+            double endY = road.EndIntersection.Y / Constants.MetresPerPixel;
 
             double roadAngle = Math.Atan2(endY - startY, endX - startX);
 
-            startX = road.StartIntersection.ActualX + startIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Cos(roadAngle);
-            startY = road.StartIntersection.ActualY + startIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Sin(roadAngle);
-            endX = road.EndIntersection.ActualX - endIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Cos(roadAngle);
-            endY = road.EndIntersection.ActualY - endIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Sin(roadAngle);
+            startX = road.StartIntersection.X / Constants.MetresPerPixel + startIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Cos(roadAngle);
+            startY = road.StartIntersection.Y / Constants.MetresPerPixel + startIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Sin(roadAngle);
+            endX = road.EndIntersection.X / Constants.MetresPerPixel - endIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Cos(roadAngle);
+            endY = road.EndIntersection.Y / Constants.MetresPerPixel - endIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Sin(roadAngle);
 
             Line line = new()
             {
@@ -234,10 +235,10 @@ namespace TrafficSimulation
         {
             double arrowLength = (road.Width - 0.5) / Constants.MetresPerPixel;
 
-            double startX = road.StartIntersection.ActualX;
-            double startY = road.StartIntersection.ActualY;
-            double endX = road.EndIntersection.ActualX;
-            double endY = road.EndIntersection.ActualY;
+            double startX = road.StartIntersection.X / Constants.MetresPerPixel;
+            double startY = road.StartIntersection.Y / Constants.MetresPerPixel;
+            double endX = road.EndIntersection.X / Constants.MetresPerPixel;
+            double endY = road.EndIntersection.Y / Constants.MetresPerPixel;
 
             double roadAngle = Math.Atan2(endY - startY, endX - startX);
 
@@ -262,18 +263,18 @@ namespace TrafficSimulation
             double startIntersectionWidth = road.StartIntersection.GetWidth();
             double endIntersectionWidth = road.EndIntersection.GetWidth();
 
-            double startX = road.StartIntersection.ActualX;
-            double startY = road.StartIntersection.ActualY;
-            double endX = road.EndIntersection.ActualX;
-            double endY = road.EndIntersection.ActualY;
+            double startX = road.StartIntersection.X / Constants.MetresPerPixel;
+            double startY = road.StartIntersection.Y / Constants.MetresPerPixel;
+            double endX = road.EndIntersection.X / Constants.MetresPerPixel;
+            double endY = road.EndIntersection.Y / Constants.MetresPerPixel;
 
             double roadAngle = Math.Atan2(endY - startY, endX - startX);
             double roadAngleDegrees = roadAngle * 180 / Math.PI;
 
-            startX = road.StartIntersection.ActualX + startIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Cos(roadAngle);
-            startY = road.StartIntersection.ActualY + startIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Sin(roadAngle);
-            endX = road.EndIntersection.ActualX - endIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Cos(roadAngle);
-            endY = road.EndIntersection.ActualY - endIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Sin(roadAngle);
+            startX = road.StartIntersection.X / Constants.MetresPerPixel + startIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Cos(roadAngle);
+            startY = road.StartIntersection.Y / Constants.MetresPerPixel + startIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Sin(roadAngle);
+            endX = road.EndIntersection.X / Constants.MetresPerPixel - endIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Cos(roadAngle);
+            endY = road.EndIntersection.Y / Constants.MetresPerPixel - endIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Sin(roadAngle);
 
             TextBlock roadNameTextBlock = new()
             {
@@ -299,17 +300,17 @@ namespace TrafficSimulation
             double startIntersectionWidth = road.StartIntersection.GetWidth();
             double endIntersectionWidth = road.EndIntersection.GetWidth();
 
-            double startX = road.StartIntersection.ActualX;
-            double startY = road.StartIntersection.ActualY;
-            double endX = road.EndIntersection.ActualX;
-            double endY = road.EndIntersection.ActualY;
+            double startX = road.StartIntersection.X / Constants.MetresPerPixel;
+            double startY = road.StartIntersection.Y / Constants.MetresPerPixel;
+            double endX = road.EndIntersection.X / Constants.MetresPerPixel;
+            double endY = road.EndIntersection.Y / Constants.MetresPerPixel;
 
             double roadAngle = Math.Atan2(endY - startY, endX - startX);
 
-            startX = road.StartIntersection.ActualX + startIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Cos(roadAngle);
-            startY = road.StartIntersection.ActualY + startIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Sin(roadAngle);
-            endX = road.EndIntersection.ActualX - endIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Cos(roadAngle);
-            endY = road.EndIntersection.ActualY - endIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Sin(roadAngle);
+            startX = road.StartIntersection.X / Constants.MetresPerPixel + startIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Cos(roadAngle);
+            startY = road.StartIntersection.Y / Constants.MetresPerPixel + startIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Sin(roadAngle);
+            endX = road.EndIntersection.X / Constants.MetresPerPixel - endIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Cos(roadAngle);
+            endY = road.EndIntersection.Y / Constants.MetresPerPixel - endIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Sin(roadAngle);
 
             double midX = (startX + endX) / 2 + globalOffset[0];
             double midY = (startY + endY) / 2 + globalOffset[1];
@@ -330,7 +331,6 @@ namespace TrafficSimulation
                 Foreground = Brushes.Black
             };
 
-            // Measure and arrange to get the actual size of the text block
             speedLimitTextBlock.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
             speedLimitTextBlock.Arrange(new Rect(speedLimitTextBlock.DesiredSize));
 
@@ -351,8 +351,8 @@ namespace TrafficSimulation
             double[] position = vehicle.CurrentRoad.GetPositionOnRoad(vehicle);
             position[0] /= Constants.MetresPerPixel;
             position[1] /= Constants.MetresPerPixel;
-            double roadAngle = Math.Atan2(vehicle.CurrentRoad.EndIntersection.ActualY - vehicle.CurrentRoad.StartIntersection.ActualY,
-                                          vehicle.CurrentRoad.EndIntersection.ActualX - vehicle.CurrentRoad.StartIntersection.ActualX);
+            double roadAngle = Math.Atan2(vehicle.CurrentRoad.EndIntersection.Y / Constants.MetresPerPixel - vehicle.CurrentRoad.StartIntersection.Y / Constants.MetresPerPixel,
+                                          vehicle.CurrentRoad.EndIntersection.X / Constants.MetresPerPixel - vehicle.CurrentRoad.StartIntersection.X / Constants.MetresPerPixel);
 
             Rectangle rect = new()
             {
@@ -418,20 +418,20 @@ namespace TrafficSimulation
 
         private void DrawTrafficLight(TrafficLight light)
         {
-            double[] position = [light.ControlledIntersection.ActualX, light.ControlledIntersection.ActualY];
+            double[] position = [light.ControlledIntersection.X / Constants.MetresPerPixel, light.ControlledIntersection.Y / Constants.MetresPerPixel];
             double roadAngle;
             if (light.ControlledIntersection == light.ControlledRoad.StartIntersection)
             {
-                roadAngle = Math.Atan2(light.ControlledRoad.EndIntersection.ActualY - light.ControlledRoad.StartIntersection.ActualY,
-                                       light.ControlledRoad.EndIntersection.ActualX - light.ControlledRoad.StartIntersection.ActualX);
+                roadAngle = Math.Atan2(light.ControlledRoad.EndIntersection.Y / Constants.MetresPerPixel - light.ControlledRoad.StartIntersection.Y / Constants.MetresPerPixel,
+                                       light.ControlledRoad.EndIntersection.X / Constants.MetresPerPixel - light.ControlledRoad.StartIntersection.X / Constants.MetresPerPixel);
             }
             else
             {
-                roadAngle = Math.Atan2(light.ControlledRoad.StartIntersection.ActualY - light.ControlledRoad.EndIntersection.ActualY,
-                                       light.ControlledRoad.StartIntersection.ActualX - light.ControlledRoad.EndIntersection.ActualX);
+                roadAngle = Math.Atan2(light.ControlledRoad.StartIntersection.Y / Constants.MetresPerPixel - light.ControlledRoad.EndIntersection.Y / Constants.MetresPerPixel,
+                                       light.ControlledRoad.StartIntersection.X / Constants.MetresPerPixel - light.ControlledRoad.EndIntersection.X / Constants.MetresPerPixel);
             }
 
-            // Смещение светофора вдоль дороги
+            //Смещение светофора вдоль дороги
             double offsetX = position[0] + Math.Cos(roadAngle) * Constants.RoadWidthPixels / 2;
             double offsetY = position[1] + Math.Sin(roadAngle) * Constants.RoadWidthPixels / 2;
 
@@ -524,20 +524,16 @@ namespace TrafficSimulation
 
         private void StartSimulation()
         {
-            // Запустить таймер
             timer.Start();
 
-            // Изменить видимость кнопок
             StartSimulationButton.Visibility = Visibility.Collapsed;
             StopSimulationButton.Visibility = Visibility.Visible;
         }
 
         private void StopSimulation()
         {
-            // Остановить таймер
             timer.Stop();
 
-            // Изменить видимость кнопок
             StartSimulationButton.Visibility = Visibility.Visible;
             StopSimulationButton.Visibility = Visibility.Collapsed;
         }
@@ -553,16 +549,18 @@ namespace TrafficSimulation
 
         private void ZoomInButton_Click(object sender, RoutedEventArgs e)
         {
-            if (Constants.MetresPerPixel <= 0.1) return;
+            if (Math.Round(Constants.MetresPerPixel, 2) <= 0.1) return;
 
-            Constants.MetresPerPixel = Math.Max(Constants.MetresPerPixel - 0.05, 0.1);
+            if (Math.Round(Constants.MetresPerPixel, 2) > 0.5 && Math.Round(Constants.MetresPerPixel, 2) <= 1) Constants.MetresPerPixel = Math.Max(Constants.MetresPerPixel - 0.1, 0.1);
+            else Constants.MetresPerPixel = Math.Max(Constants.MetresPerPixel - 0.05, 0.1);
             DrawCity();
             DrawMetresLine();
         }
 
         private void ZoomOutButton_Click(object sender, RoutedEventArgs e)
         {
-            Constants.MetresPerPixel = Math.Min(Constants.MetresPerPixel + 0.05, 1);
+            if (Math.Round(Constants.MetresPerPixel, 2) >= 0.5 && Math.Round(Constants.MetresPerPixel, 2) <= 1) Constants.MetresPerPixel = Math.Min(Constants.MetresPerPixel + 0.1, 1);
+            else Constants.MetresPerPixel = Math.Min(Constants.MetresPerPixel + 0.05, 1);
             DrawCity();
             DrawMetresLine();
         }
