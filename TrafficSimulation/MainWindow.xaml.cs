@@ -92,8 +92,7 @@ namespace TrafficSimulation
             {
                 foreach (var road in city.Roads)
                 {
-                    double maxSpeedInMps = MaxSpeedSlider.Value; //переводим км/ч в м/с
-                    road.MaxAllowedSpeed = maxSpeedInMps;
+                    road.MaxAllowedSpeed = MaxSpeedSlider.Value;
                 }
             }
         }
@@ -109,14 +108,14 @@ namespace TrafficSimulation
         {
             CityCanvas.Children.Clear();
 
-            foreach (var intersection in city.Intersections)
-            {
-                DrawIntersection(intersection);
-            }
-
             foreach (var road in city.Roads)
             {
                 DrawRoad(road);
+            }
+
+            foreach (var intersection in city.Intersections)
+            {
+                DrawIntersection(intersection);
             }
 
             foreach (var vehicle in city.Vehicles)
@@ -196,14 +195,35 @@ namespace TrafficSimulation
                 Y2 = endY + globalOffset[1],
                 Stroke = Brushes.Black,
                 StrokeThickness = road.Width / Constants.MetresPerPixel,
+                Tag = road
             };
 
+            line.MouseDown += Line_MouseDown;
             CityCanvas.Children.Add(line);
 
             if (road.Type == RoadType.OneWay)
             {
                 DrawOneWayArrow(road);
             }
+        }
+
+        private void Line_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+                if (sender is Line line && line.Tag is Road road)
+                {
+                    bool isSimulationWorked = timer.IsEnabled;
+
+                    RoadSettingsWindow settingsWindow = new(road, city);
+                    settingsWindow.Show();
+                    settingsWindow.Closed += (s, e) => DrawCity();
+                    settingsWindow.Closed += (s, e) => DrawMetresLine();
+
+                    if (isSimulationWorked)
+                    {
+                        StopSimulation();
+                        settingsWindow.Closed += (s, e) => StartSimulation();
+                    }
+                }
         }
 
         private void DrawOneWayArrow(Road road)

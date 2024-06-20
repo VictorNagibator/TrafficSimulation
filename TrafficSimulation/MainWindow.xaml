@@ -17,7 +17,6 @@
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
 
-        <!-- Controls for maximum vehicle speed -->
         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10">
             <TextBlock Text="Максимально разрешенная скорость (км/ч):" VerticalAlignment="Center"/>
             <Slider x:Name="MaxSpeedSlider" Minimum="20" Maximum="100" Value="60" Margin="5" Width="198"/>
@@ -27,7 +26,6 @@
             <Button x:Name="StopSimulationButton" Content="Остановить симуляцию" Click="StopSimulationButton_Click" Margin="75,0,0,0" Visibility="Collapsed"/>
         </StackPanel>
 
-        <!-- Canvas for drawing the city -->
         <Canvas Name="CityCanvas" Grid.Row="1" Grid.Column="0" Background="LightGray" Margin="10" 
         SizeChanged="CityCanvas_SizeChanged" MouseWheel="CityCanvas_MouseWheel"
         MouseDown="CityCanvas_MouseDown" MouseMove="CityCanvas_MouseMove" MouseUp="CityCanvas_MouseUp">
