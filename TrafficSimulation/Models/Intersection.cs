@@ -49,5 +49,10 @@
 
             return maxRoadWidth;
         }
+
+        public bool HasNoRoads()
+        {
+            return IncomingRoads.Count == 0 && OutgoingRoads.Count == 0;
+        }
     }
 }

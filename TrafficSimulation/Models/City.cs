@@ -34,6 +34,9 @@
 
             Vehicles.RemoveAll(v => v.CurrentRoad == road);
             TrafficLights.RemoveAll(tl => tl.ControlledRoad == road);
+
+            if (road.StartIntersection.HasNoRoads()) Intersections.Remove(road.StartIntersection);
+            if (road.EndIntersection.HasNoRoads()) Intersections.Remove(road.EndIntersection);
         }
 
         public void AddVehicle(Vehicle vehicle) => Vehicles.Add(vehicle);

@@ -55,8 +55,9 @@
             {
                 var roadsOnRight = CurrentRoad.GetRoads(NextIntersection, RoadDirection.Right);
                 var vehicleOnRight = city.Vehicles
-                    .Where(v => roadsOnRight.Contains(v.CurrentRoad) && v.NextIntersection == NextIntersection)
+                    .Where(v => roadsOnRight.Contains(v.CurrentRoad) && v.NextIntersection == NextIntersection && (!city.TrafficLights.Any(tl => tl.ControlledRoad == v.CurrentRoad && tl.ControlledIntersection == v.NextIntersection) || city.TrafficLights.Any(tl => tl.ControlledRoad == v.CurrentRoad && tl.ControlledIntersection == v.NextIntersection && tl.State == TrafficLightState.Green)))
                     .FirstOrDefault(v => Math.Abs(v.Position - (IsMovingForward ? v.CurrentRoad.Length : 0)) <= 10);
+
 
                 if (vehicleOnRight != null)
                 {
@@ -76,7 +77,7 @@
                 }
             }
 
-            bool shouldStopBecauseOfNoNextRoad = NextRoad == null && (IsMovingForward && Position + SpeedInMetresPerHundredMilliseconds >= CurrentRoad.Length - StopDistance) || (!IsMovingForward && Position - SpeedInMetresPerHundredMilliseconds <= StopDistance);
+            bool shouldStopBecauseOfNoNextRoad = NextRoad == null && ((IsMovingForward && Position + SpeedInMetresPerHundredMilliseconds >= CurrentRoad.Length - StopDistance) || (!IsMovingForward && Position - SpeedInMetresPerHundredMilliseconds <= StopDistance));
 
             if (shouldStopForTrafficLight || shouldStopForNextVehicle || shouldStopBecauseOfVehicleOnRight || shouldStopForTrafficJam || shouldStopBecauseOfNoNextRoad)
             {
