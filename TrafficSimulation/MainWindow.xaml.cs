@@ -88,9 +88,10 @@ namespace TrafficSimulation
         {
             if (city != null)
             {
+                city.MaxAllowedSpeed = (int)MaxSpeedSlider.Value;
                 foreach (var road in city.Roads)
                 {
-                    road.MaxAllowedSpeed = MaxSpeedSlider.Value;
+                    road.MaxAllowedSpeed = (int)MaxSpeedSlider.Value;
                 }
             }
         }
