@@ -27,14 +27,10 @@ namespace TrafficSimulation
 
         private void IntersectionSettingsWindow_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            ClipToBounds();
-            DrawIntersectionAndRoads();
-        }
-
-        private void ClipToBounds()
-        {
             RectangleGeometry clipRect = new(new Rect(0, 0, IntersectionCanvas.ActualWidth, IntersectionCanvas.ActualHeight));
             IntersectionCanvas.Clip = clipRect;
+
+            DrawIntersectionAndRoads();
         }
 
         private void DrawIntersectionAndRoads()

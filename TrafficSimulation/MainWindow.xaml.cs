@@ -149,8 +149,6 @@ namespace TrafficSimulation
 
         private void Intersection_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (e.LeftButton == MouseButtonState.Pressed)
-            {
                 if (sender is Rectangle rect && rect.Tag is Intersection intersection)
                 {
                     bool isSimulationWorked = timer.IsEnabled; 
@@ -166,7 +164,6 @@ namespace TrafficSimulation
                         settingsWindow.Closed += (s, e) => StartSimulation();
                     }
                 }
-            }
         }
 
         private void DrawRoad(Road road)
@@ -359,7 +356,8 @@ namespace TrafficSimulation
             {
                 Width = Constants.VehicleLengthPixels,
                 Height = Constants.VehicleWidthPixels,
-                Fill = Brushes.Blue
+                Fill = Brushes.Blue,
+                Tag = vehicle
             };
 
             double angle = (vehicle.IsMovingForward ? roadAngle : roadAngle + Math.PI) * 180 / Math.PI;
@@ -412,9 +410,31 @@ namespace TrafficSimulation
                 offsetY = position[1] - Math.Cos(roadAngle) * offset;
             }
 
+            rect.MouseDown += Vehicle_MouseDown;
+
             Canvas.SetLeft(rect, offsetX - rect.Width / 2 + globalOffset[0]);
             Canvas.SetTop(rect, offsetY - rect.Height / 2 + globalOffset[1]);
             CityCanvas.Children.Add(rect);
+        }
+
+        private void Vehicle_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is Rectangle rect && rect.Tag is Vehicle vehicle)
+            {
+                bool isSimulationWorked = timer.IsEnabled;
+
+                if (isSimulationWorked)
+                {
+                    StopSimulation();
+                }
+
+                if (MessageBox.Show("Вы желаете удалить эту машину?", "Удаление машины", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes) city.RemoveVehicle(vehicle);
+
+                if (isSimulationWorked)
+                {
+                    StartSimulation();
+                }
+            }
         }
 
         private void DrawTrafficLight(TrafficLight light)
