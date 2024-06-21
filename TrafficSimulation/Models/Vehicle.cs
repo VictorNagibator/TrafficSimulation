@@ -18,6 +18,8 @@
         private double SpeedInMetresPerHundredMilliseconds => SpeedInMetresPerSecond * 0.1;
         private double AccelerationInMetresPerHundredMilliseconds => Acceleration * 0.01;
 
+        private Random random = new();
+
         public void Update(City city)
         {
             //Проверка светофора на текущей дороге
@@ -54,7 +56,7 @@
                 var roadsOnRight = CurrentRoad.GetRoads(NextIntersection, RoadDirection.Right);
                 var vehicleOnRight = city.Vehicles
                     .Where(v => roadsOnRight.Contains(v.CurrentRoad) && v.NextIntersection == NextIntersection)
-                    .FirstOrDefault(v => Math.Abs(v.Position - (IsMovingForward ? v.CurrentRoad.Length : 0)) <= 20);
+                    .FirstOrDefault(v => Math.Abs(v.Position - (IsMovingForward ? v.CurrentRoad.Length : 0)) <= 10);
 
                 if (vehicleOnRight != null)
                 {
@@ -74,7 +76,9 @@
                 }
             }
 
-            if (shouldStopForTrafficLight || shouldStopForNextVehicle || shouldStopBecauseOfVehicleOnRight || shouldStopForTrafficJam)
+            bool shouldStopBecauseOfNoNextRoad = NextRoad == null && (IsMovingForward && Position + SpeedInMetresPerHundredMilliseconds >= CurrentRoad.Length - StopDistance) || (!IsMovingForward && Position - SpeedInMetresPerHundredMilliseconds <= StopDistance);
+
+            if (shouldStopForTrafficLight || shouldStopForNextVehicle || shouldStopBecauseOfVehicleOnRight || shouldStopForTrafficJam || shouldStopBecauseOfNoNextRoad)
             {
                 Speed = 0;
             }
@@ -87,13 +91,13 @@
                     Speed = CurrentRoad.MaxAllowedSpeed;
                 }
             }
-
+            
             //Обновление позиции автомобиля
-            if (!shouldStopForTrafficLight && !shouldStopForNextVehicle && !shouldStopBecauseOfVehicleOnRight && !shouldStopForTrafficJam)
+            if (!shouldStopForTrafficLight && !shouldStopForNextVehicle && !shouldStopBecauseOfVehicleOnRight && !shouldStopForTrafficJam && !shouldStopBecauseOfNoNextRoad)
             {
                 Position += IsMovingForward ? SpeedInMetresPerHundredMilliseconds : -SpeedInMetresPerHundredMilliseconds;
             }
-            else if ((shouldStopForTrafficLight || shouldStopBecauseOfVehicleOnRight || shouldStopForTrafficJam) && !shouldStopForNextVehicle)
+            else if ((shouldStopForTrafficLight || shouldStopBecauseOfVehicleOnRight || shouldStopForTrafficJam || shouldStopBecauseOfNoNextRoad) && !shouldStopForNextVehicle)
             {
                 Position = IsMovingForward ? CurrentRoad.Length - StopDistance : StopDistance;
             }
@@ -105,7 +109,6 @@
                 {
                     if (CurrentRoad == NextRoad)
                     {
-                        Random random = new();
                         LineNumber = random.Next(1, CurrentRoad.NumOfLanesPerDirection + 1);
                         IsMovingForward = !IsMovingForward;
                         Position = IsMovingForward ? 0 : NextRoad.Length;
@@ -117,13 +120,16 @@
                         CurrentRoad.RemoveVehicle(this);
                         NextRoad.AddVehicle(this);
                         CurrentRoad = NextRoad;
-                        Random random = new();
                         LineNumber = random.Next(1, CurrentRoad.NumOfLanesPerDirection + 1);
                         IsMovingForward = NextRoad.StartIntersection == NextIntersection;
                         Position = IsMovingForward ? 0 : NextRoad.Length;
                         NextIntersection = IsMovingForward ? NextRoad.EndIntersection : NextRoad.StartIntersection;
                         NextRoad = GetNextRoad();
                     }
+                }
+                else
+                {
+                    city.RemoveVehicle(this);
                 }
             }
             else

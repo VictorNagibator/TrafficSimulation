@@ -23,6 +23,19 @@
             if (!Intersections.Contains(road.EndIntersection)) Intersections.Add(road.EndIntersection);
         }
 
+        public void RemoveRoad(Road road)
+        {
+            Roads.Remove(road);
+
+            road.StartIntersection.IncomingRoads.Remove(road);
+            road.StartIntersection.OutgoingRoads.Remove(road);
+            road.EndIntersection.IncomingRoads.Remove(road);
+            road.EndIntersection.OutgoingRoads.Remove(road);
+
+            Vehicles.RemoveAll(v => v.CurrentRoad == road);
+            TrafficLights.RemoveAll(tl => tl.ControlledRoad == road);
+        }
+
         public void AddVehicle(Vehicle vehicle) => Vehicles.Add(vehicle);
         public void RemoveVehicle(Vehicle vehicle) => Vehicles.Remove(vehicle);
 
