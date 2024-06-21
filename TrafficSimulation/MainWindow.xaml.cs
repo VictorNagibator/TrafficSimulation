@@ -671,5 +671,10 @@ namespace TrafficSimulation
             DrawCity();
             DrawMetresLine();
         }
+
+        private void DeleteAllVehiclesButton_Click(object sender, RoutedEventArgs e)
+        {
+            city.Vehicles.Clear();
+        }
     }
 }
