@@ -22,7 +22,6 @@
             double endX = EndIntersection.X;
             double endY = EndIntersection.Y;
 
-            
             double angle = Math.Atan2(endY - startY, endX - startX);
 
             double offsetX = Math.Cos(angle) * vehicle.Position;

@@ -248,7 +248,45 @@ namespace TrafficSimulation
 
         private void Road_LeftButtonMouseDown(object sender, MouseButtonEventArgs e)
         {
-                if (sender is Line line && line.Tag is Road road && road != previewRoad)
+            if (sender is Line line && line.Tag is Road road && road != previewRoad)
+            {
+                if (currentRoadState == RoadCreationState.AddingStart || currentRoadState == RoadCreationState.AddingEnd)
+                {
+                    Intersection intersection = new()
+                    {
+                        X = e.GetPosition(CityCanvas).X * Constants.MetresPerPixel - globalOffset[0] * Constants.MetresPerPixel,
+                        Y = e.GetPosition(CityCanvas).Y * Constants.MetresPerPixel - globalOffset[1] * Constants.MetresPerPixel
+                    };
+
+                    Road newroad1 = new()
+                    {
+                        Name = road.Name,
+                        Type = road.Type,
+                        NumOfLanesPerDirection = road.NumOfLanesPerDirection,
+                        StartIntersection = road.StartIntersection,
+                        EndIntersection = intersection
+                    };
+                    Road newroad2 = new()
+                    {
+                        Name = road.Name,
+                        Type = road.Type,
+                        NumOfLanesPerDirection = road.NumOfLanesPerDirection,
+                        StartIntersection = intersection,
+                        EndIntersection = road.EndIntersection
+                    };
+
+                    var trafficlightInBegin = city.TrafficLights.Where(tl => tl.ControlledRoad == road && tl.ControlledIntersection == road.StartIntersection).FirstOrDefault();
+                    var trafficlightInEnd = city.TrafficLights.Where(tl => tl.ControlledRoad == road && tl.ControlledIntersection == road.EndIntersection).FirstOrDefault();
+                    if (trafficlightInBegin != null) trafficlightInBegin.ControlledRoad = newroad1;
+                    if (trafficlightInEnd != null) trafficlightInEnd.ControlledRoad = newroad2;
+                    city.RemoveRoad(road);
+                    
+                    city.AddRoad(newroad1);
+                    city.AddRoad(newroad2);
+
+                    Intersection_LeftButtonMouseDown(new Rectangle{Tag=intersection}, e);
+                }
+                else
                 {
                     bool isSimulationWorked = timer.IsEnabled;
 
@@ -262,7 +300,8 @@ namespace TrafficSimulation
                         StopSimulation();
                         settingsWindow.Closed += (s, e) => StartSimulation();
                     }
-                }
+                }     
+            }
         }
 
         private void DrawOneWayArrow(Road road)
