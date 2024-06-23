@@ -42,11 +42,15 @@ namespace TrafficSimulation
         private void OneWayRadioButton_Checked(object sender, RoutedEventArgs e)
         {
             selectedRoad.Type = RoadType.OneWay;
+
+            selectedRoad.EndIntersection.OutgoingRoads.Remove(selectedRoad);
         }
 
         private void TwoWayRadioButton_Checked(object sender, RoutedEventArgs e)
         {
             selectedRoad.Type = RoadType.TwoWay;
+
+            selectedRoad.EndIntersection.OutgoingRoads.Add(selectedRoad);
         }
 
         private void DeleteRoadButton_Click(object sender, RoutedEventArgs e)

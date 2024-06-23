@@ -112,6 +112,27 @@
                 return !Vehicles.Any(v => v.Position > Length - passingVehicle.StopDistance && !passingVehicle.IsMovingForward == v.IsMovingForward && v != passingVehicle);
             }
         }
+
+        public bool DoesIntersect(Road road)
+        {
+            double x1 = StartIntersection.X;
+            double y1 = StartIntersection.Y;
+            double x2 = EndIntersection.X;
+            double y2 = EndIntersection.Y;
+            double x3 = road.StartIntersection.X;
+            double y3 = road.StartIntersection.Y;
+            double x4 = road.EndIntersection.X;
+            double y4 = road.EndIntersection.Y;
+
+            double denominator = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+
+            if (denominator == 0) return false;
+
+            double t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / denominator;
+            double u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / denominator;
+
+            return t >= 0 && t <= 1 && u >= 0 && u <= 1;
+        }
     }
 
     public enum RoadType

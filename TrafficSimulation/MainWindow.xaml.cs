@@ -23,6 +23,7 @@ namespace TrafficSimulation
         private Intersection previewStartIntersection;
         private Intersection previewEndIntersection;
         private Road previewRoad;
+        private bool isAllowedToCreateRoad = true;
 
         public MainWindow()
         {
@@ -37,40 +38,6 @@ namespace TrafficSimulation
         private void InitializeCity()
         {
             city.MaxAllowedSpeed = MaxSpeedSlider.Value;
-
-            Intersection intersection1 = new() { Name = "Intersection1", X = 10, Y = 10 };
-            Intersection intersection2 = new() { Name = "Intersection2", X = 110, Y = 10 };
-            Intersection intersection3 = new() { Name = "Intersection3", X = 110, Y = 110 };
-            Intersection intersection4 = new() { Name = "Intersection4", X = 210, Y = 10 };
-            Intersection intersection5 = new() { Name = "Intersection5", X = 10, Y = 110 };
-
-            Road road1 = new() { Name = "Road1", Type = RoadType.TwoWay, NumOfLanesPerDirection = 1, StartIntersection = intersection1, EndIntersection = intersection2 };
-            Road road2 = new() { Name = "Road2", Type = RoadType.TwoWay, NumOfLanesPerDirection = 1, StartIntersection = intersection2, EndIntersection = intersection3 };
-            Road road3 = new() { Name = "Road3", Type = RoadType.TwoWay, NumOfLanesPerDirection = 2, StartIntersection = intersection2, EndIntersection = intersection4 };
-            Road road4 = new() { Name = "Road4", Type = RoadType.OneWay, NumOfLanesPerDirection = 1, StartIntersection = intersection3, EndIntersection = intersection4 };
-            Road road5 = new() { Name = "Road5", Type = RoadType.OneWay, NumOfLanesPerDirection = 2, StartIntersection = intersection1, EndIntersection = intersection3 };
-            Road road6 = new() { Name = "Road6", Type = RoadType.OneWay, NumOfLanesPerDirection = 3, StartIntersection = intersection1, EndIntersection = intersection5 };
-            Road road7 = new() { Name = "Road7", Type = RoadType.OneWay, NumOfLanesPerDirection = 2, StartIntersection = intersection5, EndIntersection = intersection3 };
-
-            city.AddRoad(road1);
-            city.AddRoad(road2);
-            city.AddRoad(road3);
-            city.AddRoad(road4);
-            city.AddRoad(road5);
-            city.AddRoad(road6);
-            city.AddRoad(road7);
-
-            TrafficLight light1 = new() { ID = "Light1", ControlledRoad = road1, ControlledIntersection = intersection1, State = TrafficLightState.Green, RedTimer = 10, GreenTimer = 15 };
-            TrafficLight light2 = new() { ID = "Light2", ControlledRoad = road1, ControlledIntersection = intersection2, State = TrafficLightState.Red, RedTimer = 10, GreenTimer = 15 };
-            TrafficLight light3 = new() { ID = "Light3", ControlledRoad = road2, ControlledIntersection = intersection2, State = TrafficLightState.Green, RedTimer = 10, GreenTimer = 15 };
-            TrafficLight light4 = new() { ID = "Light4", ControlledRoad = road3, ControlledIntersection = intersection2, State = TrafficLightState.Red, RedTimer = 10, GreenTimer = 15 };
-            TrafficLight light5 = new() { ID = "Light5", ControlledRoad = road5, ControlledIntersection = intersection3, State = TrafficLightState.Red, RedTimer = 10, GreenTimer = 15 };
-
-            city.AddTrafficLight(light1);
-            city.AddTrafficLight(light2);
-            city.AddTrafficLight(light3);
-            city.AddTrafficLight(light4);
-            city.AddTrafficLight(light5);
         }
 
         private void InitializeTimer()
@@ -170,7 +137,7 @@ namespace TrafficSimulation
 
                     currentRoadState = RoadCreationState.AddingEnd;
                 }
-                else if (currentRoadState == RoadCreationState.AddingEnd)
+                else if (currentRoadState == RoadCreationState.AddingEnd && isAllowedToCreateRoad)
                 {
                     previewEndIntersection = intersection;
                     previewRoad.EndIntersection = previewEndIntersection;
@@ -225,7 +192,7 @@ namespace TrafficSimulation
                 Y1 = startY + globalOffset[1],
                 X2 = endX + globalOffset[0],
                 Y2 = endY + globalOffset[1],
-                Stroke = road != previewRoad ? Brushes.Black : Brushes.Aqua,
+                Stroke = road != previewRoad ? Brushes.Black : isAllowedToCreateRoad ? Brushes.Aqua : Brushes.Red,
                 StrokeThickness = road.Width / Constants.MetresPerPixel,
                 Tag = road
             };
@@ -250,12 +217,12 @@ namespace TrafficSimulation
         {
             if (sender is Line line && line.Tag is Road road && road != previewRoad)
             {
-                if (currentRoadState == RoadCreationState.AddingStart || currentRoadState == RoadCreationState.AddingEnd)
+                if (currentRoadState == RoadCreationState.AddingStart || (currentRoadState == RoadCreationState.AddingEnd && isAllowedToCreateRoad))
                 {
                     Intersection intersection = new()
                     {
                         X = e.GetPosition(CityCanvas).X * Constants.MetresPerPixel - globalOffset[0] * Constants.MetresPerPixel,
-                        Y = e.GetPosition(CityCanvas).Y * Constants.MetresPerPixel - globalOffset[1] * Constants.MetresPerPixel
+                        Y = e.GetPosition(CityCanvas).Y * Constants.MetresPerPixel - globalOffset[1] * Constants.MetresPerPixel + road.Width / 2 * Math.Sin(road.Angle)
                     };
 
                     Road newroad1 = new()
@@ -286,7 +253,7 @@ namespace TrafficSimulation
 
                     Intersection_LeftButtonMouseDown(new Rectangle{Tag=intersection}, e);
                 }
-                else
+                else if (currentRoadState == RoadCreationState.None)
                 {
                     bool isSimulationWorked = timer.IsEnabled;
 
@@ -695,7 +662,7 @@ namespace TrafficSimulation
 
                 currentRoadState = RoadCreationState.AddingEnd;
             }
-            else if (currentRoadState == RoadCreationState.AddingEnd && previewStartIntersection != previewEndIntersection)
+            else if (currentRoadState == RoadCreationState.AddingEnd && previewStartIntersection != previewEndIntersection && isAllowedToCreateRoad)
             {
                 previewEndIntersection = new Intersection
                 {
@@ -727,9 +694,11 @@ namespace TrafficSimulation
             { 
                previewEndIntersection = new Intersection
                {
-                   X = e.GetPosition(CityCanvas).X * Constants.MetresPerPixel - globalOffset[0] * Constants.MetresPerPixel - Math.Cos(previewRoad.Angle),
-                   Y = e.GetPosition(CityCanvas).Y * Constants.MetresPerPixel - globalOffset[1] * Constants.MetresPerPixel - Math.Sin(previewRoad.Angle)
+                   X = e.GetPosition(CityCanvas).X * Constants.MetresPerPixel - globalOffset[0] * Constants.MetresPerPixel - 0.2 * Math.Cos(previewRoad.Angle),
+                   Y = e.GetPosition(CityCanvas).Y * Constants.MetresPerPixel - globalOffset[1] * Constants.MetresPerPixel - 0.2 * Math.Sin(previewRoad.Angle)
                };
+
+               isAllowedToCreateRoad = city.Roads.Where(r => r.DoesIntersect(previewRoad) && r.StartIntersection != previewRoad.StartIntersection && r.EndIntersection != previewRoad.StartIntersection).ToList().Count == 0;
 
                previewRoad.EndIntersection = previewEndIntersection;
 
