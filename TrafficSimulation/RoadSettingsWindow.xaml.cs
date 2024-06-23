@@ -45,6 +45,9 @@ namespace TrafficSimulation
 
             selectedRoad.EndIntersection.OutgoingRoads.Remove(selectedRoad);
             selectedRoad.StartIntersection.IncomingRoads.Remove(selectedRoad);
+
+            city.Vehicles.ForEach(car => car.NextRoad = car.GetNextRoad());
+            city.Vehicles.RemoveAll(car => !car.IsMovingForward && car.CurrentRoad == selectedRoad);
         }
 
         private void TwoWayRadioButton_Checked(object sender, RoutedEventArgs e)
@@ -53,6 +56,8 @@ namespace TrafficSimulation
 
             selectedRoad.EndIntersection.OutgoingRoads.Add(selectedRoad);
             selectedRoad.StartIntersection.IncomingRoads.Add(selectedRoad);
+
+            city.Vehicles.ForEach(car => car.NextRoad = car.GetNextRoad());
         }
 
         private void DeleteRoadButton_Click(object sender, RoutedEventArgs e)
