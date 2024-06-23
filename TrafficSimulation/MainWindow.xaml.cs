@@ -67,7 +67,6 @@ namespace TrafficSimulation
         {
             city.Update();
             DrawCity();
-            DrawMetresLine();
         }
 
         private void DrawCity()
@@ -98,6 +97,8 @@ namespace TrafficSimulation
             {
                 DrawRoad(previewRoad);
             }
+
+            DrawMetresLine();
         }
 
         private void DrawIntersection(Intersection intersection)
@@ -158,7 +159,6 @@ namespace TrafficSimulation
                     IntersectionSettingsWindow settingsWindow = new(intersection, city);
                     settingsWindow.Show();
                     settingsWindow.Closed += (s, e) => DrawCity();
-                    settingsWindow.Closed += (s, e) => DrawMetresLine();
 
                     if (isSimulationWorked)
                     {
@@ -260,7 +260,6 @@ namespace TrafficSimulation
                     RoadSettingsWindow settingsWindow = new(road, city);
                     settingsWindow.Show();
                     settingsWindow.Closed += (s, e) => DrawCity();
-                    settingsWindow.Closed += (s, e) => DrawMetresLine();
 
                     if (isSimulationWorked)
                     {
@@ -607,7 +606,6 @@ namespace TrafficSimulation
             CityCanvas.Clip = clipRect;
 
             DrawCity();
-            DrawMetresLine();
         }
 
         private void ZoomInButton_Click(object sender, RoutedEventArgs e)
@@ -617,7 +615,6 @@ namespace TrafficSimulation
             if (Math.Round(Constants.MetresPerPixel, 2) > 0.5 && Math.Round(Constants.MetresPerPixel, 2) <= 1) Constants.MetresPerPixel = Math.Max(Constants.MetresPerPixel - 0.1, 0.1);
             else Constants.MetresPerPixel = Math.Max(Constants.MetresPerPixel - 0.05, 0.1);
             DrawCity();
-            DrawMetresLine();
         }
 
         private void ZoomOutButton_Click(object sender, RoutedEventArgs e)
@@ -625,7 +622,6 @@ namespace TrafficSimulation
             if (Math.Round(Constants.MetresPerPixel, 2) >= 0.5 && Math.Round(Constants.MetresPerPixel, 2) <= 1) Constants.MetresPerPixel = Math.Min(Constants.MetresPerPixel + 0.1, 1);
             else Constants.MetresPerPixel = Math.Min(Constants.MetresPerPixel + 0.05, 1);
             DrawCity();
-            DrawMetresLine();
         }
 
         private void CityCanvas_MouseWheel(object sender, MouseWheelEventArgs e)
@@ -763,7 +759,6 @@ namespace TrafficSimulation
             globalOffset = [0, 0];
             Constants.MetresPerPixel = 0.2;
             DrawCity();
-            DrawMetresLine();
         }
 
         private void DeleteAllVehiclesButton_Click(object sender, RoutedEventArgs e)

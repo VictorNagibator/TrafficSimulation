@@ -44,6 +44,7 @@ namespace TrafficSimulation
             selectedRoad.Type = RoadType.OneWay;
 
             selectedRoad.EndIntersection.OutgoingRoads.Remove(selectedRoad);
+            selectedRoad.StartIntersection.IncomingRoads.Remove(selectedRoad);
         }
 
         private void TwoWayRadioButton_Checked(object sender, RoutedEventArgs e)
@@ -51,6 +52,7 @@ namespace TrafficSimulation
             selectedRoad.Type = RoadType.TwoWay;
 
             selectedRoad.EndIntersection.OutgoingRoads.Add(selectedRoad);
+            selectedRoad.StartIntersection.IncomingRoads.Add(selectedRoad);
         }
 
         private void DeleteRoadButton_Click(object sender, RoutedEventArgs e)
