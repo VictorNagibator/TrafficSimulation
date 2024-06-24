@@ -33,8 +33,10 @@
                 Roads.ForEach(road => road.Quality = value);
             }
         }
-        public double ChanceToGetInCarAccident { get; set; }
-        public double ChanceOfRaining { get; set; }
+        public double ChanceToGetInCarAccident { get; set; } = 0.001;
+
+        public int CarAccidentTimer { get; set; } = 30 * 10;
+        public double ChanceOfRaining { get; set; } = 0.01;
 
         public void AddRoad(Road road)
         {

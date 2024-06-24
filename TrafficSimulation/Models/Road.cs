@@ -111,7 +111,7 @@
 
                 // Разница углов относительно текущей дороги
                 double angleDifference = NormalizeAngle(roadAngle - currentRoadAngle);
-                double angleTolerance = Math.PI / 6;
+                double angleTolerance = Math.PI / 12;
 
                 switch (direction)
                 {
@@ -158,11 +158,11 @@
         {
             if (passingVehicle.NextIntersection == StartIntersection)
             {
-                return !Vehicles.Any(v => v.Position < passingVehicle.StopDistance && passingVehicle.IsMovingForward == v.IsMovingForward && v != passingVehicle);
+                return !Vehicles.Any(v => v.Position < passingVehicle.StopDistance && v.IsMovingForward && v != passingVehicle);
             }
             else
             {
-                return !Vehicles.Any(v => v.Position > Length - passingVehicle.StopDistance && !passingVehicle.IsMovingForward == v.IsMovingForward && v != passingVehicle);
+                return !Vehicles.Any(v => v.Position > Length - passingVehicle.StopDistance && !v.IsMovingForward && v != passingVehicle);
             }
         }
 

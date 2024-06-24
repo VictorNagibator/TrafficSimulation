@@ -370,7 +370,7 @@ namespace TrafficSimulation
             {
                 Width = Constants.VehicleLengthPixels,
                 Height = Constants.VehicleWidthPixels,
-                Fill = Brushes.Blue,
+                Fill = vehicle.IsInCarAccident ? Brushes.IndianRed : Brushes.Blue,
                 Tag = vehicle
             };
 
