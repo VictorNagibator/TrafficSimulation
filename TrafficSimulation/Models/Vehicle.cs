@@ -13,10 +13,11 @@
         public Road NextRoad { get; set; }
         public bool IsMovingForward { get; set; } = true;
 
-        public double StopDistance => NextIntersection.GetWidth() / 2 + Constants.VehicleLengthMetres / 2;
+        public double StopDistance => NextIntersection.Width / 2 + Constants.VehicleLengthMetres / 2;
         private double SpeedInMetresPerSecond => Speed / 3600 * 1000;
         private double SpeedInMetresPerHundredMilliseconds => SpeedInMetresPerSecond * 0.1;
         private double AccelerationInMetresPerHundredMilliseconds => Acceleration * 0.01;
+        private double MaxPossibleSpeed => CurrentRoad.Quality * CurrentRoad.MaxAllowedSpeed;
 
         private Random random = new();
 
@@ -87,9 +88,9 @@
             {
                 double speedAfterHundredMilliseconds = SpeedInMetresPerHundredMilliseconds + AccelerationInMetresPerHundredMilliseconds;
                 Speed += speedAfterHundredMilliseconds * 10 * 3600 / 1000;
-                if (Speed > CurrentRoad.MaxAllowedSpeed)
+                if (Speed > MaxPossibleSpeed)
                 {
-                    Speed = CurrentRoad.MaxAllowedSpeed;
+                    Speed = MaxPossibleSpeed;
                 }
             }
             
@@ -108,6 +109,7 @@
             {
                 if (NextRoad != null)
                 {
+                    CurrentRoad.Quality -= 0.0002; //условное значение ухудшения качества дороги после каждого проезда
                     if (CurrentRoad == NextRoad)
                     {
                         LineNumber = random.Next(1, CurrentRoad.NumOfLanesPerDirection + 1);
@@ -147,7 +149,7 @@
             switch (numOfLanes)
             {
                 case 1:
-                    outgoingRoads = NextIntersection.OutgoingRoads;
+                    outgoingRoads = NextIntersection.OutgoingRoads.ToList();
                     break;
                 case 2:
                     outgoingRoads = CurrentRoad.GetRoadsToGo(NextIntersection, RoadDirection.Forward);

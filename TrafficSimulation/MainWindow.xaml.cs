@@ -103,14 +103,15 @@ namespace TrafficSimulation
 
         private void DrawIntersection(Intersection intersection)
         {
-            double maxRoadWidth = intersection.GetWidth();
+            double maxRoadWidth = intersection.Width;
 
             Rectangle rect = new()
             {
                 Width = maxRoadWidth / Constants.MetresPerPixel,
                 Height = maxRoadWidth / Constants.MetresPerPixel,
                 Fill = Brushes.Black,
-                Tag = intersection
+                Tag = intersection,
+                Opacity = intersection.BestRoadQuality
             };
 
             rect.MouseLeftButtonDown += Intersection_LeftButtonMouseDown;
@@ -171,8 +172,8 @@ namespace TrafficSimulation
 
         private void DrawRoad(Road road)
         {
-            double startIntersectionWidth = road.StartIntersection.GetWidth();
-            double endIntersectionWidth = road.EndIntersection.GetWidth();
+            double startIntersectionWidth = road.StartIntersection.Width;
+            double endIntersectionWidth = road.EndIntersection.Width;
 
             double startX = road.StartIntersection.X / Constants.MetresPerPixel;
             double startY = road.StartIntersection.Y / Constants.MetresPerPixel;
@@ -194,7 +195,8 @@ namespace TrafficSimulation
                 Y2 = endY + globalOffset[1],
                 Stroke = road != previewRoad ? Brushes.Black : isAllowedToCreateRoad ? Brushes.Aqua : Brushes.Red,
                 StrokeThickness = road.Width / Constants.MetresPerPixel,
-                Tag = road
+                Tag = road,
+                Opacity = road.Quality
             };
 
             line.MouseLeftButtonDown += Road_LeftButtonMouseDown;
@@ -231,7 +233,8 @@ namespace TrafficSimulation
                         Type = road.Type,
                         NumOfLanesPerDirection = road.NumOfLanesPerDirection,
                         StartIntersection = road.StartIntersection,
-                        EndIntersection = intersection
+                        EndIntersection = intersection,
+                        Quality = road.Quality,
                     };
                     Road newroad2 = new()
                     {
@@ -239,7 +242,8 @@ namespace TrafficSimulation
                         Type = road.Type,
                         NumOfLanesPerDirection = road.NumOfLanesPerDirection,
                         StartIntersection = intersection,
-                        EndIntersection = road.EndIntersection
+                        EndIntersection = road.EndIntersection,
+                        Quality = road.Quality,
                     };
 
                     var trafficlightInBegin = city.TrafficLights.Where(tl => tl.ControlledRoad == road && tl.ControlledIntersection == road.StartIntersection).FirstOrDefault();
@@ -299,8 +303,8 @@ namespace TrafficSimulation
 
         private void DrawRoadName(Road road)
         {
-            double startIntersectionWidth = road.StartIntersection.GetWidth();
-            double endIntersectionWidth = road.EndIntersection.GetWidth();
+            double startIntersectionWidth = road.StartIntersection.Width;
+            double endIntersectionWidth = road.EndIntersection.Width;
 
             double startX = road.StartIntersection.X / Constants.MetresPerPixel;
             double startY = road.StartIntersection.Y / Constants.MetresPerPixel;
@@ -336,8 +340,8 @@ namespace TrafficSimulation
 
         private void DrawSpeedLimitSign(Road road)
         {
-            double startIntersectionWidth = road.StartIntersection.GetWidth();
-            double endIntersectionWidth = road.EndIntersection.GetWidth();
+            double startIntersectionWidth = road.StartIntersection.Width;
+            double endIntersectionWidth = road.EndIntersection.Width;
 
             double startX = road.StartIntersection.X / Constants.MetresPerPixel;
             double startY = road.StartIntersection.Y / Constants.MetresPerPixel;

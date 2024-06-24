@@ -11,6 +11,8 @@
         public double MaxAllowedSpeed { get; set; }
         public double MaxAllowedSpeedInMetresPerSecond => MaxAllowedSpeed / 3600 * 1000;
 
+        public double Quality { get; set; } = 1;
+
         public void AddVehicle(Vehicle vehicle) => Vehicles.Add(vehicle);
 
         public void RemoveVehicle(Vehicle vehicle) => Vehicles.Remove(vehicle);
@@ -59,23 +61,24 @@
 
                 // Разница углов относительно текущей дороги
                 double angleDifference = NormalizeAngle(roadAngle - currentRoadAngle);
+                double angleTolerance = Math.PI / 6;
 
                 switch (direction)
                 {
                     case RoadDirection.Left:
-                        if (angleDifference > 0)
+                        if (angleDifference > angleTolerance)
                         {
                             neededRoads.Add(road);
                         }
                         break;
                     case RoadDirection.Forward:
-                        if (angleDifference == 0 && road != this)
+                        if (Math.Abs(angleDifference) <= angleTolerance && road != this)
                         {
                             neededRoads.Add(road);
                         }
                         break;
                     case RoadDirection.Right:
-                        if (angleDifference < 0)
+                        if (angleDifference < -angleTolerance)
                         {
                             neededRoads.Add(road);
                         }

@@ -55,7 +55,7 @@ namespace TrafficSimulation
 
         private void DrawIntersection()
         {
-            double maxRoadWidth = intersection.GetWidth();
+            double maxRoadWidth = intersection.Width;
             double intersectionCenterX = IntersectionCanvas.ActualWidth / 2;
             double intersectionCenterY = IntersectionCanvas.ActualHeight / 2;
 

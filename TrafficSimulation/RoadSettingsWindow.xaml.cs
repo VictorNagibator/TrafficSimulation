@@ -22,6 +22,7 @@ namespace TrafficSimulation
             else TwoWayRadioButton.IsChecked = true;
 
             NumOfLanesSlider.Value = road.NumOfLanesPerDirection;
+            RoadQualitySlider.Value = road.Quality * 100;
         }
 
         private void RoadNameTextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
@@ -67,6 +68,11 @@ namespace TrafficSimulation
                 city.RemoveRoad(selectedRoad);
                 Close();
             }
+        }
+
+        private void RoadQualitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (city != null) selectedRoad.Quality = Math.Round(RoadQualitySlider.Value / 100, 2);
         }
     }
 }

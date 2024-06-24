@@ -5,8 +5,8 @@
         public string Name { get; set; }
         public double X { get; set; }
         public double Y { get; set; }
-        public List<Road> IncomingRoads { get; set; } = [];
-        public List<Road> OutgoingRoads { get; set; } = [];
+        public HashSet<Road> IncomingRoads { get; set; } = [];
+        public HashSet<Road> OutgoingRoads { get; set; } = [];
 
         public void AddRoad(Road road)
         {
@@ -34,7 +34,9 @@
             OutgoingRoads.Remove(road);
         }
 
-        public double GetWidth()
+
+        public double Width => GetWidth();
+        private double GetWidth()
         {
             double maxRoadWidth = 0;
 
@@ -53,6 +55,23 @@
         public bool HasNoRoads()
         {
             return IncomingRoads.Count == 0 && OutgoingRoads.Count == 0;
+        }
+
+        public double BestRoadQuality => GetBestRoadQuality();
+
+        private double GetBestRoadQuality()
+        {
+            double bestRoadQuality = 0;
+            foreach (var road in IncomingRoads)
+            {
+                bestRoadQuality = Math.Max(bestRoadQuality, road.Quality);
+            }
+            foreach (var road in OutgoingRoads)
+            {
+                bestRoadQuality = Math.Max(bestRoadQuality, road.Quality);
+            }
+
+            return bestRoadQuality;
         }
     }
 }

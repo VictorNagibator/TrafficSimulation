@@ -5,9 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TrafficSimulation"
         mc:Ignorable="d"
-        Title="Настройки дороги" Height="350" Width="550">
+        Title="Настройки дороги" Height="450" Width="550">
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -26,13 +27,19 @@
             <TextBlock x:Name="MaxSpeedValue" VerticalAlignment="Center" Margin="10,0,0,0" Text="{Binding ElementName=MaxSpeedSlider, Path=Value, StringFormat=F0}" Width="20"/>
         </StackPanel>
 
-        <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Vertical" Margin="10">
+        <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal" Margin="10">
+            <TextBlock x:Name="RoadQualityTextBlock" Text="Качество дороги (в %): " Margin="10,0,120,0" VerticalAlignment="Center"/>
+            <Slider x:Name="RoadQualitySlider" Minimum="20" Maximum="100" Margin="10" Width="198" ValueChanged="RoadQualitySlider_ValueChanged"/>
+            <TextBlock x:Name="RoadQualityValue" VerticalAlignment="Center" Margin="10,0,0,0" Text="{Binding ElementName=RoadQualitySlider, Path=Value, StringFormat=F0}" Width="20"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="3" Grid.Column="0" Orientation="Vertical" Margin="10">
             <TextBlock Text="Параметры дороги" FontWeight="Bold" HorizontalAlignment="Center" Margin="10"/>
             <RadioButton x:Name="OneWayRadioButton" Content="Одностороннее движение" HorizontalAlignment="Left" Margin="10" Checked="OneWayRadioButton_Checked"/>
             <RadioButton x:Name="TwoWayRadioButton" Content="Двухстороннее движение" HorizontalAlignment="Left" Margin="10" Checked="TwoWayRadioButton_Checked"/>
         </StackPanel>
 
-        <StackPanel Grid.Row="3" Grid.Column="0" Orientation="Horizontal" Margin="10" Grid.RowSpan="2">
+        <StackPanel Grid.Row="4" Grid.Column="0" Orientation="Horizontal" Margin="10">
             <TextBlock x:Name="NumOfLanesTextBlock" Text="Количество полос (в каждую сторону): " Margin="10,0,0,0" VerticalAlignment="Center"/>
             <Slider x:Name="NumOfLanesSlider" Minimum="1" Maximum="10" Margin="10" Width="200" ValueChanged="NumOfLanesSlider_ValueChanged"/>
             <TextBlock x:Name="NumOfLanesValue" VerticalAlignment="Center" Margin="10,0,0,0" Text="{Binding ElementName=NumOfLanesSlider, Path=Value, StringFormat=F0}" Width="18"/>
