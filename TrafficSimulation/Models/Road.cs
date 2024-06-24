@@ -3,10 +3,60 @@
     public class Road
     {
         public string Name { get; set; }
-        public RoadType Type { get; set; }
+        private RoadType type;
+        public RoadType Type
+        {
+            get { return type; }
+            set
+            {
+                type = value;
+                switch (type)
+                {
+                    case RoadType.OneWay:
+                        StartIntersection.IncomingRoads.Remove(this);
+                        EndIntersection.OutgoingRoads.Remove(this);
+
+                        Vehicles.ForEach(car => car.NextRoad = car.GetNextRoad());
+                        Vehicles.RemoveAll(car => !car.IsMovingForward);
+                        break;
+                    case RoadType.TwoWay:
+                        StartIntersection.IncomingRoads.Add(this);
+                        EndIntersection.OutgoingRoads.Add(this);
+                        
+                        Vehicles.ForEach(car => car.NextRoad = car.GetNextRoad());
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
         public int NumOfLanesPerDirection { get; set; }
-        public Intersection StartIntersection { get; set; }
-        public Intersection EndIntersection { get; set; }
+        private Intersection startIntersection;
+        public Intersection StartIntersection
+        {
+            get { return startIntersection; }
+            set
+            {
+                startIntersection = value;
+                if (Type == RoadType.OneWay)
+                {
+                    startIntersection.OutgoingRoads.Add(this);
+                }
+            }
+        }
+        private Intersection endIntersection;
+        public Intersection EndIntersection
+        {
+            get { return endIntersection; }
+            set
+            {
+                endIntersection = value;
+                if (Type == RoadType.OneWay)
+                {
+                    endIntersection.IncomingRoads.Add(this);
+                }
+            }
+        }
         public List<Vehicle> Vehicles { get; set; } = [];
         public double MaxAllowedSpeed { get; set; }
         public double MaxAllowedSpeedInMetresPerSecond => MaxAllowedSpeed / 3600 * 1000;

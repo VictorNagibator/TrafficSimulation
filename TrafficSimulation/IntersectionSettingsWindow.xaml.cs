@@ -22,6 +22,7 @@ namespace TrafficSimulation
             this.city = city;
             IntersectionNameTextBox.Text = intersection.Name;
             DrawIntersectionAndRoads();
+
             SizeChanged += IntersectionSettingsWindow_SizeChanged;
         }
 
@@ -64,7 +65,8 @@ namespace TrafficSimulation
                 Width = maxRoadWidth / Constants.MetresPerPixelInIntersectionSettings,
                 Height = maxRoadWidth / Constants.MetresPerPixelInIntersectionSettings,
                 Fill = Brushes.Black,
-                Tag = intersection
+                Tag = intersection,
+                Opacity = intersection.BestRoadQuality
             };
 
             Canvas.SetLeft(rect, intersectionCenterX - rect.Width / 2);
@@ -91,7 +93,8 @@ namespace TrafficSimulation
                 Y2 = end.Y,
                 Stroke = Brushes.Black,
                 StrokeThickness = road.Width / Constants.MetresPerPixelInIntersectionSettings,
-                Tag = road
+                Tag = road,
+                Opacity = road.Quality
             };
 
             line.MouseDown += RoadLine_MouseDown;

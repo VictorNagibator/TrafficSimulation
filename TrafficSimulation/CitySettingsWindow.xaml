@@ -1,0 +1,41 @@
+﻿<Window x:Class="TrafficSimulation.CitySettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TrafficSimulation"
+        mc:Ignorable="d"
+        Title="Настройки города" Height="450" Width="550">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" HorizontalAlignment="Left" Orientation="Horizontal"  Margin="10">
+            <TextBlock Text="Максимально разрешенная скорость (км/ч):" VerticalAlignment="Center" Margin="10"/>
+            <Slider x:Name="MaxSpeedSlider" Minimum="20" Maximum="100"  Margin="5" Width="198" VerticalAlignment="Center" ValueChanged="MaxSpeedSlider_ValueChanged"/>
+            <TextBlock x:Name="MaxSpeedValue" Margin="10,0,0,0" Text="{Binding ElementName=MaxSpeedSlider, Path=Value, StringFormat=F0}" Width="20" VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" HorizontalAlignment="Left" Orientation="Horizontal"  Margin="10">
+            <TextBlock Text="Качество дорог (в %):" VerticalAlignment="Center" Margin="10"/>
+            <Slider x:Name="RoadQualitySlider" Minimum="20" Maximum="100"  Margin="5" Width="198" VerticalAlignment="Center" ValueChanged="RoadQualitySlider_ValueChanged"/>
+            <TextBlock x:Name="RoadQualityValue" Margin="10,0,0,0" Text="{Binding ElementName=RoadQualitySlider, Path=Value, StringFormat=F0}" Width="20" VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="2" HorizontalAlignment="Left" Orientation="Horizontal"  Margin="10">
+            <TextBlock Text="Вероятность ДТП и поломок машин (в %):" VerticalAlignment="Center" Margin="10"/>
+            <Slider x:Name="CarAccidentSlider" Minimum="20" Maximum="100"  Margin="5" Width="198" VerticalAlignment="Center" ValueChanged="CarAccidentSlider_ValueChanged"/>
+            <TextBlock x:Name="CarAccidentValue" Margin="10,0,0,0" Text="{Binding ElementName=CarAccidentSlider, Path=Value, StringFormat=F0}" Width="18" VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="3" HorizontalAlignment="Left" Orientation="Horizontal"  Margin="10">
+            <TextBlock Text="Вероятность выпадения осадков (в %):" VerticalAlignment="Center" Margin="10"/>
+            <Slider x:Name="RainingSlider" Minimum="20" Maximum="100"  Margin="5" Width="198" VerticalAlignment="Center" ValueChanged="RainingSlider_ValueChanged"/>
+            <TextBlock x:Name="RainingValue" Margin="10,0,0,0" Text="{Binding ElementName=RainingSlider, Path=Value, StringFormat=F0}" Width="18" VerticalAlignment="Center"/>
+        </StackPanel>
+    </Grid>
+</Window>

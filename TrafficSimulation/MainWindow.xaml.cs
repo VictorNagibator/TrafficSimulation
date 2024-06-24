@@ -5,6 +5,7 @@ using System.Windows.Shapes;
 using TrafficSimulation.Models;
 using System.Windows.Threading;
 using System.Windows.Input;
+using Microsoft.VisualBasic;
 
 namespace TrafficSimulation
 {
@@ -20,47 +21,21 @@ namespace TrafficSimulation
         private double[] globalOffset = [0, 0];
         private enum RoadCreationState { None, AddingStart, AddingEnd }
         private RoadCreationState currentRoadState = RoadCreationState.None;
-        private Intersection previewStartIntersection;
-        private Intersection previewEndIntersection;
         private Road previewRoad;
         private bool isAllowedToCreateRoad = true;
 
         public MainWindow()
         {
             InitializeComponent();
-            InitializeCity();
             InitializeTimer();
-            InitializeSliders();
 
             DrawCity();
-        }
-
-        private void InitializeCity()
-        {
-            city.MaxAllowedSpeed = MaxSpeedSlider.Value;
         }
 
         private void InitializeTimer()
         {
             timer.Interval = TimeSpan.FromMilliseconds(100);
             timer.Tick += Timer_Tick;
-        }
-
-        private void InitializeSliders()
-        {
-            MaxSpeedSlider.ValueChanged += MaxSpeedSlider_ValueChanged;
-        }
-
-        private void MaxSpeedSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            if (city != null)
-            {
-                city.MaxAllowedSpeed = (int)MaxSpeedSlider.Value;
-                foreach (var road in city.Roads)
-                {
-                    road.MaxAllowedSpeed = (int)MaxSpeedSlider.Value;
-                }
-            }
         }
 
         private void Timer_Tick(object sender, EventArgs e)
@@ -121,17 +96,30 @@ namespace TrafficSimulation
             CityCanvas.Children.Add(rect);
         }
 
+        private void LaunchWindow(Window window)
+        {
+            bool isSimulationWorked = timer.IsEnabled;
+
+            window.Show();
+            window.Closed += (s, e) => DrawCity();
+
+            if (isSimulationWorked)
+            {
+                StopSimulation();
+                window.Closed += (s, e) => StartSimulation();
+            }
+        }
+
         private void Intersection_LeftButtonMouseDown(object sender, MouseButtonEventArgs e)
         {
             if (sender is Rectangle rect && rect.Tag is Intersection intersection)
             {
                 if (currentRoadState == RoadCreationState.AddingStart)
                 {
-                    previewEndIntersection = previewStartIntersection = intersection;
                     previewRoad = new Road()
                     {
-                        StartIntersection = previewStartIntersection,
-                        EndIntersection = previewEndIntersection,
+                        StartIntersection = intersection,
+                        EndIntersection = intersection,
                         Type = RoadType.TwoWay,
                         NumOfLanesPerDirection = 1,
                         MaxAllowedSpeed = city.MaxAllowedSpeed
@@ -141,8 +129,7 @@ namespace TrafficSimulation
                 }
                 else if (currentRoadState == RoadCreationState.AddingEnd && isAllowedToCreateRoad)
                 {
-                    previewEndIntersection = intersection;
-                    previewRoad.EndIntersection = previewEndIntersection;
+                    previewRoad.EndIntersection = intersection;
 
                     city.AddRoad(previewRoad);
                     previewRoad = null;
@@ -153,19 +140,10 @@ namespace TrafficSimulation
 
                     DrawCity();
                 }
-                else
+                else if (currentRoadState == RoadCreationState.None)
                 {
-                    bool isSimulationWorked = timer.IsEnabled;
-
                     IntersectionSettingsWindow settingsWindow = new(intersection, city);
-                    settingsWindow.Show();
-                    settingsWindow.Closed += (s, e) => DrawCity();
-
-                    if (isSimulationWorked)
-                    {
-                        StopSimulation();
-                        settingsWindow.Closed += (s, e) => StartSimulation();
-                    }
+                    LaunchWindow(settingsWindow);
                 }    
             }
         }
@@ -230,20 +208,20 @@ namespace TrafficSimulation
                     Road newroad1 = new()
                     {
                         Name = road.Name,
-                        Type = road.Type,
                         NumOfLanesPerDirection = road.NumOfLanesPerDirection,
                         StartIntersection = road.StartIntersection,
                         EndIntersection = intersection,
                         Quality = road.Quality,
+                        Type = road.Type,
                     };
                     Road newroad2 = new()
                     {
                         Name = road.Name,
-                        Type = road.Type,
                         NumOfLanesPerDirection = road.NumOfLanesPerDirection,
                         StartIntersection = intersection,
                         EndIntersection = road.EndIntersection,
                         Quality = road.Quality,
+                        Type = road.Type,
                     };
 
                     var trafficlightInBegin = city.TrafficLights.Where(tl => tl.ControlledRoad == road && tl.ControlledIntersection == road.StartIntersection).FirstOrDefault();
@@ -259,17 +237,8 @@ namespace TrafficSimulation
                 }
                 else if (currentRoadState == RoadCreationState.None)
                 {
-                    bool isSimulationWorked = timer.IsEnabled;
-
                     RoadSettingsWindow settingsWindow = new(road, city);
-                    settingsWindow.Show();
-                    settingsWindow.Closed += (s, e) => DrawCity();
-
-                    if (isSimulationWorked)
-                    {
-                        StopSimulation();
-                        settingsWindow.Closed += (s, e) => StartSimulation();
-                    }
+                    LaunchWindow(settingsWindow);
                 }     
             }
         }
@@ -546,10 +515,10 @@ namespace TrafficSimulation
         {
             if (city.Roads.Count == 0) return;
 
-            // Выбираем случайную дорогу
+            //Выбираем случайную дорогу
             var road = city.Roads[random.Next(city.Roads.Count)];
 
-            // Определяем направление движения
+            //Определяем направление движения
             bool isMovingForward;
             if (road.Type == RoadType.OneWay)
             {
@@ -565,7 +534,7 @@ namespace TrafficSimulation
             var vehicle = new Vehicle
             {
                 ID = "Car" + (city.Vehicles.Count + 1),
-                Speed = MaxSpeedSlider.Value,
+                Speed = 0,
                 CurrentRoad = road,
                 LineNumber = lineNumber,
                 Position = isMovingForward ? 0 : road.Length,
@@ -644,32 +613,29 @@ namespace TrafficSimulation
         {
             if (currentRoadState == RoadCreationState.AddingStart)
             {
+                Intersection intersection = new()
+                {
+                    X = e.GetPosition(CityCanvas).X * Constants.MetresPerPixel - globalOffset[0] * Constants.MetresPerPixel,
+                    Y = e.GetPosition(CityCanvas).Y * Constants.MetresPerPixel - globalOffset[1] * Constants.MetresPerPixel
+                };
                 previewRoad = new Road()
                 {
+                    StartIntersection = intersection,
+                    EndIntersection = intersection,
                     Type = RoadType.TwoWay,
                     NumOfLanesPerDirection = 1,
                     MaxAllowedSpeed = city.MaxAllowedSpeed
                 };
 
-                previewStartIntersection = new Intersection
-                {
-                    X = e.GetPosition(CityCanvas).X * Constants.MetresPerPixel - globalOffset[0] * Constants.MetresPerPixel,
-                    Y = e.GetPosition(CityCanvas).Y * Constants.MetresPerPixel - globalOffset[1] * Constants.MetresPerPixel
-                };
-                previewEndIntersection = previewStartIntersection;
-                previewRoad.StartIntersection = previewStartIntersection;
-                previewRoad.EndIntersection = previewEndIntersection;
-
                 currentRoadState = RoadCreationState.AddingEnd;
             }
-            else if (currentRoadState == RoadCreationState.AddingEnd && previewStartIntersection != previewEndIntersection && isAllowedToCreateRoad)
+            else if (currentRoadState == RoadCreationState.AddingEnd && previewRoad.StartIntersection != previewRoad.EndIntersection && isAllowedToCreateRoad)
             {
-                previewEndIntersection = new Intersection
+                previewRoad.EndIntersection = new Intersection
                 {
                     X = e.GetPosition(CityCanvas).X * Constants.MetresPerPixel - globalOffset[0] * Constants.MetresPerPixel,
                     Y = e.GetPosition(CityCanvas).Y * Constants.MetresPerPixel - globalOffset[1] * Constants.MetresPerPixel
                 };
-                previewRoad.EndIntersection = previewEndIntersection;
 
                 city.AddRoad(previewRoad);
                 previewRoad = null;
@@ -692,17 +658,15 @@ namespace TrafficSimulation
         {
             if (currentRoadState == RoadCreationState.AddingEnd && e.LeftButton != MouseButtonState.Pressed)
             { 
-               previewEndIntersection = new Intersection
+               isAllowedToCreateRoad = city.Roads.Where(r => r.DoesIntersect(previewRoad) && r.StartIntersection != previewRoad.StartIntersection && r.EndIntersection != previewRoad.StartIntersection).ToList().Count == 0;
+
+               previewRoad.EndIntersection = new Intersection
                {
                    X = e.GetPosition(CityCanvas).X * Constants.MetresPerPixel - globalOffset[0] * Constants.MetresPerPixel - 0.2 * Math.Cos(previewRoad.Angle),
                    Y = e.GetPosition(CityCanvas).Y * Constants.MetresPerPixel - globalOffset[1] * Constants.MetresPerPixel - 0.2 * Math.Sin(previewRoad.Angle)
                };
 
-               isAllowedToCreateRoad = city.Roads.Where(r => r.DoesIntersect(previewRoad) && r.StartIntersection != previewRoad.StartIntersection && r.EndIntersection != previewRoad.StartIntersection).ToList().Count == 0;
-
-               previewRoad.EndIntersection = previewEndIntersection;
-
-               DrawCity();
+                DrawCity();
             }
             else if (isDragging && e.LeftButton == MouseButtonState.Pressed)
             {
@@ -767,9 +731,9 @@ namespace TrafficSimulation
 
         private void DeleteAllVehiclesButton_Click(object sender, RoutedEventArgs e)
         {
-            city.Vehicles.Clear();
+            if (MessageBox.Show("Вы желаете удалить все машины?", "Удаление машин", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                city.Vehicles.Clear();
         }
-
 
         private void AddRoadButton_Click(object sender, RoutedEventArgs e)
         {
@@ -790,6 +754,12 @@ namespace TrafficSimulation
             }
 
             DrawCity();
+        }
+
+        private void CitySettingsButton_Click(object sender, RoutedEventArgs e)
+        {
+            CitySettingsWindow window = new(city);
+            LaunchWindow(window);
         }
     }
 }

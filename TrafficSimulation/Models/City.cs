@@ -6,8 +6,35 @@
         public List<Road> Roads { get; private set; } = [];
         public List<Vehicle> Vehicles { get; private set; } = [];
         public List<TrafficLight> TrafficLights { get; private set; } = [];
-        public double MaxAllowedSpeed { get; set; }
+
+        private double maxAllowedSpeed = 60;
+        public double MaxAllowedSpeed
+        {
+            get
+            {
+                return maxAllowedSpeed;
+            }
+            set
+            {
+                maxAllowedSpeed = value;
+                Roads.ForEach(road => road.MaxAllowedSpeed = value);
+            }
+        }
+        private double roadQuality = 1;
+        public double RoadQuality
+        {
+            get
+            {
+                return roadQuality;
+            }
+            set
+            {
+                roadQuality = value;
+                Roads.ForEach(road => road.Quality = value);
+            }
+        }
         public double ChanceToGetInCarAccident { get; set; }
+        public double ChanceOfRaining { get; set; }
 
         public void AddRoad(Road road)
         {
