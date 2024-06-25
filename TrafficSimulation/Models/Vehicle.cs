@@ -18,7 +18,8 @@
         private double SpeedInMetresPerSecond => Speed / 3600 * 1000;
         private double SpeedInMetresPerHundredMilliseconds => SpeedInMetresPerSecond * 0.1;
         private double AccelerationInMetresPerHundredMilliseconds => Acceleration * 0.01;
-        private double MaxPossibleSpeed => CurrentRoad.Quality * CurrentRoad.MaxAllowedSpeed;
+
+        private double AdditionToGetInCarAccidentChanceBecauseOfRaining = 0.005;
 
         private Random random = new();
         private int currentTimer;
@@ -34,7 +35,8 @@
                 }
                 return;
             }
-            double ActualChanceToGetInCarAccident = city.ChanceToGetInCarAccident + (1 - CurrentRoad.Quality) * city.ChanceToGetInCarAccident;
+            double ActualChanceToGetInCarAccident = city.ChanceToGetInCarAccident / 10 + (1 - CurrentRoad.Quality) * city.ChanceToGetInCarAccident / 10;
+            ActualChanceToGetInCarAccident += city.IsRaining ? AdditionToGetInCarAccidentChanceBecauseOfRaining / 10 : 0;
             if (random.NextDouble() <= ActualChanceToGetInCarAccident)
             {
                 IsInCarAccident = true;
@@ -103,6 +105,8 @@
 
             double speedAfterHundredMilliseconds = SpeedInMetresPerHundredMilliseconds + AccelerationInMetresPerHundredMilliseconds;
             Speed += speedAfterHundredMilliseconds * 10 * 3600 / 1000;
+            double MaxPossibleSpeed = CurrentRoad.Quality * CurrentRoad.MaxAllowedSpeed;
+            MaxPossibleSpeed -= city.IsRaining ? 10 : 0;
             if (Speed > MaxPossibleSpeed)
             {
                 Speed = MaxPossibleSpeed;
@@ -114,7 +118,7 @@
             {
                 if (NextRoad != null)
                 {
-                    CurrentRoad.Quality -= 0.0002; //условное значение ухудшения качества дороги после каждого проезда
+                    CurrentRoad.Quality -= city.IsRaining ? 0.0005 : 0.0002; //условное значение ухудшения качества дороги после каждого проезда
                     if (CurrentRoad == NextRoad)
                     {
                         LineNumber = random.Next(1, CurrentRoad.NumOfLanesPerDirection + 1);

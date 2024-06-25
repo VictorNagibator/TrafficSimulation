@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using TrafficSimulation.Models;
 
 namespace TrafficSimulation
@@ -32,12 +33,12 @@ namespace TrafficSimulation
 
         private void MaxSpeedSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            if (city != null) selectedRoad.MaxAllowedSpeed = (int)MaxSpeedSlider.Value;
+            if (city != null) selectedRoad.MaxAllowedSpeed = Math.Round(MaxSpeedSlider.Value);
         }
 
         private void NumOfLanesSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            if (city != null) selectedRoad.NumOfLanesPerDirection = (int)NumOfLanesSlider.Value;
+            if (city != null) selectedRoad.NumOfLanesPerDirection = (int)Math.Round(NumOfLanesSlider.Value);
         }
 
         private void OneWayRadioButton_Checked(object sender, RoutedEventArgs e)

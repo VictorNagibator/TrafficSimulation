@@ -8,4 +8,18 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Remove="clouds-raining.gif" />
+    <None Remove="Media\clouds-raining.gif" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WpfAnimatedGif" Version="2.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="clouds-raining.gif" />
+    <Resource Include="Media\clouds-raining.gif" />
+  </ItemGroup>
+
 </Project>

@@ -18,7 +18,7 @@
         <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" Margin="10">
             <TextBlock x:Name="RoadNameTextBlock" Text="Название дороги: " VerticalAlignment="Center" Margin="10"/>
             <TextBox x:Name="RoadNameTextBox" Height="20" Margin="5" VerticalAlignment="Center" Width="150" TextChanged="RoadNameTextBox_TextChanged"/>
-            <Button x:Name="DeleteRoadButton" Content="🗑" Margin="10" HorizontalAlignment="Right" Click="DeleteRoadButton_Click"/>
+            <Button x:Name="DeleteRoadButton" Content="🗑" FontSize="18" Margin="30,10,10,10" HorizontalAlignment="Right" Click="DeleteRoadButton_Click"/>
         </StackPanel>
 
         <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" Margin="10">

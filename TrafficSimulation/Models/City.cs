@@ -33,10 +33,14 @@
                 Roads.ForEach(road => road.Quality = value);
             }
         }
-        public double ChanceToGetInCarAccident { get; set; } = 0.001;
+        public double ChanceToGetInCarAccident { get; set; } = 0.0005;
 
         public int CarAccidentTimer { get; set; } = 30 * 10;
-        public double ChanceOfRaining { get; set; } = 0.01;
+
+        public int RainingTimer { get; set; } = 60 * 10;
+        private int currentRainingTimer;
+        public double ChanceOfRaining { get; set; } = 0.001;
+        public bool IsRaining { get; private set; } = false;
 
         public void AddRoad(Road road)
         {
@@ -76,6 +80,24 @@
 
         public void Update()
         {
+            if (IsRaining)
+            {
+                currentRainingTimer--;
+                if (currentRainingTimer <= 0)
+                {
+                    IsRaining = false;
+                    currentRainingTimer = RainingTimer;
+                }
+            }
+            else
+            {
+                Random random = new();
+                if (random.NextDouble() < ChanceOfRaining)
+                {
+                    IsRaining = true;
+                }
+            }
+
             foreach (var vehicle in Vehicles)
             {
                 vehicle.Update(this);

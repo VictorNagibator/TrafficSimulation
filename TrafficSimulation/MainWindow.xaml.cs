@@ -74,6 +74,9 @@ namespace TrafficSimulation
             }
 
             DrawMetresLine();
+
+            if (city.IsRaining) RainGIF.Visibility = Visibility.Visible;
+            else RainGIF.Visibility = Visibility.Hidden;
         }
 
         private void DrawIntersection(Intersection intersection)
