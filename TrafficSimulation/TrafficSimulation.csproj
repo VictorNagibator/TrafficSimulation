@@ -9,7 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="clouds-raining.gif" />
     <None Remove="Media\clouds-raining.gif" />
   </ItemGroup>
 
@@ -18,7 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="clouds-raining.gif" />
     <Resource Include="Media\clouds-raining.gif" />
   </ItemGroup>
 

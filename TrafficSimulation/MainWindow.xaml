@@ -39,7 +39,7 @@
         </Canvas>
 
         <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
-            <Image x:Name="RainGIF" gif:ImageBehavior.AnimatedSource="/clouds-raining.gif" ToolTip="Сейчас идет дождь. Машины движутся медленнее и с большей вероятностью попадут в ДТП." Height="80" Width="90" VerticalAlignment="Top" Visibility="Hidden" Margin="0,0,0,15"/>
+            <Image x:Name="RainGIF" gif:ImageBehavior.AnimatedSource="Media/clouds-raining.gif" ToolTip="Сейчас идет дождь. Машины движутся медленнее и с большей вероятностью попадут в ДТП." Height="80" Width="90" VerticalAlignment="Top" Visibility="Hidden" Margin="0,0,0,15"/>
             <Button Content="↺" Click="ResetButton_Click" Width="30" Height="30" Margin="5"/>
             <Button Content="+" Click="ZoomInButton_Click" Width="30" Height="30" Margin="5"/>
             <Button Content="-" Click="ZoomOutButton_Click" Width="30" Height="30" Margin="5"/>

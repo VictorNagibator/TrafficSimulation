@@ -51,7 +51,34 @@
 
             return maxRoadWidth;
         }
+        public double Angle => GetAngle();
+        private double GetAngle()
+        {
+            var uniqueroads = UniqueBiggestRoads.ToList();
+            if (uniqueroads.Count == 1) return uniqueroads[0].Angle;
+            else if (uniqueroads.Count == 2 && Math.Abs(uniqueroads[0].Angle - uniqueroads[1].Angle) <= Constants.AngleTolerance) return uniqueroads[0].Angle;
+            else if (uniqueroads.Count == 2) return uniqueroads[0].Angle - uniqueroads[1].Angle;
+            else
+            {
+                foreach (var road1 in uniqueroads)
+                {
+                    foreach (var road2 in uniqueroads)
+                    {
+                        if (road1 != road2 && Math.Abs(road1.Angle - road2.Angle) <= Constants.AngleTolerance) return road1.Angle;
+                    }
+                }
 
+                return 0;
+            }
+        }
+        public HashSet<Road> UniqueBiggestRoads => GetUniqueBiggestRoads();
+        private HashSet<Road> GetUniqueBiggestRoads()
+        {
+            var roads = new HashSet<Road>();
+            foreach (var road in IncomingRoads) { if (road.Width == Width) roads.Add(road); }
+            foreach (var road in OutgoingRoads) { if (road.Width == Width) roads.Add(road); }
+            return roads;
+        }
         public bool HasNoRoads()
         {
             return IncomingRoads.Count == 0 && OutgoingRoads.Count == 0;

@@ -5,7 +5,6 @@ using System.Windows.Shapes;
 using TrafficSimulation.Models;
 using System.Windows.Threading;
 using System.Windows.Input;
-using Microsoft.VisualBasic;
 
 namespace TrafficSimulation
 {
@@ -81,21 +80,21 @@ namespace TrafficSimulation
 
         private void DrawIntersection(Intersection intersection)
         {
-            double maxRoadWidth = intersection.Width;
 
             Rectangle rect = new()
             {
-                Width = maxRoadWidth / Constants.MetresPerPixel,
-                Height = maxRoadWidth / Constants.MetresPerPixel,
+                Width = intersection.Width / Constants.MetresPerPixel,
+                Height = intersection.Width / Constants.MetresPerPixel,
                 Fill = Brushes.Black,
                 Tag = intersection,
                 Opacity = intersection.BestRoadQuality
             };
 
+            rect.RenderTransform = new RotateTransform(intersection.Angle * 180 / Math.PI, rect.Width / 2, rect.Height / 2);
             rect.MouseLeftButtonDown += Intersection_LeftButtonMouseDown;
 
-            Canvas.SetLeft(rect, intersection.X / Constants.MetresPerPixel - maxRoadWidth / (2 * Constants.MetresPerPixel) + globalOffset[0]);
-            Canvas.SetTop(rect, intersection.Y / Constants.MetresPerPixel - maxRoadWidth / (2 * Constants.MetresPerPixel) + globalOffset[1]);
+            Canvas.SetLeft(rect, intersection.X / Constants.MetresPerPixel - intersection.Width / (2 * Constants.MetresPerPixel) + globalOffset[0]);
+            Canvas.SetTop(rect, intersection.Y / Constants.MetresPerPixel - intersection.Width / (2 * Constants.MetresPerPixel) + globalOffset[1]);
             CityCanvas.Children.Add(rect);
         }
 
@@ -205,8 +204,9 @@ namespace TrafficSimulation
                     Intersection intersection = new()
                     {
                         X = e.GetPosition(CityCanvas).X * Constants.MetresPerPixel - globalOffset[0] * Constants.MetresPerPixel,
-                        Y = e.GetPosition(CityCanvas).Y * Constants.MetresPerPixel - globalOffset[1] * Constants.MetresPerPixel + road.Width / 2 * Math.Sin(road.Angle)
                     };
+                    intersection.Y = (intersection.X - road.StartIntersection.X) * (road.EndIntersection.Y - road.StartIntersection.Y) / (road.EndIntersection.X - road.StartIntersection.X) + road.StartIntersection.Y - globalOffset[1] * Constants.MetresPerPixel;
+
 
                     Road newroad1 = new()
                     {

@@ -42,12 +42,12 @@ namespace TrafficSimulation
 
         private void CarAccidentTimerSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            if (city != null) city.CarAccidentTimer = (int)Math.Round(CarAccidentTimerSlider.Value);
+            if (city != null) city.CarAccidentTimer = Math.Round(CarAccidentTimerSlider.Value);
         }
 
         private void RainingTimerSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            if (city != null) city.RainingTimer = (int)Math.Round(RainingTimerSlider.Value);
+            if (city != null) city.RainingTimer = Math.Round(RainingTimerSlider.Value);
         }
     }
 }

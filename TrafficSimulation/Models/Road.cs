@@ -111,24 +111,23 @@
 
                 // Разница углов относительно текущей дороги
                 double angleDifference = NormalizeAngle(roadAngle - currentRoadAngle);
-                double angleTolerance = Math.PI / 12;
 
                 switch (direction)
                 {
                     case RoadDirection.Left:
-                        if (angleDifference > angleTolerance)
+                        if (angleDifference > Constants.AngleTolerance)
                         {
                             neededRoads.Add(road);
                         }
                         break;
                     case RoadDirection.Forward:
-                        if (Math.Abs(angleDifference) <= angleTolerance && road != this)
+                        if (Math.Abs(angleDifference) <= Constants.AngleTolerance && road != this)
                         {
                             neededRoads.Add(road);
                         }
                         break;
                     case RoadDirection.Right:
-                        if (angleDifference < -angleTolerance)
+                        if (angleDifference < -Constants.AngleTolerance)
                         {
                             neededRoads.Add(road);
                         }

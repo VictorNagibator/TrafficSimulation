@@ -69,6 +69,7 @@ namespace TrafficSimulation
                 Opacity = intersection.BestRoadQuality
             };
 
+            rect.RenderTransform = new RotateTransform(intersection.Angle * 180 / Math.PI, rect.Width / 2, rect.Height / 2);
             Canvas.SetLeft(rect, intersectionCenterX - rect.Width / 2);
             Canvas.SetTop(rect, intersectionCenterY - rect.Height / 2);
             IntersectionCanvas.Children.Add(rect);
