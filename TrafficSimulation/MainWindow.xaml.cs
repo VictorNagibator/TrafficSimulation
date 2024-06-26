@@ -207,7 +207,6 @@ namespace TrafficSimulation
                     };
                     intersection.Y = (intersection.X - road.StartIntersection.X) * (road.EndIntersection.Y - road.StartIntersection.Y) / (road.EndIntersection.X - road.StartIntersection.X) + road.StartIntersection.Y - globalOffset[1] * Constants.MetresPerPixel;
 
-
                     Road newroad1 = new()
                     {
                         Name = road.Name,
