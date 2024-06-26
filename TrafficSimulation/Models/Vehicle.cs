@@ -19,7 +19,7 @@
         private double SpeedInMetresPerHundredMilliseconds => SpeedInMetresPerSecond * 0.1;
         private double AccelerationInMetresPerHundredMilliseconds => Acceleration * 0.01;
 
-        private double AdditionToGetInCarAccidentChanceBecauseOfRaining = 0.005;
+        private double AdditionToGetInCarAccidentChanceBecauseOfRaining = 0.05 * Constants.TimerInterval;
 
         private Random random = new();
         private int currentTimer;
@@ -35,12 +35,12 @@
                 }
                 return;
             }
-            double ActualChanceToGetInCarAccident = city.ChanceToGetInCarAccident / 10 + (1 - CurrentRoad.Quality) * city.ChanceToGetInCarAccident / 10;
-            ActualChanceToGetInCarAccident += city.IsRaining ? AdditionToGetInCarAccidentChanceBecauseOfRaining / 10 : 0;
+            double ActualChanceToGetInCarAccident = city.ActualChanceToGetInCarAccident + (1 - CurrentRoad.Quality) * city.ActualChanceToGetInCarAccident;
+            ActualChanceToGetInCarAccident += city.IsRaining ? AdditionToGetInCarAccidentChanceBecauseOfRaining : 0;
             if (random.NextDouble() <= ActualChanceToGetInCarAccident)
             {
                 IsInCarAccident = true;
-                currentTimer = city.CarAccidentTimer;
+                currentTimer = (int)city.ActualCarAccidentTimer;
                 return;
             }
 
@@ -69,9 +69,7 @@
                 }
                 else if (nextVehicle.IsInCarAccident && distanceToNextVehicle < Constants.SafetyDistanceToStop)
                 {
-                    int linenow = LineNumber;
-                    if (CurrentRoad.NumOfLanesPerDirection != 1) while (LineNumber == linenow) LineNumber = random.Next(1, CurrentRoad.NumOfLanesPerDirection + 1);
-                    return;
+                    if (!TryToChangeLine()) return;
                 }
             }
 
@@ -121,7 +119,7 @@
                     CurrentRoad.Quality -= city.IsRaining ? 0.0005 : 0.0002; //условное значение ухудшения качества дороги после каждого проезда
                     if (CurrentRoad == NextRoad)
                     {
-                        LineNumber = random.Next(1, CurrentRoad.NumOfLanesPerDirection + 1);
+                        LineNumber = random.Next(1, CurrentRoad.NumOfLinesPerDirection + 1);
                         IsMovingForward = !IsMovingForward;
                         Position = IsMovingForward ? 0 : NextRoad.Length;
                         NextIntersection = IsMovingForward ? NextRoad.EndIntersection : NextRoad.StartIntersection;
@@ -132,7 +130,7 @@
                         CurrentRoad.RemoveVehicle(this);
                         NextRoad.AddVehicle(this);
                         CurrentRoad = NextRoad;
-                        LineNumber = random.Next(1, CurrentRoad.NumOfLanesPerDirection + 1);
+                        LineNumber = random.Next(1, CurrentRoad.NumOfLinesPerDirection + 1);
                         IsMovingForward = NextRoad.StartIntersection == NextIntersection;
                         Position = IsMovingForward ? 0 : NextRoad.Length;
                         NextIntersection = IsMovingForward ? NextRoad.EndIntersection : NextRoad.StartIntersection;
@@ -147,9 +145,21 @@
             }
         }
 
+        public bool TryToChangeLine()
+        {
+            if (CurrentRoad.NumOfLinesPerDirection == 1) return false;
+
+            int newLine;
+            while ((newLine = random.Next(Math.Max(1, LineNumber - 1), Math.Min(LineNumber + 1, CurrentRoad.NumOfLinesPerDirection) + 1)) == LineNumber);
+            if (CurrentRoad.Vehicles.Any(v => v.LineNumber == newLine && Math.Abs(v.Position - Position) <= Constants.VehicleLengthMetres)) return false;
+
+            LineNumber = newLine;
+            return true;
+        }
+
         public Road GetNextRoad()
         {
-            int numOfLanes = CurrentRoad.NumOfLanesPerDirection;
+            int numOfLanes = CurrentRoad.NumOfLinesPerDirection;
             List<Road> outgoingRoads;
             switch (numOfLanes)
             {
@@ -175,7 +185,7 @@
                         outgoingRoads.AddRange(CurrentRoad.GetRoadsToGo(NextIntersection, RoadDirection.Left));
                         if (CurrentRoad.Type != RoadType.OneWay) outgoingRoads.Add(CurrentRoad);
                     }
-                    else if (LineNumber == CurrentRoad.NumOfLanesPerDirection)
+                    else if (LineNumber == CurrentRoad.NumOfLinesPerDirection)
                     {
                         outgoingRoads.AddRange(CurrentRoad.GetRoadsToGo(NextIntersection, RoadDirection.Right));
                     }

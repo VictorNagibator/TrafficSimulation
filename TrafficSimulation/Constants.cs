@@ -10,7 +10,8 @@ namespace TrafficSimulation
         public const double VehicleWidthMetres = 1.8;
         public const double TrafficLightMetres = 1.5;
         public const double SafetyDistanceToStop = VehicleLengthMetres * 1.5;
-
+        public const double TimerInterval = 0.1; //0.1 с
+        
         public static double RoadWidthPixels => RoadWidthMetres / MetresPerPixel;
         public static double VehicleLengthPixels => VehicleLengthMetres / MetresPerPixel;
         public static double VehicleWidthPixels => VehicleWidthMetres / MetresPerPixel;

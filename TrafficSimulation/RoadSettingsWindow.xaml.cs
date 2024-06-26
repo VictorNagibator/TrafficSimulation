@@ -22,7 +22,7 @@ namespace TrafficSimulation
             if (road.Type == RoadType.OneWay) OneWayRadioButton.IsChecked = true;
             else TwoWayRadioButton.IsChecked = true;
 
-            NumOfLanesSlider.Value = road.NumOfLanesPerDirection;
+            NumOfLanesSlider.Value = road.NumOfLinesPerDirection;
             RoadQualitySlider.Value = road.Quality * 100;
         }
 
@@ -38,7 +38,7 @@ namespace TrafficSimulation
 
         private void NumOfLanesSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            if (city != null) selectedRoad.NumOfLanesPerDirection = (int)Math.Round(NumOfLanesSlider.Value);
+            if (city != null) selectedRoad.NumOfLinesPerDirection = (int)Math.Round(NumOfLanesSlider.Value);
         }
 
         private void OneWayRadioButton_Checked(object sender, RoutedEventArgs e)

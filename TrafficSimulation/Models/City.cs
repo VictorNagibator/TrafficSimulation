@@ -33,13 +33,17 @@
                 Roads.ForEach(road => road.Quality = value);
             }
         }
-        public double ChanceToGetInCarAccident { get; set; } = 0.0005;
+        public double ChanceToGetInCarAccident { get; set; } = 0.005;
+        public double ActualChanceToGetInCarAccident => ChanceToGetInCarAccident * Constants.TimerInterval;
 
-        public int CarAccidentTimer { get; set; } = 30 * 10;
+        public double CarAccidentTimer { get; set; } = 30;
+        public double ActualCarAccidentTimer => CarAccidentTimer / Constants.TimerInterval;
 
-        public int RainingTimer { get; set; } = 60 * 10;
+        public double RainingTimer { get; set; } = 60;
+        public double ActualRainingTimer => RainingTimer / Constants.TimerInterval;
         private int currentRainingTimer;
-        public double ChanceOfRaining { get; set; } = 0.001;
+        public double ChanceOfRaining { get; set; } = 0.01;
+        public double ActualChanceOfRaining => ChanceOfRaining * Constants.TimerInterval;
         public bool IsRaining { get; private set; } = false;
 
         public void AddRoad(Road road)
@@ -86,15 +90,15 @@
                 if (currentRainingTimer <= 0)
                 {
                     IsRaining = false;
-                    currentRainingTimer = RainingTimer;
                 }
             }
             else
             {
                 Random random = new();
-                if (random.NextDouble() < ChanceOfRaining)
+                if (random.NextDouble() < ActualChanceOfRaining)
                 {
                     IsRaining = true;
+                    currentRainingTimer = (int)ActualRainingTimer;
                 }
             }
 

@@ -30,7 +30,7 @@
                 }
             }
         }
-        public int NumOfLanesPerDirection { get; set; }
+        public int NumOfLinesPerDirection { get; set; }
         private Intersection startIntersection;
         public Intersection StartIntersection
         {
@@ -86,7 +86,7 @@
 
         public double Length => Math.Sqrt((EndIntersection.X - StartIntersection.X) * (EndIntersection.X - StartIntersection.X) + (EndIntersection.Y - StartIntersection.Y) * (EndIntersection.Y - StartIntersection.Y));
 
-        public double Width => Type != RoadType.OneWay ? NumOfLanesPerDirection * Constants.RoadWidthMetres : NumOfLanesPerDirection * Constants.RoadWidthMetres / 2;
+        public double Width => Type != RoadType.OneWay ? NumOfLinesPerDirection * Constants.RoadWidthMetres : NumOfLinesPerDirection * Constants.RoadWidthMetres / 2;
 
         public List<Road> GetRoads(Intersection intersection, RoadDirection direction)
         {

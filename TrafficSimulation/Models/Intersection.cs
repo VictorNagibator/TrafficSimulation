@@ -42,11 +42,11 @@
 
             foreach (var road in IncomingRoads)
             {
-                maxRoadWidth = Math.Max(maxRoadWidth, road.Type == RoadType.OneWay ? Constants.RoadWidthMetres * road.NumOfLanesPerDirection / 2 : Constants.RoadWidthMetres * road.NumOfLanesPerDirection);
+                maxRoadWidth = Math.Max(maxRoadWidth, road.Type == RoadType.OneWay ? Constants.RoadWidthMetres * road.NumOfLinesPerDirection / 2 : Constants.RoadWidthMetres * road.NumOfLinesPerDirection);
             }
             foreach (var road in OutgoingRoads)
             {
-                maxRoadWidth = Math.Max(maxRoadWidth, road.Type == RoadType.OneWay ? Constants.RoadWidthMetres * road.NumOfLanesPerDirection / 2 : Constants.RoadWidthMetres * road.NumOfLanesPerDirection);
+                maxRoadWidth = Math.Max(maxRoadWidth, road.Type == RoadType.OneWay ? Constants.RoadWidthMetres * road.NumOfLinesPerDirection / 2 : Constants.RoadWidthMetres * road.NumOfLinesPerDirection);
             }
 
             return maxRoadWidth;

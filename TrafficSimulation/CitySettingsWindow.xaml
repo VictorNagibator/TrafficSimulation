@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TrafficSimulation"
         mc:Ignorable="d"
-        Title="Настройки города" Height="450" Width="550">
+        Title="Настройки города" Height="450" Width="600">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -30,20 +30,20 @@
 
         <StackPanel Grid.Row="2" HorizontalAlignment="Left" Orientation="Horizontal"  Margin="10">
             <TextBlock Text="Вероятность ДТП и поломок машин (в %):" VerticalAlignment="Center" Margin="10"/>
-            <Slider x:Name="CarAccidentSlider" Minimum="0.01" Maximum="20"  Margin="5" Width="198" VerticalAlignment="Center" ValueChanged="CarAccidentSlider_ValueChanged"/>
-            <TextBlock x:Name="CarAccidentValue" Margin="10,0,0,0" Text="{Binding ElementName=CarAccidentSlider, Path=Value, StringFormat=F2}" Width="22" VerticalAlignment="Center"/>
+            <Slider x:Name="CarAccidentSlider" Minimum="0" Maximum="20"  Margin="5" Width="198" VerticalAlignment="Center" ValueChanged="CarAccidentSlider_ValueChanged"/>
+            <TextBlock x:Name="CarAccidentValue" Margin="10,0,0,0" Text="{Binding ElementName=CarAccidentSlider, Path=Value, StringFormat=F1}" Width="22" VerticalAlignment="Center"/>
         </StackPanel>
 
         <StackPanel Grid.Row="3" HorizontalAlignment="Left" Orientation="Horizontal"  Margin="10">
-            <TextBlock Text="Время стоянки в ДТП (в секундах):" VerticalAlignment="Center" Margin="10"/>
+            <TextBlock Text="Время остановки в ДТП или поломке(в секундах):" VerticalAlignment="Center" Margin="10"/>
             <Slider x:Name="CarAccidentTimerSlider" Minimum="5" Maximum="300"  Margin="5" Width="198" VerticalAlignment="Center" ValueChanged="CarAccidentTimerSlider_ValueChanged"/>
             <TextBlock x:Name="CarAccidentTimerValue" Margin="10,0,0,0" Text="{Binding ElementName=CarAccidentTimerSlider, Path=Value, StringFormat=F0}" Width="22" VerticalAlignment="Center"/>
         </StackPanel>
 
         <StackPanel Grid.Row="4" HorizontalAlignment="Left" Orientation="Horizontal"  Margin="10">
             <TextBlock Text="Вероятность выпадения осадков (в %):" VerticalAlignment="Center" Margin="10"/>
-            <Slider x:Name="RainingSlider" Minimum="0.01" Maximum="40"  Margin="5" Width="198" VerticalAlignment="Center" ValueChanged="RainingSlider_ValueChanged"/>
-            <TextBlock x:Name="RainingValue" Margin="10,0,0,0" Text="{Binding ElementName=RainingSlider, Path=Value, StringFormat=F2}" Width="22" VerticalAlignment="Center"/>
+            <Slider x:Name="RainingSlider" Minimum="0" Maximum="40"  Margin="5" Width="198" VerticalAlignment="Center" ValueChanged="RainingSlider_ValueChanged"/>
+            <TextBlock x:Name="RainingValue" Margin="10,0,0,0" Text="{Binding ElementName=RainingSlider, Path=Value, StringFormat=F1}" Width="22" VerticalAlignment="Center"/>
         </StackPanel>
 
         <StackPanel Grid.Row="5" HorizontalAlignment="Left" Orientation="Horizontal"  Margin="10">

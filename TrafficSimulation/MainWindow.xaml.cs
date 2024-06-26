@@ -34,7 +34,7 @@ namespace TrafficSimulation
 
         private void InitializeTimer()
         {
-            timer.Interval = TimeSpan.FromMilliseconds(100);
+            timer.Interval = TimeSpan.FromSeconds(Constants.TimerInterval);
             timer.Tick += Timer_Tick;
         }
 
@@ -124,7 +124,7 @@ namespace TrafficSimulation
                         StartIntersection = intersection,
                         EndIntersection = intersection,
                         Type = RoadType.TwoWay,
-                        NumOfLanesPerDirection = 1,
+                        NumOfLinesPerDirection = 1,
                         MaxAllowedSpeed = city.MaxAllowedSpeed
                     };
 
@@ -211,7 +211,7 @@ namespace TrafficSimulation
                     Road newroad1 = new()
                     {
                         Name = road.Name,
-                        NumOfLanesPerDirection = road.NumOfLanesPerDirection,
+                        NumOfLinesPerDirection = road.NumOfLinesPerDirection,
                         StartIntersection = road.StartIntersection,
                         EndIntersection = intersection,
                         Quality = road.Quality,
@@ -220,7 +220,7 @@ namespace TrafficSimulation
                     Road newroad2 = new()
                     {
                         Name = road.Name,
-                        NumOfLanesPerDirection = road.NumOfLanesPerDirection,
+                        NumOfLinesPerDirection = road.NumOfLinesPerDirection,
                         StartIntersection = intersection,
                         EndIntersection = road.EndIntersection,
                         Quality = road.Quality,
@@ -384,15 +384,15 @@ namespace TrafficSimulation
 
             if (vehicle.CurrentRoad.Type == RoadType.OneWay)
             {
-                if (vehicle.CurrentRoad.NumOfLanesPerDirection % 2 == 0)
+                if (vehicle.CurrentRoad.NumOfLinesPerDirection % 2 == 0)
                 {
-                    if (vehicle.LineNumber <= vehicle.CurrentRoad.NumOfLanesPerDirection / 2)
+                    if (vehicle.LineNumber <= vehicle.CurrentRoad.NumOfLinesPerDirection / 2)
                     {
-                        offset = rect.Height / 2 + Constants.VehicleWidthPixels * Math.Abs(vehicle.CurrentRoad.NumOfLanesPerDirection / 2 - vehicle.LineNumber);
+                        offset = rect.Height / 2 + Constants.VehicleWidthPixels * Math.Abs(vehicle.CurrentRoad.NumOfLinesPerDirection / 2 - vehicle.LineNumber);
                     }
                     else
                     {
-                        offset = rect.Height / 2 + Constants.VehicleWidthPixels * Math.Abs(vehicle.CurrentRoad.NumOfLanesPerDirection / 2 - vehicle.LineNumber + 1);
+                        offset = rect.Height / 2 + Constants.VehicleWidthPixels * Math.Abs(vehicle.CurrentRoad.NumOfLinesPerDirection / 2 - vehicle.LineNumber + 1);
                         offset = -offset;
                     }
 
@@ -404,8 +404,8 @@ namespace TrafficSimulation
                 }
                 else
                 {
-                    offset = Constants.VehicleWidthPixels * Math.Abs(vehicle.CurrentRoad.NumOfLanesPerDirection / 2 - vehicle.LineNumber + 1);
-                    if (vehicle.LineNumber > vehicle.CurrentRoad.NumOfLanesPerDirection / 2)
+                    offset = Constants.VehicleWidthPixels * Math.Abs(vehicle.CurrentRoad.NumOfLinesPerDirection / 2 - vehicle.LineNumber + 1);
+                    if (vehicle.LineNumber > vehicle.CurrentRoad.NumOfLinesPerDirection / 2)
                     {
                         offset = -offset;
                     }
@@ -532,7 +532,7 @@ namespace TrafficSimulation
                 isMovingForward = random.Next(2) == 0;
             }
 
-            int lineNumber = random.Next(1, road.NumOfLanesPerDirection + 1);
+            int lineNumber = random.Next(1, road.NumOfLinesPerDirection + 1);
 
             var vehicle = new Vehicle
             {
@@ -626,7 +626,7 @@ namespace TrafficSimulation
                     StartIntersection = intersection,
                     EndIntersection = intersection,
                     Type = RoadType.TwoWay,
-                    NumOfLanesPerDirection = 1,
+                    NumOfLinesPerDirection = 1,
                     MaxAllowedSpeed = city.MaxAllowedSpeed
                 };
 
