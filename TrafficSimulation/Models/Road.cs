@@ -63,7 +63,7 @@
 
         public double Quality { get; set; } = 1;
 
-        public int MaxPossibleNumOfVehicles => (int)(Length / (Constants.VehicleLengthMetres * 2));
+        public int MaxPossibleNumOfVehicles => (int)(Length * NumOfLinesPerDirection / (Constants.VehicleLengthMetres * 2));
 
         public void AddVehicle(Vehicle vehicle) => Vehicles.Add(vehicle);
 
