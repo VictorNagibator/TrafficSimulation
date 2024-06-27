@@ -474,7 +474,11 @@ namespace TrafficSimulation
                     StopSimulation();
                 }
 
-                if (MessageBox.Show("Вы желаете удалить эту машину?", "Удаление машины", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes) city.RemoveVehicle(vehicle);
+                if (MessageBox.Show("Вы желаете удалить эту машину?", "Удаление машины", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+                {
+                    city.RemoveVehicle(vehicle);
+                    DrawCity();
+                }
 
                 if (isSimulationWorked)
                 {
@@ -764,7 +768,10 @@ namespace TrafficSimulation
         private void DeleteAllVehiclesButton_Click(object sender, RoutedEventArgs e)
         {
             if (MessageBox.Show("Вы желаете удалить все машины?", "Удаление машин", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+            {
                 city.Vehicles.Clear();
+                DrawCity();
+            }
         }
 
         private void AddRoadButton_Click(object sender, RoutedEventArgs e)
