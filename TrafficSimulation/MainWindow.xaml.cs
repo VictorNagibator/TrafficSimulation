@@ -803,15 +803,8 @@ namespace TrafficSimulation
 
         private void TrafficJamButton_Click(object sender, RoutedEventArgs e)
         {
-            if (!isWatchingTrafficJams)
-            {
-               isWatchingTrafficJams = true;
-               
-            }
-            else
-            {
-                isWatchingTrafficJams = false;
-            }
+            isWatchingTrafficJams = !isWatchingTrafficJams;
+            DrawCity();
         }
     }
 }
