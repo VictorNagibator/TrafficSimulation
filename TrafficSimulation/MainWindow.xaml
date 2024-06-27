@@ -43,6 +43,7 @@
             <Button Content="↺" Click="ResetButton_Click" Width="30" Height="30" Margin="5"/>
             <Button Content="+" Click="ZoomInButton_Click" Width="30" Height="30" Margin="5"/>
             <Button Content="-" Click="ZoomOutButton_Click" Width="30" Height="30" Margin="5"/>
+            <Button Content="🕶" Click="TrafficJamButton_Click" Width="30" Height="30" Margin="5,25,5,5" ToolTip="Режим просмотра трафика"/>
         </StackPanel>
     </Grid>
 </Window>

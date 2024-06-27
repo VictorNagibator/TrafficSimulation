@@ -23,6 +23,8 @@ namespace TrafficSimulation
         private Road previewRoad;
         private bool isAllowedToCreateRoad = true;
 
+        private bool isWatchingTrafficJams = false;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -57,16 +59,19 @@ namespace TrafficSimulation
                 DrawIntersection(intersection);
             }
 
-            foreach (var vehicle in city.Vehicles)
+            if (!isWatchingTrafficJams)
             {
-                DrawVehicle(vehicle);
-            }
+                foreach (var vehicle in city.Vehicles)
+                {
+                    DrawVehicle(vehicle);
+                }
 
-            foreach (var light in city.TrafficLights)
-            {
-                DrawTrafficLight(light);
+                foreach (var light in city.TrafficLights)
+                {
+                    DrawTrafficLight(light);
+                }
             }
-
+            
             if (previewRoad != null)
             {
                 DrawRoad(previewRoad);
@@ -173,11 +178,36 @@ namespace TrafficSimulation
                 Y1 = startY + globalOffset[1],
                 X2 = endX + globalOffset[0],
                 Y2 = endY + globalOffset[1],
-                Stroke = road != previewRoad ? Brushes.Black : isAllowedToCreateRoad ? Brushes.Aqua : Brushes.Red,
                 StrokeThickness = road.Width / Constants.MetresPerPixel,
                 Tag = road,
                 Opacity = road.Quality
             };
+
+            if (road == previewRoad)
+            {
+                line.Stroke = isAllowedToCreateRoad ? Brushes.Aqua : Brushes.Red;
+            }
+            else if (isWatchingTrafficJams)
+            {
+                switch (road.TrafficJamStatus)
+                {
+                    case TrafficJamColor.Red:
+                        line.Stroke = Brushes.DarkRed;
+                        break;
+                    case TrafficJamColor.Yellow:
+                        line.Stroke = Brushes.Yellow;
+                        break;
+                    case TrafficJamColor.Green:
+                        line.Stroke = Brushes.Green;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            else
+            {
+                line.Stroke = Brushes.Black;
+            }
 
             line.MouseLeftButtonDown += Road_LeftButtonMouseDown;
             CityCanvas.Children.Add(line);
@@ -762,6 +792,19 @@ namespace TrafficSimulation
         {
             CitySettingsWindow window = new(city);
             LaunchWindow(window);
+        }
+
+        private void TrafficJamButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (!isWatchingTrafficJams)
+            {
+               isWatchingTrafficJams = true;
+               
+            }
+            else
+            {
+                isWatchingTrafficJams = false;
+            }
         }
     }
 }

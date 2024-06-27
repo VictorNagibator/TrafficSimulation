@@ -63,6 +63,8 @@
 
         public double Quality { get; set; } = 1;
 
+        public int MaxPossibleNumOfVehicles => (int)(Length / (Constants.VehicleLengthMetres + Constants.SafetyDistanceToStop));
+
         public void AddVehicle(Vehicle vehicle) => Vehicles.Add(vehicle);
 
         public void RemoveVehicle(Vehicle vehicle) => Vehicles.Remove(vehicle);
@@ -185,6 +187,14 @@
 
             return t >= 0 && t <= 1 && u >= 0 && u <= 1;
         }
+
+        public TrafficJamColor TrafficJamStatus => GetTrafficJamStatus();
+        private TrafficJamColor GetTrafficJamStatus()
+        {
+            if (Vehicles.Count <= MaxPossibleNumOfVehicles * 0.25) return TrafficJamColor.Green;
+            else if (Vehicles.Count <= MaxPossibleNumOfVehicles * 0.7) return TrafficJamColor.Yellow;
+            else return TrafficJamColor.Red;
+        }
     }
 
     public enum RoadType
@@ -198,5 +208,12 @@
         Left,
         Forward,
         Right
+    }
+
+    public enum TrafficJamColor
+    {
+        Red,
+        Yellow,
+        Green
     }
 }

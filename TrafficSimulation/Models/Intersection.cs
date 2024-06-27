@@ -39,7 +39,7 @@
         private double GetWidth()
         {
             double maxRoadWidth = 0;
-
+            //секс очко анал дебилы марина жена
             foreach (var road in IncomingRoads)
             {
                 maxRoadWidth = Math.Max(maxRoadWidth, road.Type == RoadType.OneWay ? Constants.RoadWidthMetres * road.NumOfLinesPerDirection / 2 : Constants.RoadWidthMetres * road.NumOfLinesPerDirection);
