@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TrafficSimulation"
         mc:Ignorable="d"
-        Title="Настройки города" Height="450" Width="600">
+        Title="Настройки города" Height="450" Width="600" Icon="Media/cityIcon.png" ResizeMode="CanMinimize">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -35,7 +35,7 @@
         </StackPanel>
 
         <StackPanel Grid.Row="3" HorizontalAlignment="Left" Orientation="Horizontal"  Margin="10">
-            <TextBlock Text="Время остановки в ДТП или поломке(в секундах):" VerticalAlignment="Center" Margin="10"/>
+            <TextBlock Text="Время остановки в ДТП или поломке (в секундах):" VerticalAlignment="Center" Margin="10"/>
             <Slider x:Name="CarAccidentTimerSlider" Minimum="5" Maximum="300"  Margin="5" Width="198" VerticalAlignment="Center" ValueChanged="CarAccidentTimerSlider_ValueChanged"/>
             <TextBlock x:Name="CarAccidentTimerValue" Margin="10,0,0,0" Text="{Binding ElementName=CarAccidentTimerSlider, Path=Value, StringFormat=F0}" Width="22" VerticalAlignment="Center"/>
         </StackPanel>

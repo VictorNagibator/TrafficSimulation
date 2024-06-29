@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -14,16 +12,16 @@ namespace TrafficSimulation
         private Intersection intersection;
         private City city;
         private Road selectedRoad;
+        private TrafficLight selectedTrafficLight => city.TrafficLights.FirstOrDefault(tl => tl.ControlledIntersection == intersection && tl.ControlledRoad == selectedRoad);
 
         public IntersectionSettingsWindow(Intersection intersection, City city)
         {
             InitializeComponent();
+
             this.intersection = intersection;
             this.city = city;
             IntersectionNameTextBox.Text = intersection.Name;
             DrawIntersectionAndRoads();
-
-            SizeChanged += IntersectionSettingsWindow_SizeChanged;
         }
 
         private void IntersectionSettingsWindow_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -45,13 +43,7 @@ namespace TrafficSimulation
 
             DrawIntersection();
 
-            foreach (var light in city.TrafficLights)
-            {
-                if (light.ControlledIntersection == intersection)
-                {
-                    DrawTrafficLight(light);
-                }
-            }
+            DrawTrafficLight(selectedTrafficLight);
         }
 
         private void DrawIntersection()
@@ -141,8 +133,7 @@ namespace TrafficSimulation
             {
                 DeselectCurrentRoad();
 
-                TrafficLightOffRadioButton.IsEnabled = true;
-                TrafficLightOnRadioButton.IsEnabled = true;
+                if (selectedTrafficLight != null) IsEnabledTrafficLightCheckBox.IsChecked = true;
                 selectedRoad = road;
                 SelectCurrentRoad();
                 RoadNameTextBlock.Text = $"Название дороги: {selectedRoad.Name}";
@@ -172,51 +163,31 @@ namespace TrafficSimulation
             }
         }
 
-        private void TrafficLightOnRadioButton_Checked(object sender, RoutedEventArgs e)
-        {
-            TrafficLightSettingsPanel.Visibility = Visibility.Visible;
-
-            if (!city.TrafficLights.Any(tl => tl.ControlledIntersection == intersection && tl.ControlledRoad == selectedRoad))
-            {
-                TrafficLight newTrafficLight = new()
-                {
-                    ControlledIntersection = intersection,
-                    ControlledRoad = selectedRoad,
-                    GreenTimer = 30,
-                    RedTimer = 30
-                };
-                city.TrafficLights.Add(newTrafficLight);
-
-                UpdateTrafficLightSettings();
-                DrawIntersectionAndRoads();
-                SelectCurrentRoad();
-            }
-        }
-
-        private void TrafficLightOffRadioButton_Checked(object sender, RoutedEventArgs e)
-        {
-            TrafficLightSettingsPanel.Visibility = Visibility.Collapsed;
-
-            if (city.TrafficLights.Any(tl => tl.ControlledIntersection == intersection && tl.ControlledRoad == selectedRoad))
-            {
-                city.RemoveTrafficLight(city.TrafficLights.Where(tl => tl.ControlledIntersection == intersection && tl.ControlledRoad == selectedRoad).First());
-                DrawIntersectionAndRoads();
-                SelectCurrentRoad();
-            }
-        }
-
         private void UpdateTrafficLightSettings()
         {
-            if (city.TrafficLights.Any(tl => tl.ControlledIntersection == intersection && tl.ControlledRoad == selectedRoad))
+            if (selectedTrafficLight != null)
             {
-                var trafficLight = city.TrafficLights.First(tl => tl.ControlledIntersection == intersection && tl.ControlledRoad == selectedRoad);
-                TrafficLightOnRadioButton.IsChecked = true;
-                GreenTimeSlider.Value = trafficLight.GreenTimer;
-                RedTimeSlider.Value = trafficLight.RedTimer;
+                IsEnabledTrafficLightCheckBox.IsChecked = true;
+                GreenTimeSlider.Value = selectedTrafficLight.GreenTimer;
+                RedTimeSlider.Value = selectedTrafficLight.RedTimer;
+                switch (selectedTrafficLight.State)
+                {
+                    case TrafficLightState.Red:
+                        RedLightRadioButton.IsChecked = true;
+                        break;
+                    case TrafficLightState.Yellow:
+                        YellowLightRadioButton.IsChecked = true;
+                        break;
+                    case TrafficLightState.Green:
+                        GreenLightRadioButton.IsChecked = true;
+                        break;
+                    default:
+                        break;
+                }
             }
             else
             {
-                TrafficLightOffRadioButton.IsChecked = true;
+                IsEnabledTrafficLightCheckBox.IsChecked = false;
             }
         }
 
@@ -229,8 +200,7 @@ namespace TrafficSimulation
         {
             if (selectedRoad != null && city.TrafficLights.Any(tl => tl.ControlledIntersection == intersection && tl.ControlledRoad == selectedRoad))
             {
-                var trafficLight = city.TrafficLights.First(tl => tl.ControlledIntersection == intersection && tl.ControlledRoad == selectedRoad);
-                trafficLight.GreenTimer = (int)GreenTimeSlider.Value;
+                selectedTrafficLight.GreenTimer = (int)GreenTimeSlider.Value;
             }
         }
 
@@ -238,9 +208,54 @@ namespace TrafficSimulation
         {
             if (selectedRoad != null && city.TrafficLights.Any(tl => tl.ControlledIntersection == intersection && tl.ControlledRoad == selectedRoad))
             {
-                var trafficLight = city.TrafficLights.First(tl => tl.ControlledIntersection == intersection && tl.ControlledRoad == selectedRoad);
-                trafficLight.RedTimer = (int)RedTimeSlider.Value;
+                selectedTrafficLight.RedTimer = (int)RedTimeSlider.Value;
             }
+        }
+
+        private void IsEnabledTrafficLightCheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            TrafficLightSettingsPanel.Visibility = Visibility.Visible;
+
+            if (selectedTrafficLight == null)
+            {
+                TrafficLight newTrafficLight = new()
+                {
+                    ControlledIntersection = intersection,
+                    ControlledRoad = selectedRoad,
+                };
+                city.TrafficLights.Add(newTrafficLight);
+
+                UpdateTrafficLightSettings();
+                DrawIntersectionAndRoads();
+                SelectCurrentRoad();
+            }
+        }
+
+        private void IsEnabledTrafficLightCheckBox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            TrafficLightSettingsPanel.Visibility = Visibility.Collapsed;
+
+            if (selectedTrafficLight != null)
+            {
+                city.RemoveTrafficLight(city.TrafficLights.Where(tl => tl.ControlledIntersection == intersection && tl.ControlledRoad == selectedRoad).First());
+                DrawIntersectionAndRoads();
+                SelectCurrentRoad();
+            }
+        }
+
+        private void RedLightRadioButton_Checked(object sender, RoutedEventArgs e)
+        {
+            selectedTrafficLight.State = TrafficLightState.Red;
+        }
+
+        private void YellowLightRadioButton_Checked(object sender, RoutedEventArgs e)
+        {
+            selectedTrafficLight.State = TrafficLightState.Yellow;
+        }
+
+        private void GreenLightRadioButton_Checked(object sender, RoutedEventArgs e)
+        {
+            selectedTrafficLight.State = TrafficLightState.Green;
         }
     }
 }

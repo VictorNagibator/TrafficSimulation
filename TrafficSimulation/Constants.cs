@@ -4,6 +4,7 @@
     {
         public static double MetresPerPixel = 0.2;
         public static double MetresPerPixelInIntersectionSettings = 0.2;
+        public const double MetresPerPixelBasic = 0.2;
         public const double RoadWidthMetres = 3.75;
         public const double VehicleLengthMetres = 4.5;
         public const double VehicleWidthMetres = 1.8;

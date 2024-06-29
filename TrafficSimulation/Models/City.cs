@@ -7,16 +7,16 @@
         public List<Vehicle> Vehicles { get; private set; } = [];
         public List<TrafficLight> TrafficLights { get; private set; } = [];
 
-        private double maxAllowedSpeed = 60;
+        private double _maxAllowedSpeed = 60;
         public double MaxAllowedSpeed
         {
             get
             {
-                return maxAllowedSpeed;
+                return _maxAllowedSpeed;
             }
             set
             {
-                maxAllowedSpeed = value;
+                _maxAllowedSpeed = value;
                 Roads.ForEach(road => road.MaxAllowedSpeed = value);
             }
         }
@@ -40,10 +40,10 @@
         public double ActualCarAccidentTimer => CarAccidentTimer / Constants.TimerInterval;
 
         public double RainingTimer { get; set; } = 60;
-        public double ActualRainingTimer => RainingTimer / Constants.TimerInterval;
+        private double ActualRainingTimer => RainingTimer / Constants.TimerInterval;
         private int currentRainingTimer;
         public double ChanceOfRaining { get; set; } = 0.01;
-        public double ActualChanceOfRaining => ChanceOfRaining * Constants.TimerInterval;
+        private double ActualChanceOfRaining => ChanceOfRaining * Constants.TimerInterval;
         public bool IsRaining { get; private set; } = false;
 
         public void AddRoad(Road road)
@@ -104,7 +104,7 @@
 
             foreach (var vehicle in Vehicles)
             {
-                vehicle.Update(this);
+                vehicle.Update();
             }
 
             foreach (var light in TrafficLights)

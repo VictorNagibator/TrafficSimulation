@@ -2,11 +2,11 @@
 {
     public class Intersection
     {
-        public string Name { get; set; }
-        public double X { get; set; }
-        public double Y { get; set; }
-        public HashSet<Road> IncomingRoads { get; set; } = [];
-        public HashSet<Road> OutgoingRoads { get; set; } = [];
+        public string Name { get; internal set; }
+        public double X { get; internal set; }
+        public double Y { get; internal set; }
+        public HashSet<Road> IncomingRoads { get; private set; } = [];
+        public HashSet<Road> OutgoingRoads { get; private set; } = [];
 
         public void AddRoad(Road road)
         {
@@ -39,7 +39,6 @@
         private double GetWidth()
         {
             double maxRoadWidth = 0;
-            //секс очко анал дебилы марина жена
             foreach (var road in IncomingRoads)
             {
                 maxRoadWidth = Math.Max(maxRoadWidth, road.Type == RoadType.OneWay ? Constants.RoadWidthMetres * road.NumOfLinesPerDirection / 2 : Constants.RoadWidthMetres * road.NumOfLinesPerDirection);
@@ -71,7 +70,7 @@
                 return 0;
             }
         }
-        public HashSet<Road> UniqueBiggestRoads => GetUniqueBiggestRoads();
+        private HashSet<Road> UniqueBiggestRoads => GetUniqueBiggestRoads();
         private HashSet<Road> GetUniqueBiggestRoads()
         {
             var roads = new HashSet<Road>();

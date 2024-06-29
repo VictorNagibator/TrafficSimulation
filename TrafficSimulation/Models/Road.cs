@@ -2,15 +2,15 @@
 {
     public class Road
     {
-        public string Name { get; set; }
-        private RoadType type;
+        public string Name { get; internal set; }
+        private RoadType _type;
         public RoadType Type
         {
-            get { return type; }
+            get { return _type; }
             set
             {
-                type = value;
-                switch (type)
+                _type = value;
+                switch (_type)
                 {
                     case RoadType.OneWay:
                         StartIntersection.IncomingRoads.Remove(this);
@@ -31,39 +31,38 @@
             }
         }
         public int NumOfLinesPerDirection { get; set; }
-        private Intersection startIntersection;
+        private Intersection _startIntersection;
         public Intersection StartIntersection
         {
-            get { return startIntersection; }
+            get { return _startIntersection; }
             set
             {
-                startIntersection = value;
+                _startIntersection = value;
                 if (Type == RoadType.OneWay)
                 {
-                    startIntersection.OutgoingRoads.Add(this);
+                    _startIntersection.OutgoingRoads.Add(this);
                 }
             }
         }
-        private Intersection endIntersection;
+        private Intersection _endIntersection;
         public Intersection EndIntersection
         {
-            get { return endIntersection; }
+            get { return _endIntersection; }
             set
             {
-                endIntersection = value;
+                _endIntersection = value;
                 if (Type == RoadType.OneWay)
                 {
-                    endIntersection.IncomingRoads.Add(this);
+                    _endIntersection.IncomingRoads.Add(this);
                 }
             }
         }
-        public List<Vehicle> Vehicles { get; set; } = [];
+        public List<Vehicle> Vehicles { get; private set; } = [];
         public double MaxAllowedSpeed { get; set; }
-        public double MaxAllowedSpeedInMetresPerSecond => MaxAllowedSpeed / 3600 * 1000;
 
-        public double Quality { get; set; } = 1;
+        public double Quality { get; internal set; } = 1;
 
-        public int MaxPossibleNumOfVehicles => (int)(Length * NumOfLinesPerDirection / (Constants.VehicleLengthMetres * 2));
+        private int MaxPossibleNumOfVehicles => (int)(Length * NumOfLinesPerDirection / (Constants.VehicleLengthMetres * 2));
 
         public void AddVehicle(Vehicle vehicle) => Vehicles.Add(vehicle);
 
@@ -92,6 +91,8 @@
 
         public List<Road> GetRoads(Intersection intersection, RoadDirection direction)
         {
+            if (intersection != StartIntersection && intersection != EndIntersection) return null;
+
             var neededRoads = new List<Road>();
 
             List<Road> roads = [];
@@ -99,19 +100,19 @@
             roads.AddRange(intersection.IncomingRoads);
             HashSet<Road> lookingRoads = roads.ToHashSet();
 
-            // Угол текущей дороги относительно перекрестка
+            //Угол текущей дороги относительно перекрестка
             double currentRoadAngle = intersection == StartIntersection
                 ? Math.Atan2(EndIntersection.Y - StartIntersection.Y, EndIntersection.X - StartIntersection.X)
                 : Math.Atan2(StartIntersection.Y - EndIntersection.Y, StartIntersection.X - EndIntersection.X);
 
             foreach (var road in lookingRoads)
             {
-                // Угол других дорог относительно перекрестка
+                //Угол других дорог относительно перекрестка
                 double roadAngle = intersection == road.StartIntersection
                     ? Math.Atan2(road.EndIntersection.Y - road.StartIntersection.Y, road.EndIntersection.X - road.StartIntersection.X)
                     : Math.Atan2(road.StartIntersection.Y - road.EndIntersection.Y, road.StartIntersection.X - road.EndIntersection.X);
 
-                // Разница углов относительно текущей дороги
+                //Разница углов относительно текущей дороги
                 double angleDifference = NormalizeAngle(roadAngle - currentRoadAngle);
 
                 switch (direction)
@@ -148,7 +149,7 @@
             return list;
         }
 
-        private double NormalizeAngle(double angle)
+        private static double NormalizeAngle(double angle)
         {
             while (angle > Math.PI) angle -= 2 * Math.PI;
             while (angle <= -Math.PI) angle += 2 * Math.PI;
@@ -192,7 +193,7 @@
         private TrafficJamColor GetTrafficJamStatus()
         {
             if (Vehicles.Count <= MaxPossibleNumOfVehicles * 0.25) return TrafficJamColor.Green;
-            else if (Vehicles.Count <= MaxPossibleNumOfVehicles * 0.7) return TrafficJamColor.Yellow;
+            else if (Vehicles.Count <= MaxPossibleNumOfVehicles * 0.5) return TrafficJamColor.Yellow;
             else return TrafficJamColor.Red;
         }
     }

@@ -9,7 +9,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Media\cityIcon.png" />
     <None Remove="Media\clouds-raining.gif" />
+    <None Remove="Media\crossIcon.png" />
+    <None Remove="Media\mainIcon.png" />
+    <None Remove="Media\roadIcon.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -17,7 +21,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Media\cityIcon.png" />
     <Resource Include="Media\clouds-raining.gif" />
+    <Resource Include="Media\crossIcon.png" />
+    <Resource Include="Media\mainIcon.png" />
+    <Resource Include="Media\roadIcon.png" />
   </ItemGroup>
 
 </Project>

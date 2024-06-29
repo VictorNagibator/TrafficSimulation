@@ -5,6 +5,7 @@ using System.Windows.Shapes;
 using TrafficSimulation.Models;
 using System.Windows.Threading;
 using System.Windows.Input;
+using Microsoft.VisualBasic;
 
 namespace TrafficSimulation
 {
@@ -78,14 +79,17 @@ namespace TrafficSimulation
             }
 
             DrawMetresLine();
+            DrawRain();
+        }
 
+        private void DrawRain()
+        {
             if (city.IsRaining) RainGIF.Visibility = Visibility.Visible;
             else RainGIF.Visibility = Visibility.Hidden;
         }
 
         private void DrawIntersection(Intersection intersection)
         {
-
             Rectangle rect = new()
             {
                 Width = intersection.Width / Constants.MetresPerPixel,
@@ -107,14 +111,11 @@ namespace TrafficSimulation
         {
             bool isSimulationWorked = timer.IsEnabled;
 
-            window.Show();
-            window.Closed += (s, e) => DrawCity();
+            if (isSimulationWorked) StopSimulation();
+            window.ShowDialog();
+            DrawCity();
 
-            if (isSimulationWorked)
-            {
-                StopSimulation();
-                window.Closed += (s, e) => StartSimulation();
-            }
+            if (isSimulationWorked) StartSimulation();
         }
 
         private void Intersection_LeftButtonMouseDown(object sender, MouseButtonEventArgs e)
@@ -134,7 +135,7 @@ namespace TrafficSimulation
 
                     currentRoadState = RoadCreationState.AddingEnd;
                 }
-                else if (currentRoadState == RoadCreationState.AddingEnd && isAllowedToCreateRoad)
+                else if (isAllowedToCreateRoad)
                 {
                     previewRoad.EndIntersection = intersection;
 
@@ -361,8 +362,8 @@ namespace TrafficSimulation
 
             Ellipse speedLimitEllipse = new()
             {
-                Width = 4 / Constants.MetresPerPixel,
-                Height = 4 / Constants.MetresPerPixel,
+                Width = 6 / Constants.MetresPerPixel,
+                Height = 6 / Constants.MetresPerPixel,
                 Fill = Brushes.White,
                 Stroke = Brushes.Red,
                 StrokeThickness = 0.4 / Constants.MetresPerPixel
@@ -371,15 +372,15 @@ namespace TrafficSimulation
             TextBlock speedLimitTextBlock = new()
             {
                 Text = road.MaxAllowedSpeed.ToString(),
-                FontSize = 2 / Constants.MetresPerPixel,
+                FontSize = 3 / Constants.MetresPerPixel,
                 Foreground = Brushes.Black
             };
 
             speedLimitTextBlock.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
             speedLimitTextBlock.Arrange(new Rect(speedLimitTextBlock.DesiredSize));
 
-            double offsetX = midX + 20 * Math.Cos(roadAngle + Math.PI / 2);
-            double offsetY = midY + 20 * Math.Sin(roadAngle + Math.PI / 2);
+            double offsetX = midX + (road.Width + 3.5 * Math.Cos(roadAngle + Math.PI / 2)) / Constants.MetresPerPixel;
+            double offsetY = midY + (road.Width + 3.5 * Math.Sin(roadAngle + Math.PI / 2)) / Constants.MetresPerPixel;
 
             Canvas.SetLeft(speedLimitEllipse, offsetX - speedLimitEllipse.Width / 2);
             Canvas.SetTop(speedLimitEllipse, offsetY - speedLimitEllipse.Height / 2);
@@ -549,37 +550,7 @@ namespace TrafficSimulation
 
         private void AddVehicleButton_Click(object sender, RoutedEventArgs e)
         {
-            if (city.Roads.Count == 0) return;
-
-            //Выбираем случайную дорогу
-            var road = city.Roads[random.Next(city.Roads.Count)];
-
-            //Определяем направление движения
-            bool isMovingForward;
-            if (road.Type == RoadType.OneWay)
-            {
-                isMovingForward = true;
-            }
-            else
-            {
-                isMovingForward = random.Next(2) == 0;
-            }
-
-            int lineNumber = random.Next(1, road.NumOfLinesPerDirection + 1);
-
-            var vehicle = new Vehicle
-            {
-                ID = "Car" + (city.Vehicles.Count + 1),
-                Speed = 0,
-                CurrentRoad = road,
-                LineNumber = lineNumber,
-                Position = isMovingForward ? 0 : road.Length,
-                NextIntersection = isMovingForward ? road.EndIntersection : road.StartIntersection,
-                IsMovingForward = isMovingForward,
-            };
-
-            vehicle.NextRoad = vehicle.GetNextRoad();
-
+            Vehicle vehicle = new(city);
             city.AddVehicle(vehicle);
         }
 
@@ -702,7 +673,7 @@ namespace TrafficSimulation
                    Y = e.GetPosition(CityCanvas).Y * Constants.MetresPerPixel - globalOffset[1] * Constants.MetresPerPixel - 0.2 * Math.Sin(previewRoad.Angle)
                };
 
-                DrawCity();
+               DrawCity();
             }
             else if (isDragging && e.LeftButton == MouseButtonState.Pressed)
             {
@@ -761,7 +732,7 @@ namespace TrafficSimulation
         private void ResetButton_Click(object sender, RoutedEventArgs e)
         {
             globalOffset = [0, 0];
-            Constants.MetresPerPixel = 0.2;
+            Constants.MetresPerPixel = Constants.MetresPerPixelBasic;
             DrawCity();
         }
 
