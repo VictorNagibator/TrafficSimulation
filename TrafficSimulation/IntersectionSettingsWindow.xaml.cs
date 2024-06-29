@@ -43,7 +43,13 @@ namespace TrafficSimulation
 
             DrawIntersection();
 
-            DrawTrafficLight(selectedTrafficLight);
+            foreach (var trafficLight in city.TrafficLights)
+            {
+                if (trafficLight.ControlledIntersection == intersection)
+                {
+                    DrawTrafficLight(trafficLight);
+                }
+            }
         }
 
         private void DrawIntersection()

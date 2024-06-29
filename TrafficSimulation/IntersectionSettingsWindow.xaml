@@ -40,6 +40,8 @@
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="5">
                         <TextBlock Text="Текущий сигнал светофора:" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Margin="5" Orientation="Vertical">
                         <RadioButton x:Name="RedLightRadioButton" Content="Красный" Margin="5" Checked="RedLightRadioButton_Checked"/>
                         <RadioButton x:Name="YellowLightRadioButton" Content="Желтый" Margin="5" Checked="YellowLightRadioButton_Checked"/>
                         <RadioButton x:Name="GreenLightRadioButton" Content="Зеленый" Margin="5" Checked="GreenLightRadioButton_Checked"/>
