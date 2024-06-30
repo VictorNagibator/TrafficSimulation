@@ -4,13 +4,13 @@
     {
         public string ID { get; internal set; }
         public double Speed { get; private set; } = 0; //км/ч
-        public double Acceleration { get; private set; } = 2; //в м/с^2
-        public Road CurrentRoad { get; private set; }
+        public double Acceleration { get; private set; } = 1; //в м/с^2
+        public Road CurrentRoad { get; internal set; }
         public City CurrentCity { get; internal set; }
 
         public int LineNumber { get; private set; }
-        public double Position { get; private set; }
-        public Intersection NextIntersection { get; private set; }
+        public double Position { get; internal set; }
+        public Intersection NextIntersection { get; internal set; }
         public Road NextRoad { get; internal set; }
         public bool IsMovingForward { get; private set; } = true;
 
@@ -20,7 +20,8 @@
         private double SpeedInMetresPerHundredMilliseconds => SpeedInMetresPerSecond * 0.1;
         private double AccelerationInMetresPerHundredMilliseconds => Acceleration * 0.01;
 
-        private double AdditionToGetInCarAccidentChanceBecauseOfRaining = 0.02 * Constants.TimerInterval;
+        private double AdditionToGetInCarAccidentChanceBecauseOfRaining = 0.01 * Constants.TimerInterval;
+        private double ChanceToChangeLine = 0.005 * Constants.TimerInterval;
 
         private Random random = new();
         private int currentTimer;
@@ -79,6 +80,9 @@
             //Разгоняемся и передвигаем позицию машины
             SpeedUp();
             Position += IsMovingForward ? SpeedInMetresPerHundredMilliseconds : -SpeedInMetresPerHundredMilliseconds;
+
+            //Машина пытается поменять полосу движения
+            if (random.NextDouble() <= ChanceToChangeLine) TryToChangeLine();
 
             //Если автомобиль достиг конца или начала дороги
             if (Position >= CurrentRoad.Length || Position <= 0)

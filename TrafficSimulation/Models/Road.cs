@@ -2,7 +2,7 @@
 {
     public class Road
     {
-        public string Name { get; internal set; }
+        public string? Name { get; internal set; }
         private RoadType _type;
         public RoadType Type
         {
@@ -78,7 +78,7 @@
             double angle = Math.Atan2(endY - startY, endX - startX);
 
             double offsetX = Math.Cos(angle) * vehicle.Position;
-            double offsetY = Math.Sin(angle) * vehicle.Position;
+            double offsetY = Math.Sin(angle) * vehicle.Position; 
 
             return [startX + offsetX, startY + offsetY];
         }
@@ -194,7 +194,8 @@
         {
             if (Vehicles.Count <= MaxPossibleNumOfVehicles * 0.25) return TrafficJamColor.Green;
             else if (Vehicles.Count <= MaxPossibleNumOfVehicles * 0.5) return TrafficJamColor.Yellow;
-            else return TrafficJamColor.Red;
+            else if (Vehicles.Count <= MaxPossibleNumOfVehicles * 0.75) return TrafficJamColor.Red;
+            else return TrafficJamColor.DarkRed;
         }
     }
 
@@ -213,6 +214,7 @@
 
     public enum TrafficJamColor
     {
+        DarkRed,
         Red,
         Yellow,
         Green

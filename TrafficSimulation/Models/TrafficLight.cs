@@ -2,7 +2,7 @@
 {
     public class TrafficLight
     {
-        public string Name { get; internal set; }
+        public string? Name { get; internal set; }
         public Road ControlledRoad { get; internal set; }
         public Intersection ControlledIntersection { get; internal set; }
         private TrafficLightState _state;

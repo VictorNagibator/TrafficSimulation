@@ -125,7 +125,9 @@ namespace TrafficSimulation
             {
                 Width = Constants.TrafficLightMetres / Constants.MetresPerPixelInIntersectionSettings,
                 Height = Constants.TrafficLightMetres / Constants.MetresPerPixelInIntersectionSettings,
-                Fill = Brushes.Red
+                Fill = light.State == TrafficLightState.Red ? Brushes.Red :
+                       light.State == TrafficLightState.Yellow ? Brushes.Yellow : Brushes.Green,
+                Tag = light
             };
 
             Canvas.SetLeft(ellipse, offsetX - ellipse.Width / 2);
@@ -137,6 +139,7 @@ namespace TrafficSimulation
         {
             if (sender is Line line && line.Tag is Road road)
             {
+                IsEnabledTrafficLightCheckBox.IsEnabled = true;
                 DeselectCurrentRoad();
 
                 if (selectedTrafficLight != null) IsEnabledTrafficLightCheckBox.IsChecked = true;
@@ -252,16 +255,28 @@ namespace TrafficSimulation
         private void RedLightRadioButton_Checked(object sender, RoutedEventArgs e)
         {
             selectedTrafficLight.State = TrafficLightState.Red;
+            foreach (var item in IntersectionCanvas.Children)
+            {
+                if (item is Ellipse ellipse && ellipse.Tag == selectedTrafficLight) ellipse.Fill = Brushes.Red;
+            }
         }
 
         private void YellowLightRadioButton_Checked(object sender, RoutedEventArgs e)
         {
             selectedTrafficLight.State = TrafficLightState.Yellow;
+            foreach (var item in IntersectionCanvas.Children)
+            {
+                if (item is Ellipse ellipse && ellipse.Tag == selectedTrafficLight) ellipse.Fill = Brushes.Yellow;
+            }
         }
 
         private void GreenLightRadioButton_Checked(object sender, RoutedEventArgs e)
         {
             selectedTrafficLight.State = TrafficLightState.Green;
+            foreach (var item in IntersectionCanvas.Children)
+            {
+                if (item is Ellipse ellipse && ellipse.Tag == selectedTrafficLight) ellipse.Fill = Brushes.Green;
+            }
         }
     }
 }

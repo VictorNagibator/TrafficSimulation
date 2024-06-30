@@ -2,7 +2,6 @@
 {
     public class City
     {
-        public List<Intersection> Intersections { get; private set; } = [];
         public List<Road> Roads { get; private set; } = [];
         public List<Vehicle> Vehicles { get; private set; } = [];
         public List<TrafficLight> TrafficLights { get; private set; } = [];
@@ -55,9 +54,6 @@
             //Добавляем дорогу в список дорог каждого перекрестка
             road.StartIntersection.AddRoad(road);
             road.EndIntersection.AddRoad(road);
-
-            if (!Intersections.Contains(road.StartIntersection)) Intersections.Add(road.StartIntersection);
-            if (!Intersections.Contains(road.EndIntersection)) Intersections.Add(road.EndIntersection);
         }
 
         public void RemoveRoad(Road road)
@@ -71,13 +67,24 @@
 
             Vehicles.RemoveAll(v => v.CurrentRoad == road);
             TrafficLights.RemoveAll(tl => tl.ControlledRoad == road);
-
-            if (road.StartIntersection.HasNoRoads()) Intersections.Remove(road.StartIntersection);
-            if (road.EndIntersection.HasNoRoads()) Intersections.Remove(road.EndIntersection);
         }
 
-        public void AddVehicle(Vehicle vehicle) => Vehicles.Add(vehicle);
-        public void RemoveVehicle(Vehicle vehicle) => Vehicles.Remove(vehicle);
+        public void AddVehicle(Vehicle vehicle)
+        {
+            Vehicles.Add(vehicle);
+            vehicle.CurrentRoad.AddVehicle(vehicle);
+        }
+        public void RemoveVehicle(Vehicle vehicle)
+        {
+            Vehicles.Remove(vehicle);
+            vehicle.CurrentRoad.RemoveVehicle(vehicle);
+        }
+
+        public void RemoveAllVehicles()
+        {
+            foreach (var road in Roads) road.Vehicles.Clear();
+            Vehicles.Clear();
+        }
 
         public void AddTrafficLight(TrafficLight light) => TrafficLights.Add(light);
         public void RemoveTrafficLight(TrafficLight light) => TrafficLights.Remove(light);

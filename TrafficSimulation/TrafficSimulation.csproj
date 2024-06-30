@@ -14,6 +14,7 @@
     <None Remove="Media\crossIcon.png" />
     <None Remove="Media\mainIcon.png" />
     <None Remove="Media\roadIcon.png" />
+    <None Remove="Media\trafficButtonIcon.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -26,6 +27,7 @@
     <Resource Include="Media\crossIcon.png" />
     <Resource Include="Media\mainIcon.png" />
     <Resource Include="Media\roadIcon.png" />
+    <Resource Include="Media\trafficButtonIcon.png" />
   </ItemGroup>
 
 </Project>

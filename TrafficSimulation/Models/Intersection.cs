@@ -2,7 +2,7 @@
 {
     public class Intersection
     {
-        public string Name { get; internal set; }
+        public string? Name { get; internal set; }
         public double X { get; internal set; }
         public double Y { get; internal set; }
         public HashSet<Road> IncomingRoads { get; private set; } = [];
@@ -55,8 +55,8 @@
         {
             var uniqueroads = UniqueBiggestRoads.ToList();
             if (uniqueroads.Count == 1) return uniqueroads[0].Angle;
-            else if (uniqueroads.Count == 2 && (Math.Abs(uniqueroads[0].Angle - uniqueroads[1].Angle) <= Constants.AngleTolerance) || (Math.Abs(uniqueroads[0].Angle - uniqueroads[1].Angle) <= Math.PI / 2 + Constants.AngleTolerance && Math.Abs(uniqueroads[0].Angle - uniqueroads[1].Angle) >= Math.PI / 2 - Constants.AngleTolerance)) return uniqueroads[0].Angle;
-            else if (uniqueroads.Count == 2) return uniqueroads[0].Angle - uniqueroads[1].Angle;
+            else if (uniqueroads.Count == 2 && ((Math.Abs(uniqueroads[0].Angle - uniqueroads[1].Angle) <= Constants.AngleTolerance) || (Math.Abs(uniqueroads[0].Angle - uniqueroads[1].Angle) <= Math.PI / 2 + Constants.AngleTolerance && Math.Abs(uniqueroads[0].Angle - uniqueroads[1].Angle) >= Math.PI / 2 - Constants.AngleTolerance))) return uniqueroads[0].Angle;
+            else if (uniqueroads.Count == 2) return Math.Abs(uniqueroads[0].Angle - uniqueroads[1].Angle) * 2;
             else
             {
                 foreach (var road1 in uniqueroads)

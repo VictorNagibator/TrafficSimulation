@@ -51,12 +51,7 @@ namespace TrafficSimulation
 
             foreach (var road in city.Roads)
             {
-                DrawRoad(road);
-            }
-
-            foreach (var intersection in city.Intersections)
-            {
-                DrawIntersection(intersection);
+                DrawRoad(road); 
             }
 
             if (!isWatchingTrafficJams)
@@ -126,29 +121,11 @@ namespace TrafficSimulation
             {
                 if (currentRoadState == RoadCreationState.AddingStart)
                 {
-                    previewRoad = new Road()
-                    {
-                        StartIntersection = intersection,
-                        EndIntersection = intersection,
-                        Type = RoadType.TwoWay,
-                        NumOfLinesPerDirection = 1,
-                        MaxAllowedSpeed = city.MaxAllowedSpeed
-                    };
-
-                    currentRoadState = RoadCreationState.AddingEnd;
+                    AddRoadStarting(intersection);
                 }
                 else if (currentRoadState == RoadCreationState.AddingEnd && previewRoad.StartIntersection != previewRoad.EndIntersection && isAllowedToCreateRoad)
                 {
-                    previewRoad.EndIntersection = intersection;
-
-                    city.AddRoad(previewRoad);
-                    previewRoad = null;
-
-                    currentRoadState = RoadCreationState.None;
-                    AddRoadButton.Visibility = Visibility.Visible;
-                    CancelAddRoadButton.Visibility = Visibility.Collapsed;
-
-                    DrawCity();
+                    AddRoadEnding(intersection);
                 }
                 else if (currentRoadState == RoadCreationState.None)
                 {
@@ -194,8 +171,11 @@ namespace TrafficSimulation
             {
                 switch (road.TrafficJamStatus)
                 {
-                    case TrafficJamColor.Red:
+                    case TrafficJamColor.DarkRed:
                         line.Stroke = Brushes.DarkRed;
+                        break;
+                    case TrafficJamColor.Red:
+                        line.Stroke = Brushes.Red;
                         break;
                     case TrafficJamColor.Yellow:
                         line.Stroke = Brushes.Yellow;
@@ -226,6 +206,12 @@ namespace TrafficSimulation
             {
                 DrawSpeedLimitSign(road);
             }
+
+            if (road != previewRoad)
+            {
+                DrawIntersection(road.StartIntersection);
+                DrawIntersection(road.EndIntersection);
+            }
         }
 
         private void Road_LeftButtonMouseDown(object sender, MouseButtonEventArgs e)
@@ -248,7 +234,21 @@ namespace TrafficSimulation
                         EndIntersection = intersection,
                         Quality = road.Quality,
                         Type = road.Type,
+                        MaxAllowedSpeed = road.MaxAllowedSpeed,
                     };
+
+                    var vehiclesOnFirstHalfOfRoad = road.Vehicles.Where(v => v.Position <= newroad1.Length).ToList();
+                    if (vehiclesOnFirstHalfOfRoad.Count != 0)
+                    {
+                        vehiclesOnFirstHalfOfRoad.ForEach(v => { 
+                            newroad1.AddVehicle(v);
+                            v.CurrentRoad = newroad1;
+                            v.NextIntersection = v.IsMovingForward ? intersection : road.StartIntersection;
+                            v.NextRoad = v.GetNextRoad();
+                            road.RemoveVehicle(v); 
+                        });
+                    }
+
                     Road newroad2 = new()
                     {
                         Name = road.Name,
@@ -257,7 +257,21 @@ namespace TrafficSimulation
                         EndIntersection = road.EndIntersection,
                         Quality = road.Quality,
                         Type = road.Type,
+                        MaxAllowedSpeed = road.MaxAllowedSpeed
                     };
+
+                    var vehiclesOnSecondHalfOfRoad = road.Vehicles.Where(v => v.Position > newroad1.Length).ToList();
+                    if (vehiclesOnSecondHalfOfRoad.Count != 0)
+                    {
+                        vehiclesOnSecondHalfOfRoad.ForEach(v => { 
+                            newroad2.AddVehicle(v);
+                            v.CurrentRoad = newroad2; 
+                            v.Position = v.Position - newroad1.Length;
+                            v.NextIntersection = v.IsMovingForward ? road.EndIntersection : intersection;
+                            v.NextRoad = v.GetNextRoad();
+                            road.RemoveVehicle(v);
+                        });
+                    }
 
                     var trafficlightInBegin = city.TrafficLights.Where(tl => tl.ControlledRoad == road && tl.ControlledIntersection == road.StartIntersection).FirstOrDefault();
                     var trafficlightInEnd = city.TrafficLights.Where(tl => tl.ControlledRoad == road && tl.ControlledIntersection == road.EndIntersection).FirstOrDefault();
@@ -268,7 +282,8 @@ namespace TrafficSimulation
                     city.AddRoad(newroad1);
                     city.AddRoad(newroad2);
 
-                    Intersection_LeftButtonMouseDown(new Rectangle { Tag=intersection }, e);
+                    if (currentRoadState == RoadCreationState.AddingStart) AddRoadStarting(intersection);
+                    else AddRoadEnding(intersection);
                 }
                 else if (currentRoadState == RoadCreationState.None)
                 {
@@ -460,6 +475,7 @@ namespace TrafficSimulation
             }
 
             rect.MouseDown += Vehicle_MouseDown;
+            rect.ToolTip = new ToolTip() { Content = "Скорость: " + (int)vehicle.Speed };
 
             Canvas.SetLeft(rect, offsetX - rect.Width / 2 + globalOffset[0]);
             Canvas.SetTop(rect, offsetY - rect.Height / 2 + globalOffset[1]);
@@ -627,7 +643,9 @@ namespace TrafficSimulation
                     X = e.GetPosition(CityCanvas).X * Constants.MetresPerPixel - globalOffset[0] * Constants.MetresPerPixel,
                     Y = e.GetPosition(CityCanvas).Y * Constants.MetresPerPixel - globalOffset[1] * Constants.MetresPerPixel
                 };
-                Intersection_LeftButtonMouseDown(new Rectangle { Tag = intersection }, e);
+
+                if (currentRoadState == RoadCreationState.AddingStart) AddRoadStarting(intersection);
+                else AddRoadEnding(intersection);
             }
             else
             {
@@ -716,7 +734,7 @@ namespace TrafficSimulation
         {
             if (MessageBox.Show("Вы желаете удалить все машины?", "Удаление машин", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
             {
-                city.Vehicles.Clear();
+                city.RemoveAllVehicles();
                 DrawCity();
             }
         }
@@ -751,6 +769,34 @@ namespace TrafficSimulation
         private void TrafficJamButton_Click(object sender, RoutedEventArgs e)
         {
             isWatchingTrafficJams = !isWatchingTrafficJams;
+            DrawCity();
+        }
+
+        private void AddRoadStarting(Intersection intersection)
+        {
+            previewRoad = new Road()
+            {
+                 StartIntersection = intersection,
+                 EndIntersection = intersection,
+                 Type = RoadType.TwoWay,
+                 NumOfLinesPerDirection = 1,
+                 MaxAllowedSpeed = city.MaxAllowedSpeed
+            };
+
+            currentRoadState = RoadCreationState.AddingEnd;
+        }
+
+        private void AddRoadEnding(Intersection intersection)
+        {
+            previewRoad.EndIntersection = intersection;
+
+            city.AddRoad(previewRoad);
+            previewRoad = null;
+
+            currentRoadState = RoadCreationState.None;
+            AddRoadButton.Visibility = Visibility.Visible;
+            CancelAddRoadButton.Visibility = Visibility.Collapsed;
+
             DrawCity();
         }
     }
