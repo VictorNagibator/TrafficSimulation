@@ -227,7 +227,7 @@ namespace TrafficSimulation
                     {
                         X = e.GetPosition(CityCanvas).X * Constants.MetresPerPixel - globalOffset[0] * Constants.MetresPerPixel,
                     };
-                    intersection.Y = (intersection.X - road.StartIntersection.X) * (road.EndIntersection.Y - road.StartIntersection.Y) / (road.EndIntersection.X - road.StartIntersection.X) + road.StartIntersection.Y - globalOffset[1] * Constants.MetresPerPixel;
+                    intersection.Y = (intersection.X - road.StartIntersection.X) * (road.EndIntersection.Y - road.StartIntersection.Y) / (road.EndIntersection.X - road.StartIntersection.X) + road.StartIntersection.Y;
 
                     Road newroad1 = new()
                     {
