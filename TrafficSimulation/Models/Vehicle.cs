@@ -67,7 +67,7 @@
             }
             double ActualChanceToGetInCarAccident = CurrentCity.ActualChanceToGetInCarAccident + (1 - CurrentRoad.Quality) * CurrentCity.ActualChanceToGetInCarAccident;
             ActualChanceToGetInCarAccident += CurrentCity.IsRaining ? AdditionToGetInCarAccidentChanceBecauseOfRaining : 0;
-            if (random.NextDouble() <= ActualChanceToGetInCarAccident && !CurrentRoad.Vehicles.Any(v => v.IsMovingForward == IsMovingForward && Math.Abs(v.Position - Position) <= 5) && !WillBeOuttaRoad())
+            if (random.NextDouble() <= ActualChanceToGetInCarAccident && !WillBeOuttaRoad())
             {
                 IsInCarAccident = true;
                 currentTimer = (int)CurrentCity.ActualCarAccidentTimer;
