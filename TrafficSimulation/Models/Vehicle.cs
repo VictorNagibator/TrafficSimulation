@@ -6,7 +6,6 @@
         public double Speed { get; private set; } = 0; //км/ч
         public double Acceleration { get; private set; } = 1; //в м/с^2
         public Road CurrentRoad { get; internal set; }
-        public City CurrentCity { get; internal set; }
 
         public int LineNumber { get; private set; }
         public double Position { get; internal set; }
@@ -21,14 +20,13 @@
         private double AccelerationInMetresPerHundredMilliseconds => Acceleration * 0.01;
 
         private double AdditionToGetInCarAccidentChanceBecauseOfRaining = 0.005 * Constants.TimerInterval;
-        private double ChanceToChangeLine = 0.02 * Constants.TimerInterval;
+        private double ChanceToChangeLine = 0.05 * Constants.TimerInterval;
 
         private Random random = new();
         private int currentTimer;
 
         public Vehicle(City city)
         {
-            CurrentCity = city;
             if (city.Roads.Count == 0) return;
 
             //Выбираем случайную дорогу
@@ -54,7 +52,7 @@
             NextRoad = GetNextRoad();
         }
 
-        public void Update()
+        public void Update(City city)
         {
             if (IsInCarAccident)
             {
@@ -65,20 +63,20 @@
                 }
                 return;
             }
-            double ActualChanceToGetInCarAccident = CurrentCity.ActualChanceToGetInCarAccident + (1 - CurrentRoad.Quality) * CurrentCity.ActualChanceToGetInCarAccident;
-            ActualChanceToGetInCarAccident += CurrentCity.IsRaining ? AdditionToGetInCarAccidentChanceBecauseOfRaining : 0;
+            double ActualChanceToGetInCarAccident = city.ActualChanceToGetInCarAccident + (1 - CurrentRoad.Quality) * city.ActualChanceToGetInCarAccident;
+            ActualChanceToGetInCarAccident += city.IsRaining ? AdditionToGetInCarAccidentChanceBecauseOfRaining : 0;
             if (random.NextDouble() <= ActualChanceToGetInCarAccident && !WillBeOuttaRoad())
             {
                 IsInCarAccident = true;
-                currentTimer = (int)CurrentCity.ActualCarAccidentTimer;
+                currentTimer = (int)city.ActualCarAccidentTimer;
                 return;
             }
 
             //Проверка вариантов для остановки машины
-            if (ShouldStopBecauseOfTrafficLight() || ShouldStopBecauseOfNextVehicle() || ShouldStopBecauseOfVehicleOnRight() || ShouldStopBecauseOfTrafficJam() || ShouldStopBecauseOfDeadEnd()) return;
+            if (ShouldStopBecauseOfTrafficLight(city) || ShouldStopBecauseOfNextVehicle() || ShouldStopBecauseOfVehicleOnRight(city) || ShouldStopBecauseOfTrafficJam() || ShouldStopBecauseOfDeadEnd()) return;
 
             //Разгоняемся и передвигаем позицию машины
-            SpeedUp();
+            SpeedUp(city);
             Position += IsMovingForward ? SpeedInMetresPerHundredMilliseconds : -SpeedInMetresPerHundredMilliseconds;
 
             //Машина пытается поменять полосу движения
@@ -89,7 +87,7 @@
             {
                 if (NextRoad != null)
                 {
-                    CurrentRoad.Quality -= CurrentCity.IsRaining ? 0.0005 : 0.0002; //условное значение ухудшения качества дороги после каждого проезда
+                    CurrentRoad.Quality -= city.IsRaining ? 0.0005 : 0.0002; //условное значение ухудшения качества дороги после каждого проезда
                     if (CurrentRoad == NextRoad)
                     {
                         LineNumber = random.Next(1, CurrentRoad.NumOfLinesPerDirection + 1);
@@ -124,9 +122,9 @@
                 (!IsMovingForward && Position - SpeedInMetresPerHundredMilliseconds <= StopDistance);
         }
 
-        private bool ShouldStopBecauseOfTrafficLight()
+        private bool ShouldStopBecauseOfTrafficLight(City city)
         {
-            var trafficLight = CurrentCity.TrafficLights.FirstOrDefault(light => light.ControlledIntersection == NextIntersection && light.ControlledRoad == CurrentRoad);
+            var trafficLight = city.TrafficLights.FirstOrDefault(light => light.ControlledIntersection == NextIntersection && light.ControlledRoad == CurrentRoad);
             if (trafficLight != null && (trafficLight.State == TrafficLightState.Red || trafficLight.State == TrafficLightState.Yellow))
             {
                 if (WillBeOuttaRoad())
@@ -139,8 +137,8 @@
 
         private bool ShouldStopBecauseOfNextVehicle()
         {
-            var nextVehicle = CurrentCity.Vehicles
-                .Where(v => v.CurrentRoad == CurrentRoad && v.IsMovingForward == IsMovingForward && v.LineNumber == LineNumber)
+            var nextVehicle = CurrentRoad.Vehicles
+                .Where(v => v.IsMovingForward == IsMovingForward && v.LineNumber == LineNumber)
                 .OrderBy(v => IsMovingForward ? v.Position : -v.Position)
                 .FirstOrDefault(v => IsMovingForward ? v.Position > Position : v.Position < Position);
 
@@ -159,13 +157,13 @@
             return false;
         }
 
-        private bool ShouldStopBecauseOfVehicleOnRight()
+        private bool ShouldStopBecauseOfVehicleOnRight(City city)
         {
-            if (WillBeOuttaRoad() && CurrentCity.TrafficLights.Where(v => v.ControlledIntersection == NextIntersection && v.ControlledRoad == CurrentRoad).FirstOrDefault() == null)
+            if (WillBeOuttaRoad() && city.TrafficLights.Where(v => v.ControlledIntersection == NextIntersection && v.ControlledRoad == CurrentRoad).FirstOrDefault() == null)
             {
                 var roadsOnRight = CurrentRoad.GetRoads(NextIntersection, RoadDirection.Right);
-                var vehicleOnRight = CurrentCity.Vehicles
-                    .Where(v => roadsOnRight.Contains(v.CurrentRoad) && v.NextIntersection == NextIntersection && (!CurrentCity.TrafficLights.Any(tl => tl.ControlledRoad == v.CurrentRoad && tl.ControlledIntersection == v.NextIntersection) || CurrentCity.TrafficLights.Any(tl => tl.ControlledRoad == v.CurrentRoad && tl.ControlledIntersection == v.NextIntersection && tl.State == TrafficLightState.Green)) && !v.IsInCarAccident && Math.Abs(v.Position - (IsMovingForward ? v.CurrentRoad.Length : 0)) <= Constants.SafetyDistanceToStop * 2)
+                var vehicleOnRight = CurrentRoad.Vehicles
+                    .Where(v => v.NextIntersection == NextIntersection && (city.TrafficLights.Any(tl => tl.ControlledRoad == v.CurrentRoad && tl.ControlledIntersection == v.NextIntersection) || city.TrafficLights.Any(tl => tl.ControlledRoad == v.CurrentRoad && tl.ControlledIntersection == v.NextIntersection && tl.State == TrafficLightState.Green)) && !v.IsInCarAccident && Math.Abs(v.Position - (IsMovingForward ? v.CurrentRoad.Length : 0)) <= Constants.SafetyDistanceToStop * 2)
                     .FirstOrDefault();
 
                 if (vehicleOnRight != null)
@@ -196,12 +194,12 @@
             return false;
         }
 
-        private void SpeedUp()
+        private void SpeedUp(City city)
         {
             double speedAfterHundredMilliseconds = SpeedInMetresPerHundredMilliseconds + AccelerationInMetresPerHundredMilliseconds;
             Speed += speedAfterHundredMilliseconds * 10 * 3600 / 1000;
             double MaxPossibleSpeed = CurrentRoad.Quality * CurrentRoad.MaxAllowedSpeed;
-            MaxPossibleSpeed -= CurrentCity.IsRaining ? 15 : 0;
+            MaxPossibleSpeed -= city.IsRaining ? 15 : 0;
             if (Speed > MaxPossibleSpeed)
             {
                 Speed = MaxPossibleSpeed;

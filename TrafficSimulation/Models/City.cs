@@ -3,7 +3,8 @@
     public class City
     {
         public List<Road> Roads { get; private set; } = [];
-        public List<Vehicle> Vehicles { get; private set; } = [];
+
+        public List<Vehicle> Vehicles => Roads.SelectMany(road => road.Vehicles).ToList();
         public List<TrafficLight> TrafficLights { get; private set; } = [];
 
         private double _maxAllowedSpeed = 60;
@@ -65,25 +66,22 @@
             road.EndIntersection.IncomingRoads.Remove(road);
             road.EndIntersection.OutgoingRoads.Remove(road);
 
-            Vehicles.RemoveAll(v => v.CurrentRoad == road);
+            road.Vehicles.Clear();
             TrafficLights.RemoveAll(tl => tl.ControlledRoad == road);
         }
 
         public void AddVehicle(Vehicle vehicle)
         {
-            Vehicles.Add(vehicle);
             vehicle.CurrentRoad.AddVehicle(vehicle);
         }
         public void RemoveVehicle(Vehicle vehicle)
         {
-            Vehicles.Remove(vehicle);
             vehicle.CurrentRoad.RemoveVehicle(vehicle);
         }
 
         public void RemoveAllVehicles()
         {
             foreach (var road in Roads) road.Vehicles.Clear();
-            Vehicles.Clear();
         }
 
         public void AddTrafficLight(TrafficLight light) => TrafficLights.Add(light);
@@ -111,7 +109,7 @@
 
             foreach (var vehicle in Vehicles)
             {
-                vehicle.Update();
+                vehicle.Update(this);
             }
 
             foreach (var light in TrafficLights)
