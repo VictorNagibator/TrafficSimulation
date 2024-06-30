@@ -20,8 +20,8 @@
         private double SpeedInMetresPerHundredMilliseconds => SpeedInMetresPerSecond * 0.1;
         private double AccelerationInMetresPerHundredMilliseconds => Acceleration * 0.01;
 
-        private double AdditionToGetInCarAccidentChanceBecauseOfRaining = 0.01 * Constants.TimerInterval;
-        private double ChanceToChangeLine = 0.005 * Constants.TimerInterval;
+        private double AdditionToGetInCarAccidentChanceBecauseOfRaining = 0.005 * Constants.TimerInterval;
+        private double ChanceToChangeLine = 0.02 * Constants.TimerInterval;
 
         private Random random = new();
         private int currentTimer;
