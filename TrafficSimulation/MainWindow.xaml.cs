@@ -396,8 +396,8 @@ namespace TrafficSimulation
             speedLimitTextBlock.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
             speedLimitTextBlock.Arrange(new Rect(speedLimitTextBlock.DesiredSize));
 
-            double offsetX = midX + (road.Width + 3.5 * Math.Cos(roadAngle + Math.PI / 2)) / Constants.MetresPerPixel;
-            double offsetY = midY + (road.Width + 3.5 * Math.Sin(roadAngle + Math.PI / 2)) / Constants.MetresPerPixel;
+            double offsetX = midX + (road.Width + 2) * Math.Cos(roadAngle + Math.PI / 2) / Constants.MetresPerPixel;
+            double offsetY = midY + (road.Width + 2) * Math.Sin(roadAngle + Math.PI / 2) / Constants.MetresPerPixel;
 
             Canvas.SetLeft(speedLimitEllipse, offsetX - speedLimitEllipse.Width / 2);
             Canvas.SetTop(speedLimitEllipse, offsetY - speedLimitEllipse.Height / 2);
@@ -798,6 +798,16 @@ namespace TrafficSimulation
             CancelAddRoadButton.Visibility = Visibility.Collapsed;
 
             DrawCity();
+        }
+
+        private void ClearAllButton_Copy_Click(object sender, RoutedEventArgs e)
+        {
+            if (MessageBox.Show("Вы желаете очистить всю карту?", "Очистка города", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+            {
+                city = new();
+                ResetButton_Click(sender, e);
+                DrawCity();
+            }
         }
     }
 }

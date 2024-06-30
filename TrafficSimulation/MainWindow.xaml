@@ -10,7 +10,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
-            <RowDefinition Height="50"/>
+            <RowDefinition Height="60"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
@@ -30,6 +30,7 @@
             <Button x:Name="DeleteAllVehiclesButton" Content="Удалить все автомобили" Click="DeleteAllVehiclesButton_Click" Margin="75,0,50,0" Width="140"/>
             <Button x:Name="AddRoadButton" Content="Добавить дорогу" Click="AddRoadButton_Click" Margin="75,0,50,0" Width="140"/>
             <Button x:Name="CancelAddRoadButton" Content="Отмена" Click="CancelAddRoadButton_Click" Margin="75,0,50,0" Visibility="Collapsed" Width="140"/>
+            <Button x:Name="ClearAllButton_Copy" Content="Очистить карту" Click="ClearAllButton_Copy_Click" Width="140" Margin="75,0,50,0"/>
         </StackPanel>
 
         <Canvas Name="CityCanvas" Grid.Row="2" Grid.Column="0" Background="LightGray" Margin="10,10,10,10" 

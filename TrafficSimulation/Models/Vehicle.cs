@@ -67,7 +67,7 @@
             }
             double ActualChanceToGetInCarAccident = CurrentCity.ActualChanceToGetInCarAccident + (1 - CurrentRoad.Quality) * CurrentCity.ActualChanceToGetInCarAccident;
             ActualChanceToGetInCarAccident += CurrentCity.IsRaining ? AdditionToGetInCarAccidentChanceBecauseOfRaining : 0;
-            if (random.NextDouble() <= ActualChanceToGetInCarAccident)
+            if (random.NextDouble() <= ActualChanceToGetInCarAccident && !CurrentRoad.Vehicles.Any(v => v.IsMovingForward == IsMovingForward && Math.Abs(v.Position - Position) <= 5) && !WillBeOuttaRoad())
             {
                 IsInCarAccident = true;
                 currentTimer = (int)CurrentCity.ActualCarAccidentTimer;
@@ -118,12 +118,18 @@
             }
         }
 
+        private bool WillBeOuttaRoad()
+        {
+            return (IsMovingForward && Position + SpeedInMetresPerHundredMilliseconds >= CurrentRoad.Length - StopDistance) ||
+                (!IsMovingForward && Position - SpeedInMetresPerHundredMilliseconds <= StopDistance);
+        }
+
         private bool ShouldStopBecauseOfTrafficLight()
         {
             var trafficLight = CurrentCity.TrafficLights.FirstOrDefault(light => light.ControlledIntersection == NextIntersection && light.ControlledRoad == CurrentRoad);
             if (trafficLight != null && (trafficLight.State == TrafficLightState.Red || trafficLight.State == TrafficLightState.Yellow))
             {
-                if ((IsMovingForward && Position + SpeedInMetresPerHundredMilliseconds >= CurrentRoad.Length - StopDistance) || (!IsMovingForward && Position - SpeedInMetresPerHundredMilliseconds <= StopDistance))
+                if (WillBeOuttaRoad())
                 {
                     return true;
                 }
@@ -155,7 +161,7 @@
 
         private bool ShouldStopBecauseOfVehicleOnRight()
         {
-            if (((IsMovingForward && Position + SpeedInMetresPerHundredMilliseconds >= CurrentRoad.Length - StopDistance) || (!IsMovingForward && Position - SpeedInMetresPerHundredMilliseconds <= StopDistance)) && CurrentCity.TrafficLights.Where(v => v.ControlledIntersection == NextIntersection && v.ControlledRoad == CurrentRoad).FirstOrDefault() == null)
+            if (WillBeOuttaRoad() && CurrentCity.TrafficLights.Where(v => v.ControlledIntersection == NextIntersection && v.ControlledRoad == CurrentRoad).FirstOrDefault() == null)
             {
                 var roadsOnRight = CurrentRoad.GetRoads(NextIntersection, RoadDirection.Right);
                 var vehicleOnRight = CurrentCity.Vehicles
@@ -172,7 +178,7 @@
 
         private bool ShouldStopBecauseOfTrafficJam()
         {
-            if (NextRoad != null && ((IsMovingForward && Position + SpeedInMetresPerHundredMilliseconds >= CurrentRoad.Length - StopDistance) || (!IsMovingForward && Position - SpeedInMetresPerHundredMilliseconds <= StopDistance)))
+            if (NextRoad != null && WillBeOuttaRoad())
             {
                 bool isNextRoadClear = NextRoad.IsClear(this);
 
@@ -186,7 +192,7 @@
 
         private bool ShouldStopBecauseOfDeadEnd()
         {
-            if (NextRoad == null && LineNumber == 1 && ((IsMovingForward && Position + SpeedInMetresPerHundredMilliseconds >= CurrentRoad.Length - StopDistance) || (!IsMovingForward && Position - SpeedInMetresPerHundredMilliseconds <= StopDistance))) return true;
+            if (NextRoad == null && LineNumber == 1 && WillBeOuttaRoad()) return true;
             return false;
         }
 
