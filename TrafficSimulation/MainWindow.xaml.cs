@@ -107,6 +107,9 @@ namespace TrafficSimulation
 
             window.Show();
             window.Closed += (s, e) => DrawCity();
+            window.Closed += (s, e) => this.IsEnabled = true;
+
+            this.IsEnabled = false;
 
             if (isSimulationWorked)
             {
