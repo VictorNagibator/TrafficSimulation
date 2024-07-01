@@ -2,7 +2,6 @@
 {
     public class Vehicle
     {
-        public string ID { get; internal set; }
         public double Speed { get; private set; } = 0; //км/ч
         public double Acceleration { get; private set; } = 1; //в м/с^2
         public Road CurrentRoad { get; internal set; }
@@ -44,7 +43,6 @@
 
             int lineNumber = random.Next(1, road.NumOfLinesPerDirection + 1);
 
-            ID = "Car" + (city.Vehicles.Count + 1);
             CurrentRoad = road;
             LineNumber = lineNumber;
             Position = IsMovingForward ? 0 : road.Length;
@@ -163,7 +161,7 @@
             {
                 var roadsOnRight = CurrentRoad.GetRoads(NextIntersection, RoadDirection.Right);
                 var vehicleOnRight = CurrentRoad.Vehicles
-                    .Where(v => v.NextIntersection == NextIntersection && (city.TrafficLights.Any(tl => tl.ControlledRoad == v.CurrentRoad && tl.ControlledIntersection == v.NextIntersection) || city.TrafficLights.Any(tl => tl.ControlledRoad == v.CurrentRoad && tl.ControlledIntersection == v.NextIntersection && tl.State == TrafficLightState.Green)) && !v.IsInCarAccident && Math.Abs(v.Position - (IsMovingForward ? v.CurrentRoad.Length : 0)) <= Constants.SafetyDistanceToStop * 2)
+                    .Where(v => v.NextIntersection == NextIntersection && (city.TrafficLights.Any(tl => tl.ControlledRoad == v.CurrentRoad && tl.ControlledIntersection == v.NextIntersection) || city.TrafficLights.Any(tl => tl.ControlledRoad == v.CurrentRoad && tl.ControlledIntersection == v.NextIntersection && tl.State == TrafficLightState.Green)) && !v.IsInCarAccident && Math.Abs(v.Position - (IsMovingForward ? v.CurrentRoad.Length : 0)) <= NextIntersection.Width)
                     .FirstOrDefault();
 
                 if (vehicleOnRight != null)
@@ -212,7 +210,7 @@
 
             int newLine;
             while ((newLine = random.Next(Math.Max(1, LineNumber - 1), Math.Min(LineNumber + 1, CurrentRoad.NumOfLinesPerDirection) + 1)) == LineNumber);
-            if (CurrentRoad.Vehicles.Any(v => v.LineNumber == newLine && Math.Abs(v.Position - Position) <= Constants.VehicleLengthMetres)) return false;
+            if (CurrentRoad.Vehicles.Any(v => v.LineNumber == newLine && Math.Abs(v.Position - Position) <= Constants.VehicleLengthMetres + Constants.SafetyDistanceToStop)) return false;
 
             LineNumber = newLine;
             NextRoad = GetNextRoad();

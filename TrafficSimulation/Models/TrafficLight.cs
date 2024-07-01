@@ -2,7 +2,6 @@
 {
     public class TrafficLight
     {
-        public string? Name { get; internal set; }
         public Road ControlledRoad { get; internal set; }
         public Intersection ControlledIntersection { get; internal set; }
         private TrafficLightState _state;
@@ -28,11 +27,42 @@
                 }
             }
         }
-        public double RedTimer { get; set; } = 30;
+
+        private double _redTimer = 30;
+        public double RedTimer
+        {
+            get
+            {
+                return _redTimer;
+            }
+            set
+            {
+                if (value >= Constants.MinTrafficLightTimer)
+                {
+                    _redTimer = value;
+                }
+            }
+        }
         private double ActualRedTimer => RedTimer / Constants.TimerInterval;
-        public double GreenTimer { get; set; } = 30;
+
+        private double _greenTimer = 30;
+        public double GreenTimer
+        {
+            get
+            {
+                return _greenTimer;
+            }
+            set
+            {
+                if (value >= Constants.MinTrafficLightTimer)
+                {
+                    _greenTimer = value;
+                }
+            }
+        }
+
         private double ActualGreenTimer => GreenTimer / Constants.TimerInterval;
-        public double YellowTimer { get; set; } = 2;
+        public double YellowTimer { get; private set; } = 2;
         private double ActualYellowTimer => YellowTimer / Constants.TimerInterval;
         private int currentTime;
 

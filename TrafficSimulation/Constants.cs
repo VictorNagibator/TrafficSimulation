@@ -12,6 +12,11 @@
         public const double SafetyDistanceToStop = VehicleLengthMetres * 1.5;
         public const double TimerInterval = 0.1; //0.1 с
         public const double AngleTolerance = Math.PI / 18;
+        public const double MaxAllowedSpeed = 100;
+        public const double MinAllowedSpeed = 20;
+        public const double MaxQuality = 1;
+        public const double MinQuality = 0.05;
+        public const double MinTrafficLightTimer = 5;
 
         public static double RoadWidthPixels => RoadWidthMetres / MetresPerPixel;
         public static double VehicleLengthPixels => VehicleLengthMetres / MetresPerPixel;

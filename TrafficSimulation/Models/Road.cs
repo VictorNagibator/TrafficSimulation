@@ -58,9 +58,39 @@
             }
         }
         public List<Vehicle> Vehicles { get; private set; } = [];
-        public double MaxAllowedSpeed { get; set; }
 
-        public double Quality { get; internal set; } = 1;
+        private double _maxAllowedSpeed = 60;
+        public double MaxAllowedSpeed
+        {
+            get
+            {
+                return _maxAllowedSpeed;
+            }
+
+            internal set
+            {
+                if (value >= Constants.MinAllowedSpeed && value <= Constants.MaxAllowedSpeed)
+                {
+                    _maxAllowedSpeed = value;
+                }
+            }
+        }
+
+        private double _quality = 1;
+        public double Quality
+        {
+            get
+            {
+                return _quality;
+            }
+            internal set
+            {
+                if (value >= Constants.MinQuality && value <= Constants.MaxQuality)
+                {
+                    _quality = value;
+                }
+            }
+        }
 
         private int MaxPossibleNumOfVehicles => (int)(Length * NumOfLinesPerDirection / (Constants.VehicleLengthMetres * 2));
 

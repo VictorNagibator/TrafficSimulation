@@ -20,7 +20,6 @@ namespace TrafficSimulation
 
             this.intersection = intersection;
             this.city = city;
-            IntersectionNameTextBox.Text = intersection.Name;
             DrawIntersectionAndRoads();
         }
 
@@ -199,12 +198,6 @@ namespace TrafficSimulation
                 IsEnabledTrafficLightCheckBox.IsChecked = false;
             }
         }
-
-        private void IntersectionNameTextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            intersection.Name = IntersectionNameTextBox.Text;
-        }
-
         private void GreenTimeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             if (selectedRoad != null && city.TrafficLights.Any(tl => tl.ControlledIntersection == intersection && tl.ControlledRoad == selectedRoad))

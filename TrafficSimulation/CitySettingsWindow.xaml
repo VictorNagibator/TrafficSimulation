@@ -24,7 +24,7 @@
 
         <StackPanel Grid.Row="1" HorizontalAlignment="Left" Orientation="Horizontal"  Margin="10">
             <TextBlock Text="Качество дорог (в %):" VerticalAlignment="Center" Margin="10"/>
-            <Slider x:Name="RoadQualitySlider" Minimum="20" Maximum="100"  Margin="5" Width="198" VerticalAlignment="Center" ValueChanged="RoadQualitySlider_ValueChanged"/>
+            <Slider x:Name="RoadQualitySlider" Minimum="5" Maximum="100"  Margin="5" Width="198" VerticalAlignment="Center" ValueChanged="RoadQualitySlider_ValueChanged"/>
             <TextBlock x:Name="RoadQualityValue" Margin="10,0,0,0" Text="{Binding ElementName=RoadQualitySlider, Path=Value, StringFormat=F0}" Width="20" VerticalAlignment="Center"/>
         </StackPanel>
 

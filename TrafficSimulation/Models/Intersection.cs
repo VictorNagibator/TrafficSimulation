@@ -2,7 +2,6 @@
 {
     public class Intersection
     {
-        public string? Name { get; internal set; }
         public double X { get; internal set; }
         public double Y { get; internal set; }
         public HashSet<Road> IncomingRoads { get; private set; } = [];

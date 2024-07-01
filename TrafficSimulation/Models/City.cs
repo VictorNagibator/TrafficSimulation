@@ -16,21 +16,27 @@
             }
             set
             {
-                _maxAllowedSpeed = value;
-                Roads.ForEach(road => road.MaxAllowedSpeed = value);
+                if (value >= Constants.MinAllowedSpeed && value <= Constants.MaxAllowedSpeed)
+                {
+                    _maxAllowedSpeed = value;
+                    Roads.ForEach(road => road.MaxAllowedSpeed = value);
+                }
             }
         }
-        private double roadQuality = 1;
+        private double _roadQuality = 1;
         public double RoadQuality
         {
             get
             {
-                return roadQuality;
+                return _roadQuality;
             }
             set
             {
-                roadQuality = value;
-                Roads.ForEach(road => road.Quality = value);
+                if (value >= Constants.MinQuality && value <= Constants.MaxQuality)
+                {
+                    _roadQuality = value;
+                    Roads.ForEach(road => road.Quality = value);
+                }
             }
         }
         public double ChanceToGetInCarAccident { get; set; } = 0.005;
