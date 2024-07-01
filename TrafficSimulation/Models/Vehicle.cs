@@ -157,10 +157,10 @@
 
         private bool ShouldStopBecauseOfVehicleOnRight(City city)
         {
-            if (WillBeOuttaRoad() && city.TrafficLights.Where(v => v.ControlledIntersection == NextIntersection && v.ControlledRoad == CurrentRoad).FirstOrDefault() == null)
+            if (WillBeOuttaRoad())
             {
                 var roadsOnRight = CurrentRoad.GetRoads(NextIntersection, RoadDirection.Right);
-                var vehiclesOnRight = roadsOnRight.SelectMany(r => r.Vehicles).Where(v => v.NextIntersection == NextIntersection && (city.TrafficLights.Any(tl => tl.ControlledRoad == v.CurrentRoad && tl.ControlledIntersection == v.NextIntersection) || city.TrafficLights.Any(tl => tl.ControlledRoad == v.CurrentRoad && tl.ControlledIntersection == v.NextIntersection && tl.State == TrafficLightState.Green)) && !v.IsInCarAccident && Math.Abs(v.Position - (IsMovingForward ? v.CurrentRoad.Length : 0)) <= 15).ToList();
+                var vehiclesOnRight = roadsOnRight.SelectMany(r => r.Vehicles).Where(v => v.NextIntersection == NextIntersection && (!city.TrafficLights.Any(tl => tl.ControlledRoad == v.CurrentRoad && tl.ControlledIntersection == v.NextIntersection) || city.TrafficLights.Any(tl => tl.ControlledRoad == v.CurrentRoad && tl.ControlledIntersection == v.NextIntersection && tl.State == TrafficLightState.Green)) && !v.IsInCarAccident && Math.Abs(v.Position - (v.IsMovingForward ? v.CurrentRoad.Length : 0)) <= 10).ToList();
 
                 if (vehiclesOnRight.Count != 0)
                 {
