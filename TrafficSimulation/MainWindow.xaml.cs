@@ -148,12 +148,10 @@ namespace TrafficSimulation
             double endX = road.EndIntersection.X / Constants.MetresPerPixel;
             double endY = road.EndIntersection.Y / Constants.MetresPerPixel;
 
-            double roadAngle = Math.Atan2(endY - startY, endX - startX);
-
-            startX = road.StartIntersection.X / Constants.MetresPerPixel + startIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Cos(roadAngle);
-            startY = road.StartIntersection.Y / Constants.MetresPerPixel + startIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Sin(roadAngle);
-            endX = road.EndIntersection.X / Constants.MetresPerPixel - endIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Cos(roadAngle);
-            endY = road.EndIntersection.Y / Constants.MetresPerPixel - endIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Sin(roadAngle);
+            startX = road.StartIntersection.X / Constants.MetresPerPixel + startIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Cos(road.Angle);
+            startY = road.StartIntersection.Y / Constants.MetresPerPixel + startIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Sin(road.Angle);
+            endX = road.EndIntersection.X / Constants.MetresPerPixel - endIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Cos(road.Angle);
+            endY = road.EndIntersection.Y / Constants.MetresPerPixel - endIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Sin(road.Angle);
 
             Line line = new()
             {
@@ -305,14 +303,12 @@ namespace TrafficSimulation
             double endX = road.EndIntersection.X / Constants.MetresPerPixel;
             double endY = road.EndIntersection.Y / Constants.MetresPerPixel;
 
-            double roadAngle = Math.Atan2(endY - startY, endX - startX);
-
             double midX = (startX + endX) / 2 + globalOffset[0];
             double midY = (startY + endY) / 2 + globalOffset[1];
 
             Point p1 = new(midX, midY);
-            Point p2 = new(midX - arrowLength * Math.Cos(roadAngle - Math.PI / 6), midY - arrowLength * Math.Sin(roadAngle - Math.PI / 6));
-            Point p3 = new(midX - arrowLength * Math.Cos(roadAngle + Math.PI / 6), midY - arrowLength * Math.Sin(roadAngle + Math.PI / 6));
+            Point p2 = new(midX - arrowLength * Math.Cos(road.Angle - Math.PI / 6), midY - arrowLength * Math.Sin(road.Angle - Math.PI / 6));
+            Point p3 = new(midX - arrowLength * Math.Cos(road.Angle + Math.PI / 6), midY - arrowLength * Math.Sin(road.Angle + Math.PI / 6));
 
             Polygon arrow = new()
             {
@@ -333,13 +329,12 @@ namespace TrafficSimulation
             double endX = road.EndIntersection.X / Constants.MetresPerPixel;
             double endY = road.EndIntersection.Y / Constants.MetresPerPixel;
 
-            double roadAngle = Math.Atan2(endY - startY, endX - startX);
-            double roadAngleDegrees = roadAngle * 180 / Math.PI;
+            double roadAngleDegrees = road.Angle * 180 / Math.PI;
 
-            startX = road.StartIntersection.X / Constants.MetresPerPixel + startIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Cos(roadAngle);
-            startY = road.StartIntersection.Y / Constants.MetresPerPixel + startIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Sin(roadAngle);
-            endX = road.EndIntersection.X / Constants.MetresPerPixel - endIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Cos(roadAngle);
-            endY = road.EndIntersection.Y / Constants.MetresPerPixel - endIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Sin(roadAngle);
+            startX = road.StartIntersection.X / Constants.MetresPerPixel + startIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Cos(road.Angle);
+            startY = road.StartIntersection.Y / Constants.MetresPerPixel + startIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Sin(road.Angle);
+            endX = road.EndIntersection.X / Constants.MetresPerPixel - endIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Cos(road.Angle);
+            endY = road.EndIntersection.Y / Constants.MetresPerPixel - endIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Sin(road.Angle);
 
             TextBlock roadNameTextBlock = new()
             {
@@ -370,12 +365,10 @@ namespace TrafficSimulation
             double endX = road.EndIntersection.X / Constants.MetresPerPixel;
             double endY = road.EndIntersection.Y / Constants.MetresPerPixel;
 
-            double roadAngle = Math.Atan2(endY - startY, endX - startX);
-
-            startX = road.StartIntersection.X / Constants.MetresPerPixel + startIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Cos(roadAngle);
-            startY = road.StartIntersection.Y / Constants.MetresPerPixel + startIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Sin(roadAngle);
-            endX = road.EndIntersection.X / Constants.MetresPerPixel - endIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Cos(roadAngle);
-            endY = road.EndIntersection.Y / Constants.MetresPerPixel - endIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Sin(roadAngle);
+            startX = road.StartIntersection.X / Constants.MetresPerPixel + startIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Cos(road.Angle);
+            startY = road.StartIntersection.Y / Constants.MetresPerPixel + startIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Sin(road.Angle);
+            endX = road.EndIntersection.X / Constants.MetresPerPixel - endIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Cos(road.Angle);
+            endY = road.EndIntersection.Y / Constants.MetresPerPixel - endIntersectionWidth / (2 * Constants.MetresPerPixel) * Math.Sin(road.Angle);
 
             double midX = (startX + endX) / 2 + globalOffset[0];
             double midY = (startY + endY) / 2 + globalOffset[1];
@@ -399,8 +392,8 @@ namespace TrafficSimulation
             speedLimitTextBlock.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
             speedLimitTextBlock.Arrange(new Rect(speedLimitTextBlock.DesiredSize));
 
-            double offsetX = midX + (road.Width + 2) * Math.Cos(roadAngle + Math.PI / 2) / Constants.MetresPerPixel;
-            double offsetY = midY + (road.Width + 2) * Math.Sin(roadAngle + Math.PI / 2) / Constants.MetresPerPixel;
+            double offsetX = midX + (road.Width + 2) * Math.Cos(road.Angle + Math.PI / 2) / Constants.MetresPerPixel;
+            double offsetY = midY + (road.Width + 2) * Math.Sin(road.Angle + Math.PI / 2) / Constants.MetresPerPixel;
 
             Canvas.SetLeft(speedLimitEllipse, offsetX - speedLimitEllipse.Width / 2);
             Canvas.SetTop(speedLimitEllipse, offsetY - speedLimitEllipse.Height / 2);
@@ -416,8 +409,6 @@ namespace TrafficSimulation
             double[] position = vehicle.CurrentRoad.GetPositionOnRoad(vehicle);
             position[0] /= Constants.MetresPerPixel;
             position[1] /= Constants.MetresPerPixel;
-            double roadAngle = Math.Atan2(vehicle.CurrentRoad.EndIntersection.Y / Constants.MetresPerPixel - vehicle.CurrentRoad.StartIntersection.Y / Constants.MetresPerPixel,
-                                          vehicle.CurrentRoad.EndIntersection.X / Constants.MetresPerPixel - vehicle.CurrentRoad.StartIntersection.X / Constants.MetresPerPixel);
 
             Rectangle rect = new()
             {
@@ -427,7 +418,7 @@ namespace TrafficSimulation
                 Tag = vehicle
             };
 
-            double angle = (vehicle.IsMovingForward ? roadAngle : roadAngle + Math.PI) * 180 / Math.PI;
+            double angle = (vehicle.IsMovingForward ? vehicle.CurrentRoad.Angle : vehicle.CurrentRoad.Angle + Math.PI) * 180 / Math.PI;
             rect.RenderTransform = new RotateTransform(angle, rect.Width / 2, rect.Height / 2);
 
             double offset, offsetX, offsetY;
@@ -446,8 +437,8 @@ namespace TrafficSimulation
                         offset = -offset;
                     }
 
-                    offsetX = position[0] + Math.Sin(roadAngle) * offset;
-                    offsetY = position[1] - Math.Cos(roadAngle) * offset;
+                    offsetX = position[0] + Math.Sin(vehicle.CurrentRoad.Angle) * offset;
+                    offsetY = position[1] - Math.Cos(vehicle.CurrentRoad.Angle) * offset;
 
                     Canvas.SetLeft(rect, offsetX - rect.Width / 2);
                     Canvas.SetTop(rect, offsetY - rect.Height / 2);
@@ -460,8 +451,8 @@ namespace TrafficSimulation
                         offset = -offset;
                     }
 
-                    offsetX = position[0] + Math.Sin(roadAngle) * offset;
-                    offsetY = position[1] - Math.Cos(roadAngle) * offset;
+                    offsetX = position[0] + Math.Sin(vehicle.CurrentRoad.Angle) * offset;
+                    offsetY = position[1] - Math.Cos(vehicle.CurrentRoad.Angle) * offset;
                 }
             }
             else
@@ -473,8 +464,8 @@ namespace TrafficSimulation
                     offset = -offset;
                 }
 
-                offsetX = position[0] + Math.Sin(roadAngle) * offset;
-                offsetY = position[1] - Math.Cos(roadAngle) * offset;
+                offsetX = position[0] + Math.Sin(vehicle.CurrentRoad.Angle) * offset;
+                offsetY = position[1] - Math.Cos(vehicle.CurrentRoad.Angle) * offset;
             }
 
             rect.MouseDown += Vehicle_MouseDown;

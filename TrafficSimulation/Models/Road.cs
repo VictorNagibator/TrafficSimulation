@@ -70,17 +70,10 @@
 
         public double[] GetPositionOnRoad(Vehicle vehicle)
         {
-            double startX = StartIntersection.X;
-            double startY = StartIntersection.Y;
-            double endX = EndIntersection.X;
-            double endY = EndIntersection.Y;
+            double offsetX = Math.Cos(Angle) * vehicle.Position;
+            double offsetY = Math.Sin(Angle) * vehicle.Position; 
 
-            double angle = Math.Atan2(endY - startY, endX - startX);
-
-            double offsetX = Math.Cos(angle) * vehicle.Position;
-            double offsetY = Math.Sin(angle) * vehicle.Position; 
-
-            return [startX + offsetX, startY + offsetY];
+            return [StartIntersection.X + offsetX, StartIntersection.Y + offsetY];
         }
 
         public double Angle => Math.Atan2(EndIntersection.Y - StartIntersection.Y, EndIntersection.X - StartIntersection.X);
