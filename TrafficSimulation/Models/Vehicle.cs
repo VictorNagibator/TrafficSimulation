@@ -208,7 +208,6 @@
         {
             if (CurrentRoad.NumOfLinesPerDirection == 1) return false;
 
-            //вот эту хуйню чинить
             int newLineInLeft = Math.Max(LineNumber - 1, 1);
             int newLineInRight = Math.Min(LineNumber + 1, CurrentRoad.NumOfLinesPerDirection);
 

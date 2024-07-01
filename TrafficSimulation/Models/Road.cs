@@ -187,11 +187,11 @@
             {
                 if (passingVehicle.NextIntersection == StartIntersection)
                 {
-                    if(!Vehicles.Any(v => v.LineNumber == linenum && v.Position < passingVehicle.StopDistance && v.IsMovingForward && v != passingVehicle && !v.IsInCarAccident)) freeLines.Add(linenum);
+                    if (!Vehicles.Any(v => v.LineNumber == linenum && v.Position < passingVehicle.StopDistance && v.IsMovingForward && v != passingVehicle && !v.IsInCarAccident)) freeLines.Add(linenum);
                 }
                 else
                 {
-                    if(!Vehicles.Any(v => v.LineNumber == linenum && v.Position > Length - passingVehicle.StopDistance && !v.IsMovingForward && v != passingVehicle && !v.IsInCarAccident)) freeLines.Add(linenum);
+                    if (!Vehicles.Any(v => v.LineNumber == linenum && v.Position > Length - passingVehicle.StopDistance && !v.IsMovingForward && v != passingVehicle && !v.IsInCarAccident)) freeLines.Add(linenum);
                 }
             }
 
