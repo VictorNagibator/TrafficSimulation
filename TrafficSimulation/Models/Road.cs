@@ -179,16 +179,23 @@
             return angle;
         }
 
-        public bool IsClear(Vehicle passingVehicle)
+        public List<int> GetFreeLines(Vehicle passingVehicle)
         {
-            if (passingVehicle.NextIntersection == StartIntersection)
+            List<int> freeLines = [];
+
+            for (int linenum = 1; linenum <= NumOfLinesPerDirection; linenum++)
             {
-                return !Vehicles.Any(v => v.Position < passingVehicle.StopDistance && v.IsMovingForward && v != passingVehicle);
+                if (passingVehicle.NextIntersection == StartIntersection)
+                {
+                    if(!Vehicles.Any(v => v.LineNumber == linenum && v.Position < passingVehicle.StopDistance && v.IsMovingForward && v != passingVehicle && !v.IsInCarAccident)) freeLines.Add(linenum);
+                }
+                else
+                {
+                    if(!Vehicles.Any(v => v.LineNumber == linenum && v.Position > Length - passingVehicle.StopDistance && !v.IsMovingForward && v != passingVehicle && !v.IsInCarAccident)) freeLines.Add(linenum);
+                }
             }
-            else
-            {
-                return !Vehicles.Any(v => v.Position > Length - passingVehicle.StopDistance && !v.IsMovingForward && v != passingVehicle);
-            }
+
+            return freeLines;
         }
 
         public bool DoesIntersect(Road road)

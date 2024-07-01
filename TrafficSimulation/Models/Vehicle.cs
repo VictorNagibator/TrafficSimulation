@@ -86,9 +86,13 @@
                 if (NextRoad != null)
                 {
                     CurrentRoad.Quality -= city.IsRaining ? 0.0005 : 0.0002; //условное значение ухудшения качества дороги после каждого проезда
+
+                    var freeLines = NextRoad.GetFreeLines(this);
+                    int newLineNumber = freeLines[random.Next(freeLines.Count)];
+
                     if (CurrentRoad == NextRoad)
                     {
-                        LineNumber = random.Next(1, CurrentRoad.NumOfLinesPerDirection + 1);
+                        LineNumber = newLineNumber;
                         IsMovingForward = !IsMovingForward;
                         Position = IsMovingForward ? 0 : NextRoad.Length;
                         NextIntersection = IsMovingForward ? NextRoad.EndIntersection : NextRoad.StartIntersection;
@@ -99,7 +103,7 @@
                         CurrentRoad.RemoveVehicle(this);
                         NextRoad.AddVehicle(this);
                         CurrentRoad = NextRoad;
-                        LineNumber = random.Next(1, CurrentRoad.NumOfLinesPerDirection + 1);
+                        LineNumber = newLineNumber;
                         IsMovingForward = NextRoad.StartIntersection == NextIntersection;
                         Position = IsMovingForward ? 0 : NextRoad.Length;
                         NextIntersection = IsMovingForward ? NextRoad.EndIntersection : NextRoad.StartIntersection;
@@ -174,9 +178,7 @@
         {
             if (NextRoad != null && WillBeOuttaRoad())
             {
-                bool isNextRoadClear = NextRoad.IsClear(this);
-
-                if (!isNextRoadClear)
+                if (NextRoad.GetFreeLines(this).Count == 0)
                 {
                     return true;
                 }
@@ -206,13 +208,24 @@
         {
             if (CurrentRoad.NumOfLinesPerDirection == 1) return false;
 
-            int newLine;
-            while ((newLine = random.Next(Math.Max(1, LineNumber - 1), Math.Min(LineNumber + 1, CurrentRoad.NumOfLinesPerDirection) + 1)) == LineNumber);
-            if (CurrentRoad.Vehicles.Any(v => v.LineNumber == newLine && Math.Abs(v.Position - Position) <= Constants.VehicleLengthMetres + Constants.SafetyDistanceToStop)) return false;
+            //вот эту хуйню чинить
+            int newLineInLeft = Math.Max(LineNumber - 1, 1);
+            int newLineInRight = Math.Min(LineNumber + 1, CurrentRoad.NumOfLinesPerDirection);
 
-            LineNumber = newLine;
-            NextRoad = GetNextRoad();
-            return true;
+            if (newLineInLeft != LineNumber && !CurrentRoad.Vehicles.Any(v => v.LineNumber == newLineInLeft && Math.Abs(v.Position - Position) <= (Constants.VehicleLengthMetres + Constants.SafetyDistanceToStop)))
+            {
+                LineNumber = newLineInLeft;
+                NextRoad = GetNextRoad();
+                return true;
+            }
+            if (newLineInRight != LineNumber && !CurrentRoad.Vehicles.Any(v => v.LineNumber == newLineInRight && Math.Abs(v.Position - Position) <= (Constants.VehicleLengthMetres + Constants.SafetyDistanceToStop)))
+            {
+                LineNumber = newLineInRight;
+                NextRoad = GetNextRoad();
+                return true;
+            }
+
+            return false;
         }
 
         public Road GetNextRoad()
