@@ -110,11 +110,6 @@
                         NextRoad = GetNextRoad();
                     }
                 }
-                else
-                {
-                    LineNumber = 1;
-                    NextRoad = GetNextRoad();
-                }
             }
         }
 
@@ -188,7 +183,18 @@
 
         private bool ShouldStopBecauseOfDeadEnd()
         {
-            if (NextRoad == null && LineNumber == 1 && WillBeOuttaRoad()) return true;
+            if (NextRoad == null && WillBeOuttaRoad())
+            {
+                LineNumber = 1;
+                NextRoad = GetNextRoad();
+                if (NextRoad == null)
+                {
+                    LineNumber = CurrentRoad.NumOfLinesPerDirection;
+                    NextRoad = GetNextRoad();
+                }
+                
+                if (NextRoad == null) return true;
+            }
             return false;
         }
 
