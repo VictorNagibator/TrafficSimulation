@@ -15,8 +15,8 @@
         public double StopDistance => NextIntersection.Width / 2 + Constants.VehicleLengthMetres / 2;
         public bool IsInCarAccident { get; private set; } = false;
         private double SpeedInMetresPerSecond => Speed / 3600 * 1000;
-        private double SpeedInMetresPerHundredMilliseconds => SpeedInMetresPerSecond * 0.1;
-        private double AccelerationInMetresPerHundredMilliseconds => Acceleration * 0.01;
+        private double SpeedInMetresPerHundredMilliseconds => SpeedInMetresPerSecond * Constants.TimerInterval;
+        private double AccelerationInMetresPerHundredMilliseconds => Acceleration * Constants.TimerInterval * Constants.TimerInterval;
 
         private double AdditionToGetInCarAccidentChanceBecauseOfRaining = 0.005 * Constants.TimerInterval;
         private double ChanceToChangeLine = 0.05 * Constants.TimerInterval;
