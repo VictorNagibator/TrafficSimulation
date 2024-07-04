@@ -562,8 +562,11 @@ namespace TrafficSimulation
 
         private void AddVehicleButton_Click(object sender, RoutedEventArgs e)
         {
-            Vehicle vehicle = new(city);
-            city.AddVehicle(vehicle);
+            if (city.Roads.Count != 0)
+            {
+                Vehicle vehicle = new(city);
+                city.AddVehicle(vehicle);
+            }
         }
 
         private void StartSimulationButton_Click(object sender, RoutedEventArgs e)
