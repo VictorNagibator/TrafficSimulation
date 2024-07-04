@@ -14,12 +14,8 @@
                 {
                     case RoadType.OneWay:
                         StartIntersection.IncomingRoads.Remove(this);
-                        foreach (var road in StartIntersection.IncomingRoads)
-                        {
-                            road.Vehicles.ForEach(vehicle => vehicle.NextRoad = vehicle.GetNextRoad());
-                        }
                         EndIntersection.OutgoingRoads.Remove(this);
-                        foreach (var road in EndIntersection.OutgoingRoads)
+                        foreach (var road in EndIntersection.IncomingRoads)
                         {
                             road.Vehicles.ForEach(vehicle => vehicle.NextRoad = vehicle.GetNextRoad());
                         }
@@ -29,12 +25,8 @@
                         break;
                     case RoadType.TwoWay:
                         StartIntersection.IncomingRoads.Add(this);
-                        foreach (var road in StartIntersection.IncomingRoads)
-                        {
-                            road.Vehicles.ForEach(vehicle => vehicle.NextRoad = vehicle.GetNextRoad());
-                        }
                         EndIntersection.OutgoingRoads.Add(this);
-                        foreach (var road in EndIntersection.OutgoingRoads)
+                        foreach (var road in EndIntersection.IncomingRoads)
                         {
                             road.Vehicles.ForEach(vehicle => vehicle.NextRoad = vehicle.GetNextRoad());
                         }
