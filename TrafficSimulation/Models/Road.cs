@@ -92,7 +92,7 @@
             }
         }
 
-        private int MaxPossibleNumOfVehicles => (int)(Length * NumOfLinesPerDirection / (Constants.VehicleLengthMetres * 2));
+        private int MaxPossibleNumOfVehicles => (int)(Length * NumOfLinesPerDirection * (1 + (int)Type) / (Constants.VehicleLengthMetres * 2));
 
         public void AddVehicle(Vehicle vehicle) => Vehicles.Add(vehicle);
 

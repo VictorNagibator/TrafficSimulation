@@ -39,7 +39,7 @@
                 }
             }
         }
-        public double ChanceToGetInCarAccident { get; set; } = 0.005;
+        public double ChanceToGetInCarAccident { get; set; } = 0.003;
         public double ActualChanceToGetInCarAccident => ChanceToGetInCarAccident * Constants.TimerInterval;
 
         public double CarAccidentTimer { get; set; } = 30;
