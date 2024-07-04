@@ -224,6 +224,7 @@ namespace TrafficSimulation
                 {
                     ControlledIntersection = intersection,
                     ControlledRoad = selectedRoad,
+                    State = TrafficLightState.Red
                 };
                 city.TrafficLights.Add(newTrafficLight);
 

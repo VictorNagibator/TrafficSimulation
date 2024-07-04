@@ -74,6 +74,8 @@
 
             road.Vehicles.Clear();
             TrafficLights.RemoveAll(tl => tl.ControlledRoad == road);
+
+            Vehicles.ForEach(vehicle => vehicle.NextRoad = vehicle.GetNextRoad());
         }
 
         public void AddVehicle(Vehicle vehicle)
