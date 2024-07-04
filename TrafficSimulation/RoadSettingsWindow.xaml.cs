@@ -42,6 +42,7 @@ namespace TrafficSimulation
 
         private void OneWayRadioButton_Checked(object sender, RoutedEventArgs e)
         {
+
             selectedRoad.Type = RoadType.OneWay;
         }
 
