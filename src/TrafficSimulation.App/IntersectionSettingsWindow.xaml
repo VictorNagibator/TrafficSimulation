@@ -1,0 +1,48 @@
+<Window x:Class="TrafficSimulation.App.IntersectionSettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Intersection settings" Height="600" Width="380"
+        SizeChanged="IntersectionSettingsWindow_SizeChanged" Icon="Media/crossIcon.png" ResizeMode="CanMinimize">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="250"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+
+        <Canvas x:Name="IntersectionCanvas" Grid.Row="0" Grid.Column="0" Background="LightGray" Margin="10,20,10,0"/>
+
+        <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Vertical" Margin="10">
+            <TextBlock x:Name="RoadNameTextBlock" Text="Select a road to configure it" Margin="5"/>
+
+            <StackPanel Orientation="Vertical" Margin="10">
+                <TextBlock Text="Traffic light" HorizontalAlignment="Center" FontWeight="Bold"/>
+                <CheckBox x:Name="IsEnabledTrafficLightCheckBox" Content="Enabled" Checked="IsEnabledTrafficLightCheckBox_Checked" Margin="10" Unchecked="IsEnabledTrafficLightCheckBox_Unchecked" IsEnabled="False"/>
+                <StackPanel x:Name="TrafficLightSettingsPanel" Orientation="Vertical" Margin="10,0,0,0" Visibility="Collapsed">
+                    <StackPanel Orientation="Horizontal" Margin="5">
+                        <TextBlock Text="Green phase (s):" VerticalAlignment="Center"/>
+                        <Slider x:Name="GreenTimeSlider" Width="100" Margin="5" Minimum="5" Maximum="100" Value="30" ValueChanged="GreenTimeSlider_ValueChanged"/>
+                        <TextBlock x:Name="GreenTimeValue" VerticalAlignment="Center" Margin="10,0,0,0" Text="{Binding ElementName=GreenTimeSlider, Path=Value, StringFormat=F0}" Width="18"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="5">
+                        <TextBlock Text="Red phase (s):" VerticalAlignment="Center"/>
+                        <Slider x:Name="RedTimeSlider" Width="100" Margin="5" Minimum="5" Maximum="100" Value="30" ValueChanged="RedTimeSlider_ValueChanged"/>
+                        <TextBlock x:Name="RedTimeValue" VerticalAlignment="Center" Margin="10,0,0,0" Text="{Binding ElementName=RedTimeSlider, Path=Value, StringFormat=F0}" Width="18"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="5,10,5,5">
+                        <TextBlock Text="Current signal:" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Margin="5" Orientation="Vertical">
+                        <RadioButton x:Name="RedLightRadioButton" Content="Red" Margin="5" Checked="RedLightRadioButton_Checked"/>
+                        <RadioButton x:Name="YellowLightRadioButton" Content="Yellow" Margin="5" Checked="YellowLightRadioButton_Checked"/>
+                        <RadioButton x:Name="GreenLightRadioButton" Content="Green" Margin="5" Checked="GreenLightRadioButton_Checked"/>
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>

@@ -1,0 +1,48 @@
+<Window x:Class="TrafficSimulation.App.RoadSettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TrafficSimulation.App"
+        mc:Ignorable="d"
+        Title="Road settings" Height="450" Width="620" Icon="Media/roadIcon.png" ResizeMode="CanMinimize">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" Margin="10">
+            <TextBlock x:Name="RoadNameTextBlock" Text="Road name:" VerticalAlignment="Center" Margin="10"/>
+            <TextBox x:Name="RoadNameTextBox" Height="20" Margin="5" VerticalAlignment="Center" Width="150" TextChanged="RoadNameTextBox_TextChanged"/>
+            <Button x:Name="DeleteRoadButton" Content="🗑" FontSize="18" Margin="30,10,10,10" HorizontalAlignment="Right" Click="DeleteRoadButton_Click" ToolTip="Delete this road"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" Margin="10">
+            <TextBlock x:Name="MaxSpeedTextBlock" Text="Speed limit (km/h):" Margin="10,0,0,0" VerticalAlignment="Center"/>
+            <Slider x:Name="MaxSpeedSlider" Minimum="20" Maximum="100" Margin="10" Width="198" ValueChanged="MaxSpeedSlider_ValueChanged"/>
+            <TextBlock x:Name="MaxSpeedValue" VerticalAlignment="Center" Margin="10,0,0,0" Text="{Binding ElementName=MaxSpeedSlider, Path=Value, StringFormat=F0}" Width="20"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal" Margin="10">
+            <TextBlock x:Name="RoadQualityTextBlock" Text="Road quality (%):" Margin="10,0,120,0" VerticalAlignment="Center"/>
+            <Slider x:Name="RoadQualitySlider" Minimum="5" Maximum="100" Margin="10" Width="198" ValueChanged="RoadQualitySlider_ValueChanged"/>
+            <TextBlock x:Name="RoadQualityValue" VerticalAlignment="Center" Margin="10,0,0,0" Text="{Binding ElementName=RoadQualitySlider, Path=Value, StringFormat=F0}" Width="20"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="3" Grid.Column="0" Orientation="Vertical" Margin="10">
+            <TextBlock Text="Traffic direction" FontWeight="Bold" HorizontalAlignment="Center" Margin="10"/>
+            <RadioButton x:Name="OneWayRadioButton" Content="One way" HorizontalAlignment="Left" Margin="10" Checked="OneWayRadioButton_Checked"/>
+            <RadioButton x:Name="TwoWayRadioButton" Content="Two way" HorizontalAlignment="Left" Margin="10" Checked="TwoWayRadioButton_Checked"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="4" Grid.Column="0" Orientation="Horizontal" Margin="10">
+            <TextBlock x:Name="NumOfLanesTextBlock" Text="Lanes in each direction:" Margin="10,0,0,0" VerticalAlignment="Center"/>
+            <Slider x:Name="LanesSlider" Minimum="1" Maximum="10" Margin="10" Width="200" ValueChanged="LanesSlider_ValueChanged"/>
+            <TextBlock x:Name="NumOfLanesValue" VerticalAlignment="Center" Margin="10,0,0,0" Text="{Binding ElementName=LanesSlider, Path=Value, StringFormat=F0}" Width="18"/>
+        </StackPanel>
+    </Grid>
+</Window>

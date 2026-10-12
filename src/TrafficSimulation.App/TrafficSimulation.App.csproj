@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <LangVersion>latest</LangVersion>
+    <RootNamespace>TrafficSimulation.App</RootNamespace>
+    <AssemblyName>TrafficSimulation.App</AssemblyName>
+
+    <!-- Resource names must match the file system exactly. Windows itself is case insensitive, but
+         the project is compiled from any operating system, so keeping the casing honest avoids an
+         "resource not found" build error on a case sensitive file system. -->
+    <CaseSensitivePaths>true</CaseSensitivePaths>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TrafficSimulation.Engine\TrafficSimulation.Engine.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WpfAnimatedGif" Version="2.0.2" />
+  </ItemGroup>
+
+  <!-- Media files are referenced with their exact on-disk casing (see CaseSensitivePaths above). -->
+  <ItemGroup>
+    <Resource Include="Media\cityIcon.png" />
+    <Resource Include="Media\clouds-raining.gif" />
+    <Resource Include="Media\crossIcon.png" />
+    <Resource Include="Media\mainIcon.png" />
+    <Resource Include="Media\roadIcon.png" />
+    <Resource Include="Media\trafficButtonIcon.png" />
+  </ItemGroup>
+
+</Project>

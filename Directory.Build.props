@@ -1,0 +1,23 @@
+<Project>
+
+  <!--
+    Shared settings for every project of the solution.
+
+    EnableWindowsTargeting lets the Windows-only projects (the WPF application and its tests) be
+    restored and built from Linux or macOS as well. That is what allows the solution to be compiled
+    in a continuous integration container, and it is harmless on Windows. Running the WPF
+    application itself of course still requires Windows.
+  -->
+  <PropertyGroup>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <NeutralLanguage>en</NeutralLanguage>
+
+    <!-- Keep builds quiet and deterministic. -->
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+</Project>
